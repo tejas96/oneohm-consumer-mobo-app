@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Welcome — OneOhm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: {
+                    brand: { primary: '#76c044', dark: '#5ea031', light: '#8fd055', secondary: '#0d74b8', 'secondary-dark': '#0a5c92' },
+                    surface: { 50: '#0A0A0F', 100: '#111118', 200: '#18181F', 300: '#1E1E28' }
+                },
+                fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+            }}
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.8/dist/lottie-player.js"></script>
+    <style>
+        :root {
+            --brand-primary: #76c044;
+            --brand-secondary: #0d74b8;
+            --bg-main: #0D0E12;
+            --bg-grad: linear-gradient(180deg, #0D0E12 0%, #16181D 100%);
+            --surface: #181A20;
+            --text-main: #E2E8F0;
+            --text-dim: #94A3B8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-strong: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+        body { font-family: 'Inter', system-ui, sans-serif; overflow: hidden; background: var(--bg-main); color: var(--text-main); }
+
+        /* ─── Slide System ─── */
+        .onboarding-container { position: relative; width: 100%; height: 100vh; }
+        .ob-slide {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            padding: 0 32px 48px;
+            opacity: 0; transform: scale(0.92) translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none; z-index: 1;
+        }
+        .ob-slide.active {
+            opacity: 1; transform: scale(1) translateY(0);
+            pointer-events: auto; z-index: 10;
+        }
+        .ob-slide.exit-left {
+            opacity: 0; transform: scale(0.88) translateX(-80px);
+            pointer-events: none;
+        }
+        .ob-slide.enter-right {
+            opacity: 0; transform: scale(0.92) translateX(80px);
+            pointer-events: none;
+        }
+
+        /* ─── Lottie Container ─── */
+        .lottie-wrap {
+            position: relative; width: 300px; height: 300px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 10px;
+        }
+        .lottie-wrap lottie-player {
+            width: 280px; height: 280px; z-index: 2;
+            filter: drop-shadow(0 10px 40px rgba(118, 192, 68, 0.12));
+        }
+
+        /* ─── Ambient Ring Behind Lottie ─── */
+        .ambient-ring {
+            position: absolute; inset: -30px; border-radius: 50%; z-index: 0;
+            animation: ringBreathe 4s ease-in-out infinite;
+        }
+        @keyframes ringBreathe {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.08); opacity: 0.9; }
+        }
+
+        /* ─── Floating Orbs ─── */
+        .orb {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            filter: blur(60px); z-index: 0;
+        }
+
+        /* ─── Particle Dots ─── */
+        .pdot {
+            position: absolute; border-radius: 50%; background: rgba(118, 192, 68, 0.5);
+            animation: pFloat linear infinite; pointer-events: none; z-index: 1;
+        }
+        @keyframes pFloat {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-320px) scale(0.2); opacity: 0; }
+        }
+
+        /* ─── Text Animations ─── */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .text-reveal { animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .text-reveal-d1 { animation-delay: 0.15s; opacity: 0; }
+        .text-reveal-d2 { animation-delay: 0.3s; opacity: 0; }
+        .text-reveal-d3 { animation-delay: 0.45s; opacity: 0; }
+
+        /* ─── Progress Dots ─── */
+        .progress-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .progress-dot.active {
+            width: 28px; border-radius: 4px;
+            background: linear-gradient(90deg, #76c044, #8fd055);
+            box-shadow: 0 0 12px rgba(118, 192, 68, 0.4);
+        }
+
+        /* ─── CTA Button ─── */
+        .cta-btn {
+            display: block; width: 100%; padding: 18px; border-radius: 20px;
+            text-align: center; color: white; font-weight: 700; font-size: 16px;
+            background: linear-gradient(135deg, #76c044 0%, #5ea031 100%);
+            box-shadow: 0 6px 30px rgba(118, 192, 68, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none; letter-spacing: 0.01em;
+        }
+        .cta-btn:active { transform: scale(0.97); box-shadow: 0 3px 16px rgba(118, 192, 68, 0.2); }
+
+        .next-btn {
+            width: 64px; height: 64px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #76c044 0%, #5ea031 100%);
+            box-shadow: 0 6px 30px rgba(118, 192, 68, 0.3);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer; border: none;
+        }
+        .next-btn:active { transform: scale(0.92); }
+
+        /* ─── Skip ─── */
+        .skip-link {
+            position: absolute; top: 56px; right: 28px; z-index: 50;
+            color: rgba(255,255,255,0.35); font-size: 14px; font-weight: 500;
+            text-decoration: none; transition: color 0.2s;
+            letter-spacing: 0.02em;
+        }
+        .skip-link:hover { color: rgba(255,255,255,0.6); }
+
+        /* ─── Gradient text ─── */
+        .gradient-text {
+            background: linear-gradient(135deg, #76c044 0%, #8fd055 50%, #0d74b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-surface-50">
+    <div class="max-w-md mx-auto min-h-screen relative onboarding-container" style="background: var(--bg-grad);">
+
+        <!-- Skip -->
+        <a href="03-login.html" class="skip-link">Skip</a>
+
+        <!-- ═══ Floating Ambient Orbs (always visible) ═══ -->
+        <div class="orb" style="width:260px;height:260px;top:-60px;left:-80px;background:rgba(118,192,68,0.04);"></div>
+        <div class="orb" style="width:200px;height:200px;bottom:100px;right:-60px;background:rgba(13,116,184,0.04);"></div>
+
+        <!-- ═══ Particle Dots ═══ -->
+        <div id="particles" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;"></div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- SLIDE 1 — Solar Project Tracking           -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="ob-slide active" data-slide="0">
+            <div class="lottie-wrap" style="margin-top: 60px;">
+                <div class="ambient-ring" style="background: radial-gradient(circle, rgba(118,192,68,0.08) 0%, transparent 70%);"></div>
+                <lottie-player
+                    src="https://assets1.lottiefiles.com/packages/lf20_p8bfn5to.json"
+                    background="transparent" speed="0.8" loop autoplay
+                    style="width:280px;height:280px;">
+                </lottie-player>
+            </div>
+
+            <div class="w-full text-center" style="margin-bottom: 40px;">
+                <h2 class="text-[30px] font-extrabold text-white leading-[1.15] mb-4 text-reveal">
+                    Track Your<br><span class="gradient-text">Solar Project</span>
+                </h2>
+                <p class="text-[15px] text-white/35 leading-relaxed max-w-[300px] mx-auto text-reveal text-reveal-d1">
+                    Follow every milestone — from site survey to commissioning — in a beautiful, real-time timeline.
+                </p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- SLIDE 2 — Live Updates & Notifications     -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="ob-slide" data-slide="1">
+            <div class="lottie-wrap" style="margin-top: 60px;">
+                <div class="ambient-ring" style="background: radial-gradient(circle, rgba(13,116,184,0.08) 0%, transparent 70%);"></div>
+                <lottie-player
+                    src="https://assets2.lottiefiles.com/packages/lf20_u4yrau.json"
+                    background="transparent" speed="0.8" loop autoplay
+                    style="width:260px;height:260px;">
+                </lottie-player>
+            </div>
+
+            <div class="w-full text-center" style="margin-bottom: 40px;">
+                <h2 class="text-[30px] font-extrabold text-white leading-[1.15] mb-4 text-reveal">
+                    Real-Time<br><span style="background:linear-gradient(135deg,#0d74b8,#60A5FA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Notifications</span>
+                </h2>
+                <p class="text-[15px] text-white/35 leading-relaxed max-w-[300px] mx-auto text-reveal text-reveal-d1">
+                    Instant alerts on milestones, team visits, payments, and every project update — right on your phone.
+                </p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- SLIDE 3 — Connect With Your Team           -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="ob-slide" data-slide="2">
+            <div class="lottie-wrap" style="margin-top: 60px;">
+                <div class="ambient-ring" style="background: radial-gradient(circle, rgba(118,192,68,0.06) 0%, rgba(168,85,247,0.04) 50%, transparent 70%);"></div>
+                <lottie-player
+                    src="https://assets3.lottiefiles.com/packages/lf20_tutvdkg0.json"
+                    background="transparent" speed="0.8" loop autoplay
+                    style="width:260px;height:260px;">
+                </lottie-player>
+            </div>
+
+            <div class="w-full text-center" style="margin-bottom: 40px;">
+                <h2 class="text-[30px] font-extrabold text-white leading-[1.15] mb-4 text-reveal">
+                    Your Dedicated<br><span style="background:linear-gradient(135deg,#A855F7,#EC4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Team</span>
+                </h2>
+                <p class="text-[15px] text-white/35 leading-relaxed max-w-[300px] mx-auto text-reveal text-reveal-d1">
+                    Call or chat with your project manager, engineer, and technicians — one tap away.
+                </p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- SLIDE 4 — Documents & Payments             -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="ob-slide" data-slide="3">
+            <div class="lottie-wrap" style="margin-top: 60px;">
+                <div class="ambient-ring" style="background: radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 70%);"></div>
+                <lottie-player
+                    src="https://assets4.lottiefiles.com/packages/lf20_x62chJ.json"
+                    background="transparent" speed="0.8" loop autoplay
+                    style="width:260px;height:260px;">
+                </lottie-player>
+            </div>
+
+            <div class="w-full text-center" style="margin-bottom: 40px;">
+                <h2 class="text-[30px] font-extrabold text-white leading-[1.15] mb-4 text-reveal">
+                    Documents &<br><span style="background:linear-gradient(135deg,#F59E0B,#F97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Payments</span>
+                </h2>
+                <p class="text-[15px] text-white/35 leading-relaxed max-w-[300px] mx-auto text-reveal text-reveal-d1">
+                    Access agreements, invoices, warranties, and track every payment — all in one secure place.
+                </p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- SLIDE 5 — Energy Savings (Final)           -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div class="ob-slide" data-slide="4">
+            <div class="lottie-wrap" style="margin-top: 60px;">
+                <div class="ambient-ring" style="background: radial-gradient(circle, rgba(16,185,129,0.08) 0%, rgba(118,192,68,0.04) 50%, transparent 70%);"></div>
+                <lottie-player
+                    src="https://assets5.lottiefiles.com/packages/lf20_k9wsvzgd.json"
+                    background="transparent" speed="0.7" loop autoplay
+                    style="width:280px;height:280px;">
+                </lottie-player>
+            </div>
+
+            <div class="w-full text-center" style="margin-bottom: 28px;">
+                <h2 class="text-[30px] font-extrabold text-white leading-[1.15] mb-4 text-reveal">
+                    Power Your<br><span style="background:linear-gradient(135deg,#10B981,#76c044);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Tomorrow</span>
+                </h2>
+                <p class="text-[15px] text-white/35 leading-relaxed max-w-[300px] mx-auto text-reveal text-reveal-d1">
+                    See your impact on the planet — energy savings, carbon offset, and cost reduction, beautifully visualized.
+                </p>
+            </div>
+
+            <!-- Final CTA -->
+            <div class="w-full" style="margin-bottom: 20px;">
+                <a href="03-login.html" class="cta-btn text-reveal text-reveal-d2">
+                    Get Started →
+                </a>
+            </div>
+        </div>
+
+        <!-- ═══ Bottom Controls ═══ -->
+        <div class="absolute bottom-8 left-0 right-0 z-50 px-8 flex items-center justify-between" id="bottom-controls">
+            <!-- Dots -->
+            <div class="flex items-center gap-[6px]" id="dots">
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+            <!-- Next Button -->
+            <button class="next-btn" id="nextBtn" onclick="nextSlide()">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ─── Slide Engine ───
+        let current = 0;
+        const total = 5;
+        const slides = document.querySelectorAll('.ob-slide');
+        const dots = document.querySelectorAll('.progress-dot');
+        const nextBtn = document.getElementById('nextBtn');
+        const bottomCtrl = document.getElementById('bottom-controls');
+
+        function goToSlide(idx) {
+            if (idx < 0 || idx >= total) return;
+            slides.forEach((s, i) => {
+                s.classList.remove('active', 'exit-left', 'enter-right');
+                if (i === idx) {
+                    s.classList.add('active');
+                } else if (i < idx) {
+                    s.classList.add('exit-left');
+                } else {
+                    s.classList.add('enter-right');
+                }
+            });
+            dots.forEach((d, i) => {
+                d.classList.toggle('active', i === idx);
+            });
+            // Hide bottom controls on last slide (it has its own CTA)
+            if (idx === total - 1) {
+                bottomCtrl.style.opacity = '0';
+                bottomCtrl.style.pointerEvents = 'none';
+                bottomCtrl.style.transition = 'opacity 0.4s';
+            } else {
+                bottomCtrl.style.opacity = '1';
+                bottomCtrl.style.pointerEvents = 'auto';
+            }
+            current = idx;
+        }
+
+        function nextSlide() {
+            if (current < total - 1) {
+                goToSlide(current + 1);
+            } else {
+                window.location.href = '03-login.html';
+            }
+        }
+
+        // ─── Swipe Gestures ───
+        let startX = 0, startY = 0, isDragging = false;
+        const container = document.querySelector('.onboarding-container');
+
+        container.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+        }, { passive: true });
+
+        container.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            const dx = e.changedTouches[0].clientX - startX;
+            const dy = e.changedTouches[0].clientY - startY;
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+                if (dx < 0) nextSlide();
+                else if (current > 0) goToSlide(current - 1);
+            }
+        }, { passive: true });
+
+        // Also support mouse for desktop preview
+        container.addEventListener('mousedown', (e) => { startX = e.clientX; isDragging = true; });
+        container.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            const dx = e.clientX - startX;
+            if (Math.abs(dx) > 50) {
+                if (dx < 0) nextSlide();
+                else if (current > 0) goToSlide(current - 1);
+            }
+        });
+
+        // ─── Floating Particles ───
+        const particleContainer = document.getElementById('particles');
+        for (let i = 0; i < 12; i++) {
+            const p = document.createElement('div');
+            p.className = 'pdot';
+            p.style.left = (10 + Math.random() * 80) + '%';
+            p.style.bottom = '-8px';
+            p.style.width = (2 + Math.random() * 3) + 'px';
+            p.style.height = p.style.width;
+            p.style.animationDuration = (6 + Math.random() * 8) + 's';
+            p.style.animationDelay = (Math.random() * 10) + 's';
+            p.style.background = Math.random() > 0.5
+                ? 'rgba(118,192,68,0.4)'
+                : 'rgba(13,116,184,0.3)';
+            particleContainer.appendChild(p);
+        }
+    </script>
+</body>
+</html>

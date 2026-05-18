@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Home — OneOhm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{brand:{primary:'#76c044',dark:'#5ea031',secondary:'#0d74b8'},surface:{50:'#0A0A0F',100:'#111118',200:'#18181F',300:'#1E1E28',400:'#252532'}},fontFamily:{sans:['Inter','system-ui']}}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="project-context.js"></script>
+    <script src="language-context.js"></script>
+    <style>
+        :root {
+            --brand-primary: #76c044;
+            --brand-secondary: #0d74b8;
+            --bg-main: #0D0E12;
+            --bg-grad: linear-gradient(180deg, #0D0E12 0%, #16181D 100%);
+            --surface: #181A20;
+            --text-main: #E2E8F0;
+            --text-dim: #94A3B8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-strong: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --nav-bg: rgba(13, 14, 18, 0.94);
+            --payment-grad: linear-gradient(135deg, #0d74b8 0%, #0a5c92 100%);
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-main); }
+        .glass { background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--glass-border); }
+        .glass-strong { background: var(--glass-strong); backdrop-filter: blur(32px); border: 1px solid var(--glass-border); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes progressFill { from { width: 0; } }
+    </style>
+</head>
+<body class="bg-surface-50">
+<div class="max-w-md mx-auto min-h-screen relative pb-24" style="background: var(--bg-grad);">
+
+    <!-- Ambient glow -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[350px] pointer-events-none" style="background: radial-gradient(ellipse at 50% 0%, rgba(118,192,68,0.1) 0%, transparent 70%);"></div>
+
+    <!-- ═══ Header ═══ -->
+    <div class="relative z-10 px-6 pt-14 pb-4">
+        <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs opacity-40 font-medium mb-1" id="greeting">Good Morning</p>
+                <h1 class="text-[24px] font-bold mb-2">Raj Kumar</h1>
+
+                <!-- Project Switcher Pill -->
+                <a id="switcherLink" href="13-switch-project.html?from=05-home.html"
+                   class="inline-flex items-center gap-2 px-3 py-2 rounded-xl transition-all active:scale-[0.97]"
+                   style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);">
+                    <div class="w-2 h-2 rounded-full bg-brand-primary shrink-0" id="projStatusDot"></div>
+                    <span class="text-[12px] font-semibold text-white/80 truncate max-w-[160px]" id="projLabel">Loading...</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-2.5 ml-3 mt-1">
+                <a href="12-notifications.html" class="relative w-11 h-11 rounded-2xl glass flex items-center justify-center shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <div class="absolute -top-0.5 -right-0.5 w-[9px] h-[9px] rounded-full bg-red-500 border-2 border-surface-50"></div>
+                </a>
+                <a href="11-profile.html" class="w-11 h-11 rounded-2xl overflow-hidden border-2 border-brand-primary/25 shrink-0">
+                    <div class="w-full h-full bg-gradient-to-br from-brand-primary/25 to-brand-secondary/15 flex items-center justify-center">
+                        <span class="text-[11px] font-bold text-white">RK</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Content ═══ -->
+    <div class="relative z-10 px-6 space-y-4">
+
+        <!-- Active Project Card -->
+        <a href="06-project.html" class="block">
+            <div class="glass-strong rounded-3xl p-5 transition-all active:scale-[0.98]">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-brand-primary/15 flex items-center justify-center">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-[13px] font-semibold text-white" id="projSystem">5 kW Solar System</p>
+                            <p class="text-[11px] text-white/35" id="projId">PROJ-2025-001</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" id="projStatusBadge">In Progress</span>
+                </div>
+                <!-- Progress -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[11px] text-white/40 font-medium">Overall Progress</span>
+                        <span class="text-[13px] font-bold text-brand-primary" id="projProgress">45%</span>
+                    </div>
+                    <div class="w-full h-[6px] rounded-full bg-white/[0.06] overflow-hidden">
+                        <div id="progressBar" class="h-full rounded-full" style="background: linear-gradient(90deg, #76c044, #0d74b8); animation: progressFill 1.2s ease forwards;"></div>
+                    </div>
+                </div>
+                <!-- Mini timeline dots -->
+                <div class="flex items-center gap-0" id="timelineDots"></div>
+            </div>
+        </a>
+
+        <!-- Payment Summary -->
+        <div class="rounded-3xl p-5 relative overflow-hidden" style="background: var(--payment-grad);">
+            <div class="absolute top-0 right-0 w-44 h-44 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 70%)"></div>
+            <h3 class="text-[14px] font-bold text-white mb-4">Payment Summary</h3>
+            <div class="space-y-2 mb-4">
+                <div class="flex justify-between"><span class="text-blue-100/60 text-[12px]">Total Value</span><span class="text-white font-bold text-[17px]" id="totalValue">₹2,85,000</span></div>
+                <div class="flex justify-between"><span class="text-blue-100/60 text-[12px]">Subsidy</span><span class="text-emerald-300 font-semibold" id="subsidy">- ₹1,14,000</span></div>
+                <div class="border-t border-white/10 pt-2 flex justify-between"><span class="text-blue-100/60 text-[12px]">Amount Paid</span><span class="text-white font-semibold" id="amtPaid">₹85,500</span></div>
+                <div class="flex justify-between"><span class="text-blue-100/60 text-[12px]">Outstanding</span><span class="text-yellow-300 font-bold text-[17px]" id="outstanding">₹85,500</span></div>
+            </div>
+            <a href="08-payments.html" class="block w-full py-3 rounded-2xl text-center text-brand-secondary font-bold text-[13px] bg-white active:scale-[0.97] transition-transform">View Payments</a>
+        </div>
+
+        <!-- Action Required -->
+        <div id="actionCard" class="rounded-3xl p-4 border border-yellow-500/20" style="background: rgba(245,158,11,0.08);">
+            <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 rounded-lg bg-yellow-500/15 flex items-center justify-center shrink-0">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#EAB308"><path d="M12 2L1 21h22L12 2zm0 3.5L20.5 20H3.5L12 5.5z"/><rect x="11" y="10" width="2" height="4"/><rect x="11" y="16" width="2" height="2"/></svg>
+                </div>
+                <span class="text-[12px] font-bold text-yellow-500">Action Required</span>
+            </div>
+            <p class="text-[12px] opacity-50 mb-3" id="nextMilestoneText">—</p>
+            <a href="08-payments.html" class="block w-full py-3 rounded-2xl text-center text-white font-semibold text-[12px] active:scale-[0.97] transition-transform" style="background: linear-gradient(135deg, #76c044, #5ea031);">Upload Payment Proof</a>
+        </div>
+
+        <!-- Quick Actions -->
+        <div>
+            <h3 class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-3">Quick Actions</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="09-service.html" class="glass rounded-2xl p-4 text-center active:scale-[0.97] transition-transform block">
+                    <div class="w-11 h-11 rounded-xl bg-brand-primary/10 flex items-center justify-center mx-auto mb-2.5">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                    </div>
+                    <p class="text-[11px] font-semibold text-white/80">Service Request</p>
+                    <p class="text-[10px] text-white/30 mt-0.5">Get Support</p>
+                </a>
+                <a href="07-documents.html" class="glass rounded-2xl p-4 text-center active:scale-[0.97] transition-transform block">
+                    <div class="w-11 h-11 rounded-xl bg-brand-secondary/10 flex items-center justify-center mx-auto mb-2.5">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#0d74b8" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </div>
+                    <p class="text-[11px] font-semibold text-white/80">Documents</p>
+                    <p class="text-[10px] text-white/30 mt-0.5">View & Download</p>
+                </a>
+                <a href="10-team.html" class="glass rounded-2xl p-4 text-center active:scale-[0.97] transition-transform block">
+                    <div class="w-11 h-11 rounded-xl bg-purple-500/10 flex items-center justify-center mx-auto mb-2.5">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                    </div>
+                    <p class="text-[11px] font-semibold text-white/80">Your Team</p>
+                    <p class="text-[10px] text-white/30 mt-0.5">Contact</p>
+                </a>
+                <a href="13-switch-project.html?from=05-home.html" class="rounded-2xl p-4 text-center active:scale-[0.97] transition-transform block" style="background:linear-gradient(135deg,rgba(118,192,68,0.12),rgba(118,192,68,0.04));border:1px solid rgba(118,192,68,0.12)">
+                    <div class="w-11 h-11 rounded-xl bg-white/[0.06] flex items-center justify-center mx-auto mb-2.5">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7"/><path d="M9 22V12h6v10"/><path d="M21 9v13"/><path d="M3 9v13"/></svg>
+                    </div>
+                    <p class="text-[11px] font-semibold text-white/70">Switch Project</p>
+                    <p class="text-[10px] text-white/25 mt-0.5">All Properties</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="h-2"></div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto" style="background: var(--nav-bg); backdrop-filter: blur(30px); border-top: 1px solid var(--glass-border);">
+        <div class="flex justify-around items-center py-2.5 px-4 pb-7">
+            <a href="05-home.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="text-[10px] font-semibold text-brand-primary" id="nav-home">Home</span><div class="w-1 h-1 rounded-full bg-brand-primary"></div></a>
+            <a href="06-project.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="text-[10px] opacity-30" id="nav-project">Project</span></a>
+            <a href="07-documents.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="text-[10px] opacity-30" id="nav-docs">Docs</span></a>
+            <a href="08-payments.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span class="text-[10px] opacity-30" id="nav-payments">Payments</span></a>
+            <a href="11-profile.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="text-[10px] opacity-30" id="nav-profile">Profile</span></a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ─── Greeting ───
+    const h = new Date().getHours();
+    const greetKey = h < 12 ? 'good_morning' : h < 17 ? 'good_afternoon' : 'good_evening';
+    const greetIcon = h < 12 ? '☀️' : h < 17 ? '🌤️' : '🌙';
+    document.getElementById('greeting').textContent = t(greetKey) + ' ' + greetIcon;
+
+    // Update Nav
+    document.getElementById('nav-home').textContent = t('home');
+    document.getElementById('nav-project').textContent = t('project');
+    document.getElementById('nav-docs').textContent = t('docs');
+    document.getElementById('nav-payments').textContent = t('payments');
+    document.getElementById('nav-profile').textContent = t('profile');
+
+    // ─── Load active project ───
+    const p = getActiveProject();
+
+    // Header pill
+    document.getElementById('projLabel').textContent = p.label;
+    const statusColors = { IN_PROGRESS:'#EAB308', PLANNING:'#0d74b8', COMPLETED:'#76c044', ON_HOLD:'#EF4444' };
+    const sc = statusColors[p.status] || '#76c044';
+    document.getElementById('projStatusDot').style.background = sc;
+    document.getElementById('projStatusDot').style.boxShadow = `0 0 6px ${sc}`;
+
+    // Project card
+    document.getElementById('projSystem').textContent = `${p.systemKw} kW Solar System`;
+    document.getElementById('projId').textContent = p.id;
+    document.getElementById('projProgress').textContent = p.progress + '%';
+    document.getElementById('progressBar').style.width = p.progress + '%';
+
+    const badge = document.getElementById('projStatusBadge');
+    badge.textContent = p.statusLabel;
+    badge.style.background = sc + '1A';
+    badge.style.color = sc;
+
+    // Payment
+    document.getElementById('totalValue').textContent  = fmt(p.totalValue);
+    document.getElementById('subsidy').textContent     = p.subsidy > 0 ? `- ${fmt(p.subsidy)}` : '—';
+    document.getElementById('amtPaid').textContent     = fmt(p.amountPaid);
+    document.getElementById('outstanding').textContent = fmt(p.outstanding);
+
+    // Action card visibility
+    const actionCard = document.getElementById('actionCard');
+    if (p.outstanding <= 0 || p.status === 'COMPLETED') {
+        actionCard.style.display = 'none';
+    } else {
+        document.getElementById('nextMilestoneText').textContent = p.nextMilestone;
+    }
+
+    // Mini timeline dots
+    const tlDots = document.getElementById('timelineDots');
+    p.timeline.forEach((step, i) => {
+        const dotColor = step.status === 'done' ? '#76c044' : step.status === 'active' ? sc : 'rgba(255,255,255,0.08)';
+        const dot = document.createElement('div');
+        dot.style.cssText = `flex:1;height:4px;border-radius:2px;background:${dotColor};margin:0 1px;transition:all 0.3s;`;
+        tlDots.appendChild(dot);
+    });
+</script>
+</body>
+</html>

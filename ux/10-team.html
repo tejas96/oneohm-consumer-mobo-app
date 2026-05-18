@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Your Team — OneOhm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{brand:{primary:'#76c044',dark:'#5ea031',secondary:'#0d74b8'},surface:{50:'#0A0A0F',100:'#111118',200:'#18181F'}},fontFamily:{sans:['Inter','system-ui']}}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="project-context.js"></script>
+    <style>
+        :root {
+            --brand-primary: #76c044;
+            --brand-secondary: #0d74b8;
+            --bg-main: #0D0E12;
+            --bg-grad: linear-gradient(180deg, #0D0E12 0%, #16181D 100%);
+            --surface: #181A20;
+            --text-main: #E2E8F0;
+            --text-dim: #94A3B8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-strong: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --nav-bg: rgba(13, 14, 18, 0.94);
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-main); }
+        .glass { background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--glass-border); }
+        .glass-strong { background: var(--glass-strong); backdrop-filter: blur(32px); border: 1px solid var(--glass-border); }
+    </style>
+</head>
+<body class="bg-surface-50">
+<div class="max-w-md mx-auto min-h-screen pb-10" style="background: var(--bg-grad);">
+
+    <div class="px-6 pt-14 pb-4">
+        <div class="flex items-center gap-3 mb-1">
+            <a href="05-home.html" class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+            <div class="flex-1 min-w-0">
+                <h1 class="text-xl font-bold text-white">Your Team</h1>
+                <p class="text-[11px] text-white/30 truncate" id="projLabel"></p>
+            </div>
+            <a href="13-switch-project.html?from=10-team.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass shrink-0">
+                <div class="w-1.5 h-1.5 rounded-full" id="switchDot"></div>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="px-6 space-y-4 mt-4" id="content"></div>
+</div>
+
+<script>
+const p = getActiveProject();
+const sc = {IN_PROGRESS:'#EAB308',PLANNING:'#0d74b8',COMPLETED:'#76c044',ON_HOLD:'#EF4444'}[p.status]||'#76c044';
+
+document.getElementById('projLabel').textContent = 'Dedicated team for ' + p.label;
+document.getElementById('switchDot').style.cssText = `background:${sc};box-shadow:0 0 6px ${sc};border-radius:50%;width:6px;height:6px;display:inline-block;`;
+
+const techAvailable = p.status === 'IN_PROGRESS' || p.status === 'COMPLETED';
+
+const members = [
+    { ...p.manager,  role: 'Project Manager',         available: true,          callColor: p.manager.color,  gradFrom: p.manager.color + '40', gradTo: p.manager.color + '18' },
+    { ...p.engineer, role: 'Site Engineer',            available: true,          callColor: p.engineer.color, gradFrom: p.engineer.color + '40', gradTo: p.engineer.color + '18' },
+    { name:'Rahul Desai', initials:'RD', color:'#10B981', role:'Installation Technician', available: techAvailable, callColor:'#10B981', gradFrom:'#10B98140', gradTo:'#10B98118' },
+];
+
+const c = document.getElementById('content');
+
+members.forEach(m => {
+    const cardHtml = m.available ? `
+        <div class="glass-strong rounded-2xl p-5">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center border" style="background:linear-gradient(135deg,${m.gradFrom},${m.gradTo});border-color:${m.color}25;box-shadow:0 0 20px ${m.color}12">
+                    <span class="text-lg font-bold" style="color:${m.color}">${m.initials}</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[15px] font-bold text-white">${m.name}</p>
+                    <p class="text-[12px] font-medium" style="color:${m.color}">${m.role}</p>
+                    <div class="flex items-center gap-1.5 mt-1">
+                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                        <span class="text-[10px] text-emerald-400/70">Available</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2.5">
+                <a href="tel:+919800000000" class="flex-1 py-3 rounded-xl text-center text-[12px] font-semibold text-white flex items-center justify-center gap-1.5 active:scale-[0.97] transition-transform" style="background:linear-gradient(135deg,${m.callColor},${m.callColor}CC)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                    Call
+                </a>
+                <button class="flex-1 py-3 rounded-xl glass text-center text-[12px] font-semibold text-white/55 flex items-center justify-center gap-1.5 active:scale-[0.97] transition-transform">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    Chat
+                </button>
+            </div>
+        </div>` : `
+        <div class="glass rounded-2xl p-5 opacity-50">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl glass flex items-center justify-center">
+                    <span class="text-lg font-bold text-white/30">${m.initials}</span>
+                </div>
+                <div>
+                    <p class="text-[15px] font-bold text-white/50">${m.name}</p>
+                    <p class="text-[12px] text-white/30">${m.role}</p>
+                    <p class="text-[10px] text-white/20 mt-1">Assigned when installation begins</p>
+                </div>
+            </div>
+        </div>`;
+    c.innerHTML += cardHtml;
+});
+
+// Rating
+c.innerHTML += `
+<div class="mt-2">
+    <h3 class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-3">Rate Your Experience</h3>
+    <div class="glass-strong rounded-2xl p-5 text-center">
+        <p class="text-[12px] text-white/40 mb-4">How is your experience with <span class="text-white/60">${p.label}</span>?</p>
+        <div class="flex items-center justify-center gap-3 mb-4">
+            ${[1,2,3,4,5].map(i => `
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="${i<=4?'#76c044':'none'}" stroke="${i<=4?'#76c044':'rgba(255,255,255,0.12)'}" stroke-width="1.2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>`).join('')}
+        </div>
+        <button class="px-8 py-2.5 rounded-xl glass text-[12px] font-semibold text-white/50 active:scale-[0.97] transition-transform">Submit Feedback</button>
+    </div>
+</div>`;
+</script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Premium Theme Showcase — OneOhm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; transition: background 0.8s ease; overflow-x: hidden; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* ─── Carousel Animation ─── */
+        .theme-slide {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 88px 24px 120px;
+            opacity: 0; transform: scale(0.92) translateX(40px);
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none; z-index: 1;
+        }
+        .theme-slide.active {
+            opacity: 1; transform: scale(1) translateX(0);
+            pointer-events: auto; z-index: 10;
+        }
+        .theme-slide.exit-left {
+            opacity: 0; transform: scale(0.92) translateX(-40px);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body id="pageBody" class="min-h-screen bg-[#061810]">
+    <div class="max-w-md mx-auto min-h-screen relative flex flex-col justify-between overflow-hidden" id="ambientWrapper">
+        
+        <!-- Floating Ambient Mesh (Updated dynamically) -->
+        <div id="ambientOrb1" class="absolute -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none transition-all duration-1000 blur-[60px]" style="background: radial-gradient(circle, rgba(16,185,129,0.25), transparent 70%);"></div>
+        <div id="ambientOrb2" class="absolute bottom-20 -left-24 w-80 h-80 rounded-full pointer-events-none transition-all duration-1000 blur-[60px]" style="background: radial-gradient(circle, rgba(118,192,68,0.15), transparent 70%);"></div>
+
+        <!-- Header Controls -->
+        <div class="absolute top-0 left-0 right-0 z-50 px-6 pt-12 pb-4 flex justify-between items-center border-b border-white/[0.06] backdrop-blur-md bg-black/20">
+            <div>
+                <span class="text-[10px] font-extrabold uppercase tracking-[0.25em] text-emerald-400 block" id="headerTag">Pattern 1 of 6</span>
+                <h1 class="text-[18px] font-black text-white tracking-tight">Design Identity Lab</h1>
+            </div>
+            <a href="05-home.html" class="px-3.5 py-1.5 rounded-full bg-white/10 text-white text-[12px] font-bold border border-white/10 backdrop-blur-md active:scale-95 transition-all">Exit to App</a>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- SLIDE 1: Obsidian Emerald (Deep Premium Forest Dark)       -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div class="theme-slide active" data-index="0"
+             data-bg="radial-gradient(100% 100% at 50% 0%, #061810 0%, #030A07 100%)"
+             data-orb1="rgba(16,185,129,0.25)" data-orb2="rgba(118,192,68,0.15)">
+            <div>
+                <!-- Theme Header Banner -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-widest inline-block mb-3">Rolex & Rivian Inspired</span>
+                    <h2 class="text-[32px] font-black text-white tracking-tight leading-tight mb-2">Obsidian Emerald</h2>
+                    <p class="text-[14px] text-slate-300 leading-relaxed font-medium">A luxurious, ultra-deep green-slate hybrid that delivers breathtaking depth, superior contrast, and maximum eye comfort.</p>
+                </div>
+
+                <!-- Sample Premium Component Cards -->
+                <div class="space-y-4">
+                    <!-- Main Dashboard Sample Card -->
+                    <div class="relative rounded-[28px] p-6 backdrop-blur-[32px] transition-all shadow-2xl"
+                         style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 shadow-inner">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[16px] font-extrabold text-white tracking-tight">Solar Power Hub</h4>
+                                    <span class="text-[12px] font-semibold uppercase tracking-wider text-emerald-400">5.4 kW Output</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-widest">Active</span>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-white/10">
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-slate-300 font-medium">Today's Generation</span><span class="text-white font-extrabold">28.4 kWh</span></div>
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-slate-300 font-medium">CO₂ Offset</span><span class="text-emerald-400 font-bold">14.2 kg</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stat Swatches -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Color Palette</span>
+                            <div class="flex gap-1.5 mt-2">
+                                <div class="w-6 h-6 rounded-full bg-[#061810] border border-white/20 shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#10B981] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#76C044] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#F8FAFC] shadow"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Contrast Score</span>
+                            <div class="flex items-baseline gap-1 mt-1">
+                                <span class="text-[20px] font-black text-white tracking-tight">AAA</span>
+                                <span class="text-[12px] text-emerald-400 font-bold">Award Grade</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-[12px] text-emerald-400 font-semibold mb-2">💡 Recommended for premium green-tech branding.</p>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- SLIDE 2: Deep Solar Void (Midnight Indigo & Electric Blue) -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div class="theme-slide" data-index="1"
+             data-bg="radial-gradient(100% 100% at 50% 0%, #0F172A 0%, #05070F 100%)"
+             data-orb1="rgba(6,182,212,0.3)" data-orb2="rgba(59,130,246,0.2)">
+            <div>
+                <!-- Theme Header Banner -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-widest inline-block mb-3">Apple Vision Pro Aesthetic</span>
+                    <h2 class="text-[32px] font-black text-white tracking-tight leading-tight mb-2">Deep Solar Void</h2>
+                    <p class="text-[14px] text-slate-300 leading-relaxed font-medium">A high-tech sci-fi palette combining deep midnight indigo with electric cyan highlights for a state-of-the-art futuristic dashboard.</p>
+                </div>
+
+                <!-- Sample Premium Component Cards -->
+                <div class="space-y-4">
+                    <!-- Main Dashboard Sample Card -->
+                    <div class="relative rounded-[28px] p-6 backdrop-blur-[32px] transition-all shadow-2xl"
+                         style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-2xl bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30 shadow-inner">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00F2FE" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[16px] font-extrabold text-white tracking-tight">Grid Sync Status</h4>
+                                    <span class="text-[12px] font-semibold uppercase tracking-wider text-cyan-400">Net Metering</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-widest">Live Sync</span>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-white/10">
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-slate-300 font-medium">Exported to Grid</span><span class="text-white font-extrabold">12.5 kWh</span></div>
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-slate-300 font-medium">Grid Credit</span><span class="text-cyan-400 font-bold">+ ₹145.00</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stat Swatches -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Color Palette</span>
+                            <div class="flex gap-1.5 mt-2">
+                                <div class="w-6 h-6 rounded-full bg-[#0F172A] border border-white/20 shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#00F2FE] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#3B82F6] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#FFFFFF] shadow"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Tech Vibe</span>
+                            <div class="flex items-baseline gap-1 mt-1">
+                                <span class="text-[20px] font-black text-white tracking-tight">Ultra</span>
+                                <span class="text-[12px] text-cyan-400 font-bold">Futuristic</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-[12px] text-cyan-400 font-semibold mb-2">💡 Perfect for users who love ultra-modern dark mode interfaces.</p>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- SLIDE 3: Carbon Titanium (Sleek Space Black & Metallic Slate) -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div class="theme-slide" data-index="2"
+             data-bg="linear-gradient(180deg, #121316 0%, #08090A 100%)"
+             data-orb1="rgba(255,255,255,0.15)" data-orb2="rgba(118,192,68,0.12)">
+            <div>
+                <!-- Theme Header Banner -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-zinc-500/20 text-zinc-300 border border-zinc-500/30 uppercase tracking-widest inline-block mb-3">Nothing OS & Cybertruck Style</span>
+                    <h2 class="text-[32px] font-black text-white tracking-tight leading-tight mb-2">Carbon Titanium</h2>
+                    <p class="text-[14px] text-zinc-400 leading-relaxed font-medium">An ultra-minimalist industrial tech theme featuring pure carbon graphite, sleek titanium reflections, and high-impact crisp typography.</p>
+                </div>
+
+                <!-- Sample Premium Component Cards -->
+                <div class="space-y-4">
+                    <!-- Main Dashboard Sample Card -->
+                    <div class="relative rounded-[28px] p-6 backdrop-blur-[32px] transition-all shadow-2xl"
+                         style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.15);">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shadow-inner">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[16px] font-extrabold text-white tracking-tight">Milestone Invoice</h4>
+                                    <span class="text-[12px] font-semibold uppercase tracking-wider text-zinc-400">Titanium Security</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black bg-white/10 text-white border border-white/20 uppercase tracking-widest">Verified</span>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-white/10">
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-zinc-400 font-medium">Installment 2</span><span class="text-white font-extrabold">₹85,500</span></div>
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-zinc-400 font-medium">Due Date</span><span class="text-emerald-400 font-bold">Paid Successfully</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stat Swatches -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Color Palette</span>
+                            <div class="flex gap-1.5 mt-2">
+                                <div class="w-6 h-6 rounded-full bg-[#08090A] border border-white/20 shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#EDEDED] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#76C044] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#5EA031] shadow"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1">Aesthetic</span>
+                            <div class="flex items-baseline gap-1 mt-1">
+                                <span class="text-[20px] font-black text-white tracking-tight">Monolith</span>
+                                <span class="text-[12px] text-zinc-400 font-bold">Industrial</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-[12px] text-zinc-400 font-semibold mb-2">💡 Recommended for a highly professional, executive visual identity.</p>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- SLIDE 4: Galactic Amethyst (Deep Violet Slate & Sunset Gold) -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div class="theme-slide" data-index="3"
+             data-bg="radial-gradient(100% 100% at 50% 0%, #130D22 0%, #07050E 100%)"
+             data-orb1="rgba(245,158,11,0.25)" data-orb2="rgba(139,92,246,0.25)">
+            <div>
+                <!-- Theme Header Banner -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-widest inline-block mb-3">Revolut Ultra Luxury Vibe</span>
+                    <h2 class="text-[32px] font-black text-white tracking-tight leading-tight mb-2">Galactic Amethyst</h2>
+                    <p class="text-[14px] text-purple-200/80 leading-relaxed font-medium">A warm, luxurious palette blending deep space violet with warm solar sunset gold, giving your app a premium fintech club feel.</p>
+                </div>
+
+                <!-- Sample Premium Component Cards -->
+                <div class="space-y-4">
+                    <!-- Main Dashboard Sample Card -->
+                    <div class="relative rounded-[28px] p-6 backdrop-blur-[32px] transition-all shadow-2xl"
+                         style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25);">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-2xl bg-amber-500/20 flex items-center justify-center border border-amber-500/30 shadow-inner">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[16px] font-extrabold text-white tracking-tight">Milestone Dispatch</h4>
+                                    <span class="text-[12px] font-semibold uppercase tracking-wider text-amber-400">Panels En Route</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-widest">Action</span>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-white/10">
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-purple-200/70 font-medium">Expected Delivery</span><span class="text-white font-extrabold">Tomorrow, 2 PM</span></div>
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-purple-200/70 font-medium">Support Line</span><span class="text-amber-400 font-bold">24/7 Dedicated</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stat Swatches -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider block mb-1">Color Palette</span>
+                            <div class="flex gap-1.5 mt-2">
+                                <div class="w-6 h-6 rounded-full bg-[#130D22] border border-white/20 shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#8B5CF6] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#F59E0B] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#EC4899] shadow"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-purple-300 uppercase tracking-wider block mb-1">Luxury Index</span>
+                            <div class="flex items-baseline gap-1 mt-1">
+                                <span class="text-[20px] font-black text-white tracking-tight">VIP</span>
+                                <span class="text-[12px] text-amber-400 font-bold">Premium Club</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-[12px] text-amber-400 font-semibold mb-2">💡 Creates an instant "wow factor" and warmth during nighttime usage.</p>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- SLIDE 5: Eco Velvet Onyx (True Premium OLED Pitch & Frosted Glass) -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div class="theme-slide" data-index="4"
+             data-bg="#000000"
+             data-orb1="rgba(118,192,68,0.2)" data-orb2="rgba(13,116,184,0.15)">
+            <div>
+                <!-- Theme Header Banner -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-white/20 text-white border border-white/30 uppercase tracking-widest inline-block mb-3">True OLED Power Saver</span>
+                    <h2 class="text-[32px] font-black text-white tracking-tight leading-tight mb-2">Eco Velvet Onyx</h2>
+                    <p class="text-[14px] text-slate-300 leading-relaxed font-medium">The ultimate high-fidelity OLED pitch black aesthetic. Maximizes battery savings while making frosted glass cards pop with immaculate clarity.</p>
+                </div>
+
+                <!-- Sample Premium Component Cards -->
+                <div class="space-y-4">
+                    <!-- Main Dashboard Sample Card -->
+                    <div class="relative rounded-[28px] p-6 backdrop-blur-[40px] transition-all shadow-2xl"
+                         style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-2xl bg-brand-primary/20 flex items-center justify-center border border-brand-primary/30 shadow-inner">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#76C044" stroke-width="2.2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[16px] font-extrabold text-white tracking-tight">OLED Battery Hub</h4>
+                                    <span class="text-[12px] font-semibold uppercase tracking-wider text-brand-primary">100% Zero Drain</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black bg-brand-primary/20 text-brand-primary border border-brand-primary/30 uppercase tracking-widest">Pitch Black</span>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-white/10">
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-slate-300 font-medium">Battery Saved</span><span class="text-white font-extrabold">+18% Efficiency</span></div>
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-slate-300 font-medium">Display Contrast</span><span class="text-emerald-400 font-bold">Infinite : 1</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stat Swatches -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-2xl p-4 bg-white/[0.06] border border-white/[0.12] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Color Palette</span>
+                            <div class="flex gap-1.5 mt-2">
+                                <div class="w-6 h-6 rounded-full bg-[#000000] border border-white/30 shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#76C044] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#0D74B8] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#FFFFFF] shadow"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl p-4 bg-white/[0.06] border border-white/[0.12] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Efficiency</span>
+                            <div class="flex items-baseline gap-1 mt-1">
+                                <span class="text-[20px] font-black text-white tracking-tight">OLED</span>
+                                <span class="text-[12px] text-emerald-400 font-bold">Eco Max</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-[12px] text-brand-primary font-semibold mb-2">💡 The absolute gold standard for night reading and battery conservation.</p>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- SLIDE 6: Solar Flare Aurora (Radiant Sunburst Gold & Deep Space Corona) -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div class="theme-slide" data-index="5"
+             data-bg="radial-gradient(100% 100% at 50% 0%, #1A1105 0%, #080502 100%)"
+             data-orb1="rgba(245,158,11,0.35)" data-orb2="rgba(255,87,34,0.25)">
+            <div>
+                <!-- Theme Header Banner -->
+                <div class="mb-6">
+                    <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-widest inline-block mb-3">Pure Solar Energy Masterpiece</span>
+                    <h2 class="text-[32px] font-black text-white tracking-tight leading-tight mb-2">Solar Flare Aurora</h2>
+                    <p class="text-[14px] text-amber-100/80 leading-relaxed font-medium">Captures the awe-inspiring golden corona of a solar eclipse in deep space. A stunning, warm, high-energy aesthetic dedicated entirely to solar power.</p>
+                </div>
+
+                <!-- Sample Premium Component Cards -->
+                <div class="space-y-4">
+                    <!-- Main Dashboard Sample Card -->
+                    <div class="relative rounded-[28px] p-6 backdrop-blur-[40px] transition-all shadow-2xl"
+                         style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3);">
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-2xl bg-amber-500/20 flex items-center justify-center border border-amber-500/30 shadow-inner">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-[16px] font-extrabold text-white tracking-tight">Sunburst Corona Peak</h4>
+                                    <span class="text-[12px] font-semibold uppercase tracking-wider text-amber-400">100% Inverter Efficiency</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-widest">Peak Sun</span>
+                        </div>
+                        <div class="space-y-2 pt-2 border-t border-amber-500/20">
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-amber-200/70 font-medium">Realtime Flux</span><span class="text-white font-extrabold">980 W/m²</span></div>
+                            <div class="flex justify-between items-center text-[13px]"><span class="text-amber-200/70 font-medium">Daily Storage Refill</span><span class="text-amber-400 font-bold">+ 14.8 kWh Peak</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Mini Stat Swatches -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-amber-300/80 uppercase tracking-wider block mb-1">Color Palette</span>
+                            <div class="flex gap-1.5 mt-2">
+                                <div class="w-6 h-6 rounded-full bg-[#1A1105] border border-white/20 shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#F59E0B] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#FF5722] shadow"></div>
+                                <div class="w-6 h-6 rounded-full bg-[#FFFBEB] shadow"></div>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl p-4 bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl">
+                            <span class="text-[11px] font-bold text-amber-300/80 uppercase tracking-wider block mb-1">Solar Vibe</span>
+                            <div class="flex items-baseline gap-1 mt-1">
+                                <span class="text-[20px] font-black text-white tracking-tight">Corona</span>
+                                <span class="text-[12px] text-amber-400 font-bold">Gold Edition</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-[12px] text-amber-400 font-semibold mb-2">💡 The ultimate surprise theme tailored specifically for solar power lovers.</p>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <!-- BOTTOM FIXED NAVIGATION CONTROLS                           -->
+        <!-- ══════════════════════════════════════════════════════════ -->
+        <div class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto p-6 bg-black/60 backdrop-blur-2xl border-t border-white/10">
+            <!-- Carousel Dots -->
+            <div class="flex justify-center items-center gap-2 mb-4" id="dotNav">
+                <button onclick="goToSlide(0)" class="w-2.5 h-2.5 rounded-full bg-emerald-400 transition-all scale-125"></button>
+                <button onclick="goToSlide(1)" class="w-2.5 h-2.5 rounded-full bg-white/30 transition-all"></button>
+                <button onclick="goToSlide(2)" class="w-2.5 h-2.5 rounded-full bg-white/30 transition-all"></button>
+                <button onclick="goToSlide(3)" class="w-2.5 h-2.5 rounded-full bg-white/30 transition-all"></button>
+                <button onclick="goToSlide(4)" class="w-2.5 h-2.5 rounded-full bg-white/30 transition-all"></button>
+                <button onclick="goToSlide(5)" class="w-2.5 h-2.5 rounded-full bg-white/30 transition-all"></button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+                <button onclick="applyCurrentTheme()" class="flex-1 py-4 rounded-2xl bg-white/10 border border-white/20 text-white font-bold text-[15px] active:scale-95 transition-all backdrop-blur-md">
+                    Apply Pattern
+                </button>
+                <button onclick="nextSlide()" class="flex-[1.5] py-4 rounded-2xl text-white font-extrabold text-[15px] active:scale-95 transition-all shadow-xl shadow-emerald-900/40 flex items-center justify-center gap-2" style="background: linear-gradient(135deg, #10B981, #76C044);">
+                    <span>Next Pattern</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Carousel & Theme Application Logic -->
+    <script>
+        let currentIdx = 0;
+        const slides = document.querySelectorAll('.theme-slide');
+        const dots = document.querySelectorAll('#dotNav button');
+        const pageBody = document.getElementById('pageBody');
+        const orb1 = document.getElementById('ambientOrb1');
+        const orb2 = document.getElementById('ambientOrb2');
+        const headerTag = document.getElementById('headerTag');
+
+        function goToSlide(index) {
+            if (index === currentIdx) return;
+            const targetSlide = slides[index];
+            const currentSlide = slides[currentIdx];
+
+            // Determine direction
+            if (index > currentIdx) {
+                currentSlide.className = 'theme-slide exit-left';
+                targetSlide.className = 'theme-slide active';
+            } else {
+                currentSlide.className = 'theme-slide';
+                targetSlide.className = 'theme-slide active';
+            }
+
+            currentIdx = index;
+            updateUI();
+        }
+
+        function nextSlide() {
+            const nextIdx = (currentIdx + 1) % slides.length;
+            goToSlide(nextIdx);
+        }
+
+        function updateUI() {
+            const currentSlide = slides[currentIdx];
+            
+            // Update Page Background & Orbs
+            pageBody.style.background = currentSlide.dataset.bg;
+            orb1.style.background = `radial-gradient(circle, ${currentSlide.dataset.orb1}, transparent 70%)`;
+            orb2.style.background = `radial-gradient(circle, ${currentSlide.dataset.orb2}, transparent 70%)`;
+
+            // Update Header pill
+            headerTag.textContent = `Pattern ${currentIdx + 1} of 6`;
+
+            // Update Dots
+            dots.forEach((dot, i) => {
+                if (i === currentIdx) {
+                    dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 transition-all scale-125';
+                } else {
+                    dot.className = 'w-2.5 h-2.5 rounded-full bg-white/30 transition-all';
+                }
+            });
+        }
+
+        function applyCurrentTheme() {
+            const currentSlide = slides[currentIdx];
+            const themeName = currentSlide.querySelector('h2').textContent;
+            alert(`✨ "${themeName}" theme pattern has been successfully applied to your session preferences!`);
+            window.location.href = '05-home.html';
+        }
+    </script>
+</body>
+</html>

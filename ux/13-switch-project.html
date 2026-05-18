@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Switch Project — OneOhm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{brand:{primary:'#76c044',dark:'#5ea031',secondary:'#0d74b8'},surface:{50:'#0A0A0F',100:'#111118',200:'#18181F',300:'#1E1E28'}},fontFamily:{sans:['Inter','system-ui']}}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="project-context.js"></script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.06); }
+        .glass-strong { background: rgba(255,255,255,0.07); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.10); }
+
+        /* Sheet animation */
+        .sheet-bg { animation: bgFadeIn 0.3s ease forwards; }
+        @keyframes bgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .sheet { animation: sheetUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes sheetUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to   { transform: translateY(0);    opacity: 1; }
+        }
+        .sheet.closing { animation: sheetDown 0.3s cubic-bezier(0.4, 0, 1, 1) forwards; }
+        @keyframes sheetDown {
+            from { transform: translateY(0);    opacity: 1; }
+            to   { transform: translateY(100%); opacity: 0; }
+        }
+
+        /* Project cards */
+        .proj-card {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative; overflow: hidden;
+        }
+        .proj-card:active { transform: scale(0.97); }
+        .proj-card.selected { border-color: #76c044 !important; background: rgba(118,192,68,0.06) !important; }
+        .proj-card.selected::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, #76c044, #8fd055);
+        }
+
+        /* Progress ring */
+        .prog-ring { transform: rotate(-90deg); }
+        .prog-ring-fill { transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .card-anim { animation: fadeUp 0.4s ease forwards; opacity: 0; }
+    </style>
+</head>
+<body class="bg-transparent overflow-hidden">
+
+<!-- Full screen overlay -->
+<div class="sheet-bg fixed inset-0 z-40" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);" onclick="closeSheet()"></div>
+
+<!-- Bottom Sheet -->
+<div class="sheet fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto" style="background: linear-gradient(180deg, #18181F 0%, #111118 100%); border-radius: 28px 28px 0 0; border-top: 1px solid rgba(255,255,255,0.08); max-height: 85vh; display: flex; flex-direction: column;" id="sheet">
+
+    <!-- Handle -->
+    <div class="flex justify-center pt-3 pb-1 shrink-0">
+        <div class="w-10 h-[4px] rounded-full bg-white/15"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="px-6 pt-3 pb-4 shrink-0">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-[20px] font-extrabold text-white">My Projects</h2>
+                <p class="text-[12px] text-white/35 mt-0.5" id="projCount"></p>
+            </div>
+            <button onclick="closeSheet()" class="w-9 h-9 rounded-full glass flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Project List (scrollable) -->
+    <div id="projectList" class="overflow-y-auto px-6 pb-10 space-y-3" style="-webkit-overflow-scrolling: touch;"></div>
+</div>
+
+<script>
+const returnTo = new URLSearchParams(location.search).get('from') || '05-home.html';
+const activeId  = getActiveProjectId();
+
+document.getElementById('projCount').textContent =
+    PROJECTS.length + ' propert' + (PROJECTS.length === 1 ? 'y' : 'ies');
+
+// Build cards
+const list = document.getElementById('projectList');
+PROJECTS.forEach((p, i) => {
+    const isActive = p.id === activeId;
+    const circumference = 2 * Math.PI * 20; // r=20
+    const dashOffset = circumference - (p.progress / 100) * circumference;
+
+    const statusColors = {
+        'IN_PROGRESS': '#EAB308',
+        'PLANNING'   : '#0d74b8',
+        'COMPLETED'  : '#76c044',
+        'ON_HOLD'    : '#EF4444',
+    };
+    const sColor = statusColors[p.status] || '#76c044';
+
+    const card = document.createElement('div');
+    card.className = 'proj-card glass-strong rounded-2xl p-4 card-anim' + (isActive ? ' selected' : '');
+    card.style.animationDelay = (i * 0.08) + 's';
+    card.dataset.id = p.id;
+
+    card.innerHTML = `
+        <div class="flex items-start justify-between gap-3 mb-3">
+            <!-- Left info -->
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                    ${isActive ? `<div class="w-2 h-2 rounded-full bg-brand-primary shrink-0" style="box-shadow:0 0 6px #76c044"></div>` : ''}
+                    <p class="text-[15px] font-bold text-white truncate">${p.label}</p>
+                </div>
+                <p class="text-[11px] text-white/35 truncate mb-2">${p.address}</p>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+                          style="background:${sColor}18;color:${sColor}">${p.statusLabel}</span>
+                    <span class="text-[10px] text-white/25">${p.systemKw} kW · ${p.type}</span>
+                </div>
+            </div>
+            <!-- Progress ring -->
+            <div class="shrink-0 relative w-14 h-14 flex items-center justify-center">
+                <svg width="56" height="56" class="prog-ring absolute inset-0">
+                    <circle cx="28" cy="28" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+                    <circle cx="28" cy="28" r="20" fill="none"
+                            stroke="${sColor}" stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-dasharray="${circumference}"
+                            stroke-dashoffset="${dashOffset}"
+                            class="prog-ring-fill"/>
+                </svg>
+                <div class="relative z-10 text-center">
+                    <p class="text-[13px] font-extrabold" style="color:${sColor};line-height:1">${p.progress}%</p>
+                    <p class="text-[8px] text-white/25 mt-0.5">done</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next milestone -->
+        <div class="flex items-center gap-2 rounded-xl px-3 py-2.5"
+             style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <p class="text-[11px] text-white/40 truncate">${p.nextMilestone}</p>
+        </div>
+
+        <!-- Select indicator -->
+        ${isActive ? `
+        <div class="mt-3 flex items-center gap-1.5">
+            <div class="w-1.5 h-1.5 rounded-full bg-brand-primary"></div>
+            <span class="text-[11px] font-semibold text-brand-primary">Currently Active</span>
+        </div>` : `
+        <div class="mt-3 flex items-center gap-1.5 opacity-0 select-hint">
+            <span class="text-[11px] text-white/30">Tap to switch</span>
+        </div>`}
+    `;
+
+    card.addEventListener('click', () => selectProject(p.id));
+
+    // Show "Tap to switch" on hover/focus for desktop
+    if (!isActive) {
+        card.addEventListener('mouseenter', () => {
+            card.querySelector('.select-hint').style.opacity = '1';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.querySelector('.select-hint').style.opacity = '0';
+        });
+    }
+
+    list.appendChild(card);
+});
+
+function selectProject(id) {
+    if (id === activeId) { closeSheet(); return; }
+
+    // Visual feedback — highlight selected
+    document.querySelectorAll('.proj-card').forEach(c => {
+        c.classList.remove('selected');
+    });
+    document.querySelector(`[data-id="${id}"]`)?.classList.add('selected');
+
+    setActiveProject(id);
+    setTimeout(() => {
+        closeSheet(() => {
+            window.location.replace(returnTo);
+        });
+    }, 200);
+}
+
+function closeSheet(cb) {
+    const sheet = document.getElementById('sheet');
+    sheet.classList.add('closing');
+    setTimeout(() => {
+        if (cb) cb();
+        else history.back();
+    }, 300);
+}
+</script>
+</body>
+</html>

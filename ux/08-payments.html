@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Payments — OneOhm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{brand:{primary:'#76c044',dark:'#5ea031',secondary:'#0d74b8'},surface:{50:'#0A0A0F',100:'#111118',200:'#18181F'}},fontFamily:{sans:['Inter','system-ui']}}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="project-context.js"></script>
+    <style>
+        :root {
+            --brand-primary: #76c044;
+            --brand-secondary: #0d74b8;
+            --bg-main: #0D0E12;
+            --bg-grad: linear-gradient(180deg, #0D0E12 0%, #16181D 100%);
+            --surface: #181A20;
+            --text-main: #E2E8F0;
+            --text-dim: #94A3B8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-strong: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --nav-bg: rgba(13, 14, 18, 0.94);
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-main); color: var(--text-main); }
+        .glass { background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--glass-border); }
+        .glass-strong { background: var(--glass-strong); backdrop-filter: blur(32px); border: 1px solid var(--glass-border); }
+    </style>
+</head>
+<body class="bg-surface-50">
+<div class="max-w-md mx-auto min-h-screen pb-24" style="background: var(--bg-grad);">
+
+    <!-- Header -->
+    <div class="px-6 pt-14 pb-4">
+        <div class="flex items-center gap-3 mb-5">
+            <a href="05-home.html" class="w-10 h-10 rounded-xl glass flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+            <div class="flex-1 min-w-0">
+                <h1 class="text-xl font-bold text-white">Payments</h1>
+                <p class="text-[11px] text-white/35 truncate" id="projLabel"></p>
+            </div>
+            <a href="13-switch-project.html?from=08-payments.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass shrink-0">
+                <div class="w-1.5 h-1.5 rounded-full" id="switchDot"></div>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="px-6 space-y-5" id="content"></div>
+
+    <!-- Bottom Nav -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto" style="background:rgba(17,17,24,0.92);backdrop-filter:blur(30px);border-top:1px solid rgba(255,255,255,0.06)">
+        <div class="flex justify-around items-center py-2.5 px-4 pb-7">
+            <a href="05-home.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="text-[10px] text-white/30">Home</span></a>
+            <a href="06-project.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="text-[10px] text-white/30">Project</span></a>
+            <a href="07-documents.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="text-[10px] text-white/30">Docs</span></a>
+            <a href="08-payments.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span class="text-[10px] font-semibold text-brand-primary">Payments</span><div class="w-1 h-1 rounded-full bg-brand-primary"></div></a>
+            <a href="11-profile.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="text-[10px] opacity-30">Profile</span></a>
+        </div>
+    </div>
+</div>
+
+<script>
+const p = getActiveProject();
+const sc = {IN_PROGRESS:'#EAB308',PLANNING:'#0d74b8',COMPLETED:'#76c044',ON_HOLD:'#EF4444'}[p.status]||'#76c044';
+
+document.getElementById('projLabel').textContent = p.label + ' · ' + p.address;
+document.getElementById('switchDot').style.cssText = `background:${sc};box-shadow:0 0 6px ${sc};border-radius:50%;width:6px;height:6px;display:inline-block;`;
+
+// Payment schedule derived from project
+const paidPct  = Math.round(p.amountPaid / p.effectivePrice * 100);
+const circumf  = 2 * Math.PI * 32;
+const dash     = circumf - (paidPct / 100) * circumf;
+
+// Derive schedule from timeline steps with amounts
+const schedSteps = p.timeline.filter(s => s.amount);
+const c = document.getElementById('content');
+
+c.innerHTML = `
+<!-- Overview card -->
+<div class="rounded-3xl p-5 relative overflow-hidden" style="background:linear-gradient(135deg,#0d74b8,#0a5c92)">
+    <div class="absolute top-0 right-0 w-48 h-48 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(255,255,255,0.05),transparent 70%)"></div>
+    <h3 class="text-[11px] font-bold text-white/50 uppercase tracking-wider mb-4">Financial Overview</h3>
+    <div class="flex items-center gap-5 mb-4">
+        <!-- Donut ring -->
+        <div class="relative w-20 h-20 shrink-0">
+            <svg width="80" height="80" style="transform:rotate(-90deg)">
+                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
+                <circle cx="40" cy="40" r="32" fill="none" stroke="#76c044" stroke-width="5"
+                        stroke-linecap="round" stroke-dasharray="${circumf}" stroke-dashoffset="${dash}"/>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <p class="text-[14px] font-extrabold text-white">${paidPct}%</p>
+                <p class="text-[8px] text-white/35">paid</p>
+            </div>
+        </div>
+        <div class="flex-1 space-y-2">
+            <div class="flex justify-between"><span class="text-blue-200/60 text-[11px]">Total Value</span><span class="text-white font-bold">${fmt(p.totalValue)}</span></div>
+            ${p.subsidy > 0 ? `<div class="flex justify-between"><span class="text-blue-200/60 text-[11px]">Subsidy</span><span class="text-emerald-300 font-semibold">- ${fmt(p.subsidy)}</span></div>` : ''}
+            <div class="flex justify-between"><span class="text-blue-200/60 text-[11px]">Effective Price</span><span class="text-white font-semibold">${fmt(p.effectivePrice)}</span></div>
+            <div class="border-t border-white/10 pt-2 flex justify-between"><span class="text-blue-200/60 text-[11px]">Paid</span><span class="text-emerald-300 font-bold">${fmt(p.amountPaid)}</span></div>
+            <div class="flex justify-between"><span class="text-blue-200/60 text-[11px]">Outstanding</span><span class="text-yellow-300 font-bold">${fmt(p.outstanding)}</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Schedule -->
+<div>
+    <h3 class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-3">Payment Schedule</h3>
+    <div class="space-y-3" id="scheduleList"></div>
+</div>
+
+<!-- Transaction History -->
+<div>
+    <h3 class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-3">Transaction History</h3>
+    <div id="txList"></div>
+</div>`;
+
+// Build schedule
+const schedEl = document.getElementById('scheduleList');
+schedSteps.forEach((step, i) => {
+    const isDone   = step.status === 'done';
+    const isActive = step.status === 'active';
+    let html = '';
+    if (isDone) {
+        html = `
+        <div class="glass-strong rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-brand-primary/15 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div><p class="text-[12px] font-bold text-white">${step.title}</p><p class="text-[10px] text-white/25">${step.date}</p></div>
+                </div>
+                <div class="text-right"><p class="text-[15px] font-extrabold text-brand-primary">${step.amount}</p><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-brand-primary/15 text-brand-primary">Cleared</span></div>
+            </div>
+        </div>`;
+    } else if (isActive) {
+        html = `
+        <div class="rounded-2xl p-4" style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15)">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-yellow-500/15 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EAB308" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div><p class="text-[12px] font-bold text-white">${step.title}</p><p class="text-[10px] text-yellow-400/60">${step.date}</p></div>
+                </div>
+                <div class="text-right"><p class="text-[15px] font-extrabold text-yellow-400">${step.amount}</p><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-yellow-500/15 text-yellow-400">Pending</span></div>
+            </div>
+            <button class="w-full py-3 rounded-xl text-center text-white font-semibold text-[12px] active:scale-[0.97] transition-transform" style="background:linear-gradient(135deg,#76c044,#5ea031)">Upload Payment Proof</button>
+        </div>`;
+    } else {
+        html = `
+        <div class="glass rounded-2xl p-4 opacity-45">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-white/[0.04] flex items-center justify-center">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    </div>
+                    <div><p class="text-[12px] font-bold text-white/50">${step.title}</p><p class="text-[10px] text-white/20">Locked</p></div>
+                </div>
+                ${step.amount ? `<p class="text-[14px] font-extrabold text-white/25">${step.amount}</p>` : ''}
+            </div>
+        </div>`;
+    }
+    schedEl.innerHTML += html;
+});
+
+// Transaction history (only done steps)
+const txEl = document.getElementById('txList');
+const done = schedSteps.filter(s => s.status === 'done');
+if (done.length === 0) {
+    txEl.innerHTML = `<div class="glass rounded-2xl p-6 text-center"><p class="text-[12px] text-white/25">No transactions yet</p></div>`;
+} else {
+    txEl.innerHTML = '<div class="space-y-2.5">' + done.map(s => `
+        <div class="glass rounded-2xl p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center shrink-0">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="flex-1"><p class="text-[12px] font-semibold text-white/80">${s.title}</p><p class="text-[10px] text-white/25">${s.date}</p></div>
+            <p class="text-[13px] font-bold text-brand-primary">${s.amount}</p>
+        </div>`).join('') + '</div>';
+}
+</script>
+</body>
+</html>

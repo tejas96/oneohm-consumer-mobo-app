@@ -1,0 +1,49 @@
+# Antigravity AI Project Instructions & Development Standards
+
+These rules are strictly enforced for the `oneohm-consumer-mobo-app` project. You MUST abide by these guidelines to guarantee 100% code accuracy, maintain architectural integrity, and optimize interaction efficiency.
+
+## 1. AI Execution & Planning Directives
+- **Zero Hallucination & 100% Accuracy:** Your output code must be complete, functional, and flawlessly typed. Do not leave placeholder comments like `// implement later` or `// ... existing code`. Verify imports and variables exist before utilizing them.
+- **Prompt Token Conservation (No Bloat):** NEVER output massive blocks of untouched code. When editing, supply only the precise modifications, diffs, or strictly necessary context.
+- **Mandatory Planning Phase:** For any non-trivial request, define a step-by-step implementation plan *before* executing tools or generating code. Understand the system architecture first, then act.
+- **Native Antigravity Tools:** Utilize your precise file-editing tools (`replace_file_content`, `multi_replace_file_content`) to target specific line ranges instead of blindly overwriting entire files.
+
+## 2. Code Quality & Limitations
+- **Maximum File Size (500 Lines):** NO file shall exceed 500 lines of code. If adding new logic pushes a file beyond this limit, you must refactor and abstract logic into separate modules or hooks immediately.
+- **Strict Linting & Prettier Compliance:** Code must natively conform to the project's ESLint and Prettier configs. Do not introduce alternative code styles or ignore linter rules. Fix lint errors proactively.
+- **TypeScript Strictness:** Do not use `any`. Explicitly define prop interfaces, API responses, and state models.
+
+## 3. The FDAL Pattern (Frontend Data Access Layer)
+The application relies on a strict FDAL to isolate UI screens from network and data caching concerns.
+- **The FDAL Boundary (`src/data/`):** This is the heart of data management.
+- **Single Entry Point:** UI Screens (`src/app/`) and components MUST import data hooks and models exclusively via `src/data/index.ts`.
+- **`src/data/services/`:** Pure asynchronous HTTP functions (e.g., Axios). **UI components are forbidden from importing these directly.**
+- **`src/data/resources/`:** React Query hooks orchestrating caching and invoking services. These are the models consumed by the UI.
+- **`src/data/query-keys/`:** Centralized query key definitions. Do not use hardcoded strings for React Query keys in components.
+
+## 4. Strict Separation of UI and Logic
+- **Fat Hooks, Skinny Components:** Do not write complex business logic, data formatting, or heavy `useEffect` side-effects directly inside React Native components.
+- **Custom Logic Hooks:** Abstract screen/feature logic into dedicated custom hooks (e.g., `use[ScreenName]Logic.ts` alongside `[ScreenName].tsx`).
+- **Presentational Priority:** Keep UI components focused strictly on presentation. They should receive formatted data and callback handlers from their underlying custom hooks.
+
+## 5. Navigation Pattern Integration
+- **Centralized Routing (`src/core/navigation/`):** All navigators (`RootNavigator`, `AuthNavigator`, etc.) and screen configurations live exclusively here. Do not leak navigation tree definitions into the `src/app/` features folder.
+- **Type-Safe Navigation:** You must strictly type all `useNavigation` and `useRoute` hooks using definitions exported from `src/core/navigation/navigation.types.ts`.
+- **Strict Route Targeting:** Use the predefined routing enums or constants rather than injecting raw string literals when navigating between screens.
+
+## 6. Directory Structure Boundaries & Full Structure
+You must maintain strict boundaries between the Layered Architecture. Here is the full structure:
+```text
+src/
+├── app/       # Compositions of screens and feature-specific components. No raw data fetching.
+├── core/      # Application skeleton, initializers, core auth state (Zustand), navigation trees, app providers.
+├── data/      # The FDAL implementation (API services, React Query resources, query-keys).
+└── shared/    # Globally shared UI elements, theme configurations, styling tokens, and generic helpers.
+```
+
+## 7. Preventing Common AI Implementation Mistakes (CRITICAL)
+To avoid standard AI mistakes in this codebase, adhere strictly to the following:
+- **Absolute Imports:** NEVER use relative paths (e.g., `../../shared/theme`) for cross-layer imports. Always use the configured absolute path alias (e.g., `@/shared/theme`, `@/core/auth`, `@/data`).
+- **Styling & Theming (STRICT):** Under NO circumstances should any hex color codes (e.g. `#121316`), raw pixel padding/margin measurements, or inline styling values be hardcoded inside any TSX or TS files (this includes inline styles, StyleSheet sheets, and SVG layout properties). You MUST exclusively import and utilize the centralized theme tokens (`colors`, `spacing`, `fontSize`, `borderRadius`) from `@/shared/theme`. This guarantees that updating the theme in a single centralized folder automatically and instantly propagates all visual styles across the entire application.
+- **UI Primitive Library:** The project uses `react-native-paper`. Always prefer importing standard UI elements (like `Button`, `Text`, `TextInput`) from `react-native-paper` before building custom ones or importing from `react-native`.
+- **Global State:** The project uses Zustand for global state (e.g., `useAuthStore`). Do not introduce Redux or Context API for state management. Ensure Zustand stores are kept small and modular.
