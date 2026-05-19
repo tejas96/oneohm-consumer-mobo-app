@@ -1,5 +1,6 @@
 export { ScreenWrapper } from './ScreenWrapper';
 export { LoadingOverlay } from './LoadingOverlay';
+export { ThemeToggleButton } from './ThemeToggleButton';
 export { CTButton } from './CTButton';
 export { CTTextInput } from './CTTextInput';
 export { CTCard } from './CTCard';

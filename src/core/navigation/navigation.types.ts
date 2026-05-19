@@ -39,6 +39,7 @@ export type ScreenProps<
 // ============================================
 
 export type AuthStackParamList = {
+  [Route.LANGUAGE_SELECT]: undefined;
   [Route.ONBOARDING]: undefined;
   [Route.LOGIN]: undefined;
   [Route.OTP]: OtpParams;

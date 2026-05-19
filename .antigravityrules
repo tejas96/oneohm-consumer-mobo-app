@@ -44,6 +44,24 @@ src/
 ## 7. Preventing Common AI Implementation Mistakes (CRITICAL)
 To avoid standard AI mistakes in this codebase, adhere strictly to the following:
 - **Absolute Imports:** NEVER use relative paths (e.g., `../../shared/theme`) for cross-layer imports. Always use the configured absolute path alias (e.g., `@/shared/theme`, `@/core/auth`, `@/data`).
-- **Styling & Theming (STRICT):** Under NO circumstances should any hex color codes (e.g. `#121316`), raw pixel padding/margin measurements, or inline styling values be hardcoded inside any TSX or TS files (this includes inline styles, StyleSheet sheets, and SVG layout properties). You MUST exclusively import and utilize the centralized theme tokens (`colors`, `spacing`, `fontSize`, `borderRadius`) from `@/shared/theme`. This guarantees that updating the theme in a single centralized folder automatically and instantly propagates all visual styles across the entire application.
+- **Styling & Theming (STRICT):** Under NO circumstances should any hex color codes (e.g. `#121316`), raw pixel padding/margin measurements, or inline styling values be hardcoded inside any TSX or TS files (this includes inline styles, StyleSheet sheets, and SVG layout properties). You MUST exclusively import and utilize the centralized theme tokens (`colors`, `spacing`, `fontSize`, `borderRadius`) from `@/shared/theme`. **Everything should be theme-driven and not hardcoded.** This guarantees that updating the theme in a single centralized folder automatically and instantly propagates all visual styles across the entire application.
 - **UI Primitive Library:** The project uses `react-native-paper`. Always prefer importing standard UI elements (like `Button`, `Text`, `TextInput`) from `react-native-paper` before building custom ones or importing from `react-native`.
 - **Global State:** The project uses Zustand for global state (e.g., `useAuthStore`). Do not introduce Redux or Context API for state management. Ensure Zustand stores are kept small and modular.
+
+## 8. Theme System Rules (MANDATORY for ALL New Screens & Components)
+
+The app supports dynamic Dark and Light modes via `useThemeStore` (Zustand) and `react-native-paper`'s `PaperProvider`.
+
+- **NEVER import `colors` from `@/shared/theme` for any value that must adapt to dark/light mode.** The `colors.ts` file is a palette reference only. Use `useAppTheme()` for all runtime color decisions.
+- **`useAppTheme()`** is the ONLY approved way to access theme-reactive colors in components:
+  ```ts
+  import { useAppTheme } from '@/shared/theme';
+  const theme = useAppTheme();
+  // Use: theme.colors.background, theme.colors.onSurface, theme.colors.primary, etc.
+  ```
+- **`theme.dark`** (boolean) is the ONLY approved way to branch dark vs. light mode logic inside a component (e.g., `barStyle={theme.dark ? 'light-content' : 'dark-content'}`).
+- **`StyleSheet.create({})`** must NOT embed color values directly. Any color in a `StyleSheet` must come from `theme.colors.*` applied as an inline override or via a function-based style: `[styles.card, { backgroundColor: theme.colors.surface }]`.
+- **`ScreenWrapper`** auto-handles gradient, StatusBar, and ambient orbs — you do NOT need to set StatusBar or backgrounds manually on screens using it.
+- **Absolute rule on hardcoding:** Any hex value (`#RRGGBB`), `rgba(...)`, or color string literal inside a `.tsx` or `.ts` file is a **build failure** for this project. Route all colors through `useAppTheme()` or approved static theme tokens (`spacing`, `fontSize`, `borderRadius`).
+- **Adding a new theme:** To add a 3rd theme, only `src/shared/theme/paper-theme.ts` needs a new export. The rest of the app requires zero changes.
+

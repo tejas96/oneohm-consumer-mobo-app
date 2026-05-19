@@ -37,7 +37,7 @@ const VARIANT_CONFIG: Record<
   primary: {
     mode: 'contained',
     buttonColor: colors.brand.primary,
-    textColor: colors.neutral.black,
+    textColor: colors.neutral.white,
   },
   secondary: {
     mode: 'outlined',

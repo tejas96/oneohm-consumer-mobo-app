@@ -14,6 +14,7 @@
 
 export enum Route {
   // ── Auth Flow ──────────────────────────────
+  LANGUAGE_SELECT = 'LanguageSelect',
   ONBOARDING = 'Onboarding',
   LOGIN = 'Login',
   OTP = 'Otp',

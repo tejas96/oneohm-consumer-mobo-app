@@ -1,8 +1,11 @@
 /**
  * ScreenWrapper — Carbon Titanium Standard Screen Layout
  *
- * Provides a genuine edge-to-edge SVG gradient background, StatusBar configuration,
- * and transparent safe areas for all screens to conform to the Carbon Titanium theme.
+ * Provides a genuine edge-to-edge SVG gradient background, StatusBar
+ * configuration, and transparent safe areas for all screens.
+ *
+ * Fully theme-aware: reads colors from react-native-paper's useTheme()
+ * so it automatically adapts to dark and light mode.
  *
  * Layer: shared/components (Presentational — zero business logic)
  */
@@ -13,7 +16,8 @@ import { StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-import { colors, spacing } from '@/shared/theme';
+import { spacing } from '@/shared/theme';
+import { useAppTheme } from '@/shared/theme';
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -21,8 +25,6 @@ interface ScreenWrapperProps {
   style?: ViewStyle;
   /** Whether to add horizontal padding (default: true) */
   padded?: boolean;
-  /** Status bar style — defaults to 'light-content' for dark theme */
-  statusBarStyle?: 'light-content' | 'dark-content';
   /** Render ambient floating glow orbs behind content */
   ambientGlow?: boolean;
 }
@@ -31,30 +33,33 @@ export function ScreenWrapper({
   children,
   style,
   padded = true,
-  statusBarStyle = 'light-content',
   ambientGlow = false,
 }: ScreenWrapperProps) {
+  const theme = useAppTheme();
+
+  const barStyle = theme.dark ? 'light-content' : 'dark-content';
+
   return (
     <View style={styles.container}>
       <StatusBar
-        barStyle={statusBarStyle}
+        barStyle={barStyle}
         backgroundColor="transparent"
         translucent
       />
 
-      {/* ─── Premium Carbon Titanium Gradient Background (Edge-to-Edge) ─── */}
+      {/* ─── Premium Gradient Background (Edge-to-Edge) ─── */}
       <View style={StyleSheet.absoluteFill}>
         <Svg height="100%" width="100%">
           <Defs>
             <LinearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
               <Stop
                 offset="0%"
-                stopColor={colors.surface.base}
+                stopColor={theme.colors.surface}
                 stopOpacity={1}
               />
               <Stop
                 offset="100%"
-                stopColor={colors.surface.root}
+                stopColor={theme.colors.background}
                 stopOpacity={1}
               />
             </LinearGradient>
@@ -66,8 +71,22 @@ export function ScreenWrapper({
       {/* Ambient glowing mesh highlights */}
       {ambientGlow ? (
         <>
-          <View style={[styles.orb, styles.orb1]} pointerEvents="none" />
-          <View style={[styles.orb, styles.orb2]} pointerEvents="none" />
+          <View
+            style={[
+              styles.orb,
+              styles.orb1,
+              { backgroundColor: theme.colors.primaryContainer },
+            ]}
+            pointerEvents="none"
+          />
+          <View
+            style={[
+              styles.orb,
+              styles.orb2,
+              { backgroundColor: theme.colors.surfaceVariant },
+            ]}
+            pointerEvents="none"
+          />
         </>
       ) : null}
 
@@ -104,7 +123,6 @@ const styles = StyleSheet.create({
     right: -96,
     width: 320,
     height: 320,
-    backgroundColor: colors.ambient.orb1,
     opacity: 0.6,
   },
   orb2: {
@@ -112,7 +130,6 @@ const styles = StyleSheet.create({
     left: -96,
     width: 280,
     height: 280,
-    backgroundColor: colors.ambient.orb2,
     opacity: 0.5,
   },
 });

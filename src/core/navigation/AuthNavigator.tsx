@@ -10,6 +10,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingScreen } from '@/app/auth/screens/OnboardingScreen';
 import { LoginScreen } from '@/app/auth/screens/LoginScreen';
 import { OtpScreen } from '@/app/auth/screens/OtpScreen';
+import { LanguageSelectScreen } from '@/app/auth/screens/LanguageSelectScreen';
 import { getItem } from '@/core/storage/app.storage';
 import { STORAGE_KEYS } from '@/core/config/constants';
 import { LoadingOverlay } from '@/shared/components';
@@ -27,6 +28,12 @@ export function AuthNavigator() {
 
   useEffect(() => {
     async function checkOnboardingStatus() {
+      const language = await getItem(STORAGE_KEYS.APP_LANGUAGE);
+      if (!language) {
+        setInitialRoute(Route.LANGUAGE_SELECT);
+        return;
+      }
+
       const hasSeen = await getItem(STORAGE_KEYS.HAS_SEEN_ONBOARDING);
       setInitialRoute(hasSeen === 'true' ? Route.LOGIN : Route.ONBOARDING);
     }
@@ -42,6 +49,11 @@ export function AuthNavigator() {
       screenOptions={defaultScreenOptions}
       initialRouteName={initialRoute}
     >
+      <Stack.Screen
+        name={Route.LANGUAGE_SELECT}
+        component={LanguageSelectScreen}
+        options={getScreenOptions(Route.LANGUAGE_SELECT)}
+      />
       <Stack.Screen
         name={Route.ONBOARDING}
         component={OnboardingScreen}

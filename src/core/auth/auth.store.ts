@@ -20,6 +20,8 @@ import type {
 } from './auth.types';
 import { SessionService } from './session.service';
 import { TokenService } from './token.service';
+import { useI18nStore } from '@/core/i18n';
+import { useThemeStore } from '@/core/theme';
 
 type AuthStore = AuthState & AuthActions;
 
@@ -60,6 +62,8 @@ export const useAuthStore = create<AuthStore>((set, get) => {
 
     hydrate: async () => {
       try {
+        await useI18nStore.getState().initializeLanguage();
+        await useThemeStore.getState().initializeTheme();
         const hasTokens = await TokenService.hasTokens();
         if (hasTokens) {
           // Attempt to fetch current user profile to validate the session

@@ -13,6 +13,7 @@ import { Route, useAppNavigation } from '@/core/navigation';
 import { STORAGE_KEYS } from '@/core/config/constants';
 import { setItem } from '@/core/storage/app.storage';
 import { colors } from '@/shared/theme';
+import { useTranslation } from '@/core/i18n';
 
 export const TOTAL_SLIDES = 5;
 
@@ -26,40 +27,36 @@ export interface OnboardingSlideData {
 export function useOnboardingScreenLogic() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigation = useAppNavigation();
+  const { t } = useTranslation();
 
   const slides: OnboardingSlideData[] = [
     {
-      title: 'Track Your\nSolar Project',
-      subtitle:
-        'Follow every milestone — from site survey to commissioning — in a beautiful, real-time timeline.',
+      title: t('onboarding.slide1.title'),
+      subtitle: t('onboarding.slide1.subtitle'),
       accentColor: colors.brand.primary, // Brand Primary
       lottieFile: require('@/assets/animations/lottie/slide1_tracking.json'),
     },
     {
-      title: 'Real-Time\nNotifications',
-      subtitle:
-        'Instant alerts on milestones, team visits, payments, and every project update — right on your phone.',
+      title: t('onboarding.slide2.title'),
+      subtitle: t('onboarding.slide2.subtitle'),
       accentColor: colors.brand.secondary, // Brand Secondary
       lottieFile: require('@/assets/animations/lottie/slide2_notifications.json'),
     },
     {
-      title: 'Your Dedicated\nTeam',
-      subtitle:
-        'Call or chat with your project manager, engineer, and technicians — one tap away.',
+      title: t('onboarding.slide3.title'),
+      subtitle: t('onboarding.slide3.subtitle'),
       accentColor: colors.brand.accentPurple, // Brand Purple
       lottieFile: require('@/assets/animations/lottie/slide3_team.json'),
     },
     {
-      title: 'Documents &\nPayments',
-      subtitle:
-        'Access agreements, invoices, warranties, and track every payment — all in one secure place.',
+      title: t('onboarding.slide4.title'),
+      subtitle: t('onboarding.slide4.subtitle'),
       accentColor: colors.semantic.warning, // Amber
       lottieFile: require('@/assets/animations/lottie/slide4_payments.json'),
     },
     {
-      title: 'Power Your\nTomorrow',
-      subtitle:
-        'See your impact on the planet — energy savings, carbon offset, and cost reduction, beautifully visualized.',
+      title: t('onboarding.slide5.title'),
+      subtitle: t('onboarding.slide5.subtitle'),
       accentColor: colors.brand.accentEmerald, // Emerald Green
       lottieFile: require('@/assets/animations/lottie/slide5_savings.json'),
     },

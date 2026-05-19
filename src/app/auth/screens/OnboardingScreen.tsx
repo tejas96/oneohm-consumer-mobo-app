@@ -3,6 +3,7 @@
  *
  * Implements sliding transitions, custom animated particles, and local Lottie support.
  * Separates presentation from logic using `useOnboardingScreenLogic` custom hook.
+ * Fully theme-aware: all colors sourced from useAppTheme().
  *
  * Layer: app/auth/screens
  * Rules: Skinny Component, absolute imports, 100% theme token safety.
@@ -22,8 +23,20 @@ import {
 import { Text, Icon } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
 
-import { colors, fontSize, fontWeight, spacing } from '@/shared/theme';
-import { ScreenWrapper, CTButton } from '@/shared/components';
+import {
+  fontSize,
+  fontWeight,
+  spacing,
+  useAppTheme,
+  colors,
+  hexToRgba,
+} from '@/shared/theme';
+import {
+  ScreenWrapper,
+  CTButton,
+  ThemeToggleButton,
+} from '@/shared/components';
+import { useTranslation } from '@/core/i18n';
 import {
   useOnboardingScreenLogic,
   TOTAL_SLIDES,
@@ -48,7 +61,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 15,
     size: 4,
     duration: 8000,
-    color: 'rgba(118, 192, 68, 0.4)',
+    color: hexToRgba(colors.brand.primary, 0.4),
   },
   {
     id: 2,
@@ -56,7 +69,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 35,
     size: 5,
     duration: 9000,
-    color: 'rgba(13, 116, 184, 0.3)',
+    color: hexToRgba(colors.brand.secondary, 0.3),
   },
   {
     id: 3,
@@ -64,7 +77,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 60,
     size: 3,
     duration: 7500,
-    color: 'rgba(118, 192, 68, 0.5)',
+    color: hexToRgba(colors.brand.primary, 0.5),
   },
   {
     id: 4,
@@ -72,7 +85,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 80,
     size: 4,
     duration: 10000,
-    color: 'rgba(13, 116, 184, 0.2)',
+    color: hexToRgba(colors.brand.secondary, 0.2),
   },
   {
     id: 5,
@@ -80,7 +93,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 45,
     size: 3,
     duration: 8500,
-    color: 'rgba(118, 192, 68, 0.3)',
+    color: hexToRgba(colors.brand.primary, 0.3),
   },
   {
     id: 6,
@@ -88,7 +101,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 25,
     size: 5,
     duration: 9500,
-    color: 'rgba(13, 116, 184, 0.4)',
+    color: hexToRgba(colors.brand.secondary, 0.4),
   },
   {
     id: 7,
@@ -96,7 +109,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 70,
     size: 4,
     duration: 7000,
-    color: 'rgba(118, 192, 68, 0.4)',
+    color: hexToRgba(colors.brand.primary, 0.4),
   },
   {
     id: 8,
@@ -104,7 +117,7 @@ const PARTICLES: ParticleConfig[] = [
     left: 90,
     size: 3,
     duration: 9000,
-    color: 'rgba(13, 116, 184, 0.3)',
+    color: hexToRgba(colors.brand.secondary, 0.3),
   },
 ];
 
@@ -136,12 +149,10 @@ function FloatingParticle({
     inputRange: [0, 1],
     outputRange: [300, -320],
   });
-
   const opacity = animatedValue.interpolate({
     inputRange: [0, 0.1, 0.9, 1],
     outputRange: [0, 0.8, 0.3, 0],
   });
-
   const scale = animatedValue.interpolate({
     inputRange: [0, 1],
     outputRange: [1, 0.2],
@@ -168,11 +179,12 @@ function FloatingParticle({
 export function OnboardingScreen() {
   const { currentSlide, slides, handleNext, handleSkip, setSlideIndex } =
     useOnboardingScreenLogic();
+  const { t } = useTranslation();
+  const theme = useAppTheme();
 
   const scrollViewRef = useRef<ScrollView>(null);
   const activeSlide = slides[currentSlide];
 
-  // Keep ScrollView in sync when activeIndex updates via buttons
   useEffect(() => {
     scrollViewRef.current?.scrollTo({
       x: currentSlide * SCREEN_WIDTH,
@@ -204,6 +216,11 @@ export function OnboardingScreen() {
         ))}
       </View>
 
+      {/* ─── Theme Toggle (Top Left) ─── */}
+      <View style={styles.themeToggle}>
+        <ThemeToggleButton />
+      </View>
+
       {/* ─── Skip Button (Top Right) ─── */}
       {currentSlide < TOTAL_SLIDES - 1 && (
         <TouchableOpacity
@@ -211,7 +228,11 @@ export function OnboardingScreen() {
           onPress={handleSkip}
           activeOpacity={0.7}
         >
-          <Text style={styles.skipText}>Skip</Text>
+          <Text
+            style={[styles.skipText, { color: theme.colors.onSurfaceVariant }]}
+          >
+            {t('common.skip')}
+          </Text>
         </TouchableOpacity>
       )}
 
@@ -240,7 +261,10 @@ export function OnboardingScreen() {
 
             {/* Typography */}
             <View style={styles.textStack}>
-              <Text variant="displayLarge" style={styles.title}>
+              <Text
+                variant="displayLarge"
+                style={[styles.title, { color: theme.colors.onBackground }]}
+              >
                 {slide.title.split('\n')[0]}
                 {'\n'}
                 <Text
@@ -249,7 +273,13 @@ export function OnboardingScreen() {
                   {slide.title.split('\n')[1]}
                 </Text>
               </Text>
-              <Text variant="bodyLarge" style={styles.subtitle}>
+              <Text
+                variant="bodyLarge"
+                style={[
+                  styles.subtitle,
+                  { color: theme.colors.onSurfaceVariant },
+                ]}
+              >
                 {slide.subtitle}
               </Text>
             </View>
@@ -270,11 +300,18 @@ export function OnboardingScreen() {
                     key={index}
                     style={[
                       styles.dot,
-                      isActive ? styles.activeDot : styles.inactiveDot,
-                      isActive && {
-                        backgroundColor: activeSlide.accentColor,
-                        shadowColor: activeSlide.accentColor,
-                      },
+                      isActive
+                        ? [
+                            styles.activeDot,
+                            {
+                              backgroundColor: activeSlide.accentColor,
+                              shadowColor: activeSlide.accentColor,
+                            },
+                          ]
+                        : [
+                            styles.inactiveDot,
+                            { backgroundColor: theme.colors.outlineVariant },
+                          ],
                     ]}
                   />
                 );
@@ -306,7 +343,7 @@ export function OnboardingScreen() {
               onPress={handleNext}
               style={{ backgroundColor: activeSlide.accentColor }}
             >
-              Get Started
+              {t('auth.getStarted')}
             </CTButton>
           </Animated.View>
         )}
@@ -329,6 +366,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.xl,
   },
+  themeToggle: {
+    position: 'absolute',
+    top: spacing.lg,
+    left: spacing.md,
+    zIndex: 50,
+  },
   skipButton: {
     position: 'absolute',
     top: spacing.lg,
@@ -339,7 +382,6 @@ const styles = StyleSheet.create({
   skipText: {
     fontSize: fontSize.body,
     fontWeight: fontWeight.medium,
-    color: colors.text.tertiary,
   },
   particle: {
     position: 'absolute',
@@ -366,7 +408,6 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     lineHeight: 38,
-    color: colors.text.primary,
     marginBottom: spacing.md,
   },
   titleAccent: {
@@ -374,7 +415,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: 'center',
-    color: colors.text.tertiary,
     lineHeight: 22,
     maxWidth: 300,
   },
@@ -408,7 +448,6 @@ const styles = StyleSheet.create({
   },
   inactiveDot: {
     width: 6,
-    backgroundColor: colors.surface.borderLight,
   },
   nextButton: {
     width: 64,
@@ -416,7 +455,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colors.neutral.black,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 15,
