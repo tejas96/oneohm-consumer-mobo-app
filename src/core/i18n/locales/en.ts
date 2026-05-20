@@ -8,6 +8,23 @@ export const en = {
     getStarted: 'Get Started',
     onboardingTitle: 'Welcome to OneOhm',
     onboardingSubtitle: 'Your trusted partner in renewable energy.',
+    loginTitle: 'Welcome\nBack',
+    loginSubtitle:
+      'Enter your mobile number to access your solar project dashboard.',
+    mobileNumberLabel: 'Mobile Number',
+    mobileNumberPlaceholder: 'Enter mobile number',
+    verificationInfo:
+      "We'll send you a one-time verification code via SMS. Your data is secure and encrypted.",
+    termsAndPrivacy: 'By continuing, you agree to our Terms & Privacy Policy',
+    terms: 'Terms',
+    privacyPolicy: 'Privacy Policy',
+    verifyOtpTitle: 'Verify Your\nNumber',
+    verifyOtpSubtitle: 'We sent a 6-digit code to',
+    resendCode: 'Resend code',
+    resendIn: 'Resend in {time}',
+    didNotReceive: "Didn't receive the code?",
+    autoDetecting: 'Auto-detecting OTP...',
+    verifyAndContinue: 'Verify & Continue',
   },
   onboarding: {
     slide1: {

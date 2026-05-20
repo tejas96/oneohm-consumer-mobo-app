@@ -13,7 +13,7 @@ import { StyleSheet, View } from 'react-native';
 import { HelperText, TextInput } from 'react-native-paper';
 import type { Props as PaperTextInputProps } from 'react-native-paper/lib/typescript/components/TextInput/TextInput';
 
-import { borderRadius, colors, fontSize, spacing } from '@/shared/theme';
+import { borderRadius, fontSize, spacing, useAppTheme } from '@/shared/theme';
 
 type InputVariant = 'outlined' | 'flat';
 type InputStatus = 'default' | 'error' | 'success';
@@ -30,12 +30,6 @@ export interface CTTextInputProps
   containerStyle?: StyleProp<ViewStyle>;
 }
 
-const STATUS_COLORS: Record<InputStatus, string> = {
-  default: colors.border.focused,
-  error: colors.semantic.error,
-  success: colors.semantic.success,
-};
-
 export function CTTextInput({
   variant = 'outlined',
   status = 'default',
@@ -44,22 +38,35 @@ export function CTTextInput({
   style,
   ...rest
 }: CTTextInputProps) {
-  const activeOutlineColor = STATUS_COLORS[status];
+  const theme = useAppTheme();
   const isError = status === 'error';
+
+  // Semantic status colors
+  const statusColors: Record<InputStatus, string> = {
+    default: theme.colors.primary,
+    error: theme.colors.error,
+    success: theme.colors.tertiary,
+  };
+
+  const activeColor = statusColors[status];
 
   return (
     <View style={[styles.container, containerStyle]}>
       <TextInput
         mode={variant === 'flat' ? 'flat' : 'outlined'}
         error={isError}
-        activeOutlineColor={activeOutlineColor}
-        outlineColor={colors.border.default}
-        textColor={colors.text.primary}
-        placeholderTextColor={colors.text.muted}
-        activeUnderlineColor={activeOutlineColor}
-        underlineColor={colors.border.default}
+        activeOutlineColor={activeColor}
+        outlineColor={theme.colors.outline}
+        textColor={theme.colors.onSurface}
+        placeholderTextColor={theme.colors.onSurfaceVariant}
+        activeUnderlineColor={activeColor}
+        underlineColor={theme.colors.outline}
         outlineStyle={styles.outline}
-        style={[styles.input, style]}
+        style={[
+          styles.input,
+          { backgroundColor: theme.colors.surfaceVariant },
+          style,
+        ]}
         {...rest}
       />
       {helperText ? (
@@ -67,7 +74,11 @@ export function CTTextInput({
           type={isError ? 'error' : 'info'}
           style={[
             styles.helper,
-            { color: isError ? colors.semantic.error : colors.text.muted },
+            {
+              color: isError
+                ? theme.colors.error
+                : theme.colors.onSurfaceVariant,
+            },
           ]}
         >
           {helperText}
@@ -82,7 +93,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
-    backgroundColor: colors.surface.glassBase,
     fontSize: fontSize.body,
   },
   outline: {

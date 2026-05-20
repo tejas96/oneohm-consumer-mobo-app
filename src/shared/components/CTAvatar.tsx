@@ -86,7 +86,6 @@ export function CTAvatar({
           {
             borderColor,
             borderRadius: px / 2 + 3,
-            padding: 2,
           },
         ]}
       >
@@ -102,6 +101,7 @@ const styles = StyleSheet.create({
   ring: {
     borderWidth: 2,
     alignSelf: 'flex-start',
+    padding: 2,
   },
   label: {
     fontWeight: '800',

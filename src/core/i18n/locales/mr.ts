@@ -9,6 +9,24 @@ export const mr: Dictionary = {
     getStarted: 'सुरुवात करा',
     onboardingTitle: 'OneOhm मध्ये आपले स्वागत आहे',
     onboardingSubtitle: 'नवीकरणीय ऊर्जेतील तुमचा विश्वासार्ह भागीदार.',
+    loginTitle: 'आपले\nस्वागत आहे',
+    loginSubtitle:
+      'तुमच्या सोलर प्रोजेक्ट डॅशबोर्डमध्ये प्रवेश करण्यासाठी तुमचा मोबाईल नंबर टाका.',
+    mobileNumberLabel: 'मोबाईल नंबर',
+    mobileNumberPlaceholder: 'मोबाईल नंबर टाका',
+    verificationInfo:
+      'आम्ही तुम्हाला SMS द्वारे वन-टाइम पडताळणी कोड पाठवू. तुमचा डेटा सुरक्षित आणि कूटबद्ध आहे.',
+    termsAndPrivacy:
+      'पुढे जाऊन, तुम्ही आमच्या अटी आणि गोपनीयता धोरणाशी सहमत आहात',
+    terms: 'अटी',
+    privacyPolicy: 'गोपनीयता धोरण',
+    verifyOtpTitle: 'तुमचा नंबर\nपडताळणी करा',
+    verifyOtpSubtitle: 'आम्ही या नंबरवर ६ अंकी कोड पाठवला आहे:',
+    resendCode: 'कोड पुन्हा पाठवा',
+    resendIn: 'पुन्हा पाठवा {time} नंतर',
+    didNotReceive: 'कोड मिळाला नाही?',
+    autoDetecting: 'OTP स्वयंचलित शोधत आहे...',
+    verifyAndContinue: 'पडताळणी करा आणि पुढे जा',
   },
   onboarding: {
     slide1: {
