@@ -89,4 +89,53 @@ export const en = {
     connectedMessage: 'Your solar generation is active.',
     gridConnected: 'Grid Connected',
   },
+  payments: {
+    title: 'Payment Journey',
+    valuation: 'Project Valuation',
+    tracker: 'Milestone Journey Tracker',
+    agreementCost: 'Agreement Cost (Payable to OneOhm)',
+    milestonesCaption: 'Paid in milestones throughout project duration',
+    paidToOneohm: 'Paid to OneOhm',
+    remainingToOneohm: 'Remaining to OneOhm',
+    govSubsidyCredit: 'Gov Subsidy Credit (To Your Account)',
+    govSubsidyDesc: 'Credited directly to customer bank account by MNRE',
+    netInvestment: 'Your Net Investment',
+    netInvestmentDesc: 'Ultimate Cost (After Gov Subsidy)',
+    installmentTimeline: 'Installment Timeline',
+    remainingTermBalance: 'Remaining Term Balance',
+    lockedAwaitingStructure:
+      'Awaiting structure installation completion before unlocking Term 3 payment timeline.',
+    lockedAwaitingEngineering:
+      'Awaiting engineering commissioning before unlocking Term 4 final payment handover.',
+    subsidyDetailsTitle: 'MNRE National Portal Subsidy Details:',
+    subsidyDetail1: 'Registered consumer bank account verification completed ✓',
+    subsidyDetail2:
+      'Subsidy claim filed successfully on structure delivery milestone',
+    subsidyDetail3:
+      'Direct Benefit Transfer (DBT) will trigger automatically upon Discom net-metering commissioning confirmation.',
+    terms: {
+      t1: 'Term 1: Booking Advance',
+      t2: 'Term 2: Material Delivery',
+      t3: 'Term 3: Installation & Wiring',
+      t4: 'Term 4: Net Metering Handover',
+      t5: 'Govt Subsidy Refund Benefit',
+    },
+    status: {
+      paid: 'Paid',
+      partial: 'Partial ({percent}%)',
+      due: 'Due',
+      locked: 'Locked',
+      approved: 'Approved',
+      credited: 'Credited',
+      received: 'Received',
+      dueAmount: '{amount} Due',
+    },
+    deadlines: {
+      t1: 'Due on Quote Acceptance ({date})',
+      t2: 'Payment Date Deadline: {date}',
+      t3: 'Due Date Deadline: {date}',
+      t4: 'Due Date Deadline: {date}',
+      t5: "Credited to customer's linked account 15–30 days post Term 4",
+    },
+  },
 };

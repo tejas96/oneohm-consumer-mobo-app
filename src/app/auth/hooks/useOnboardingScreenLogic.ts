@@ -35,7 +35,7 @@ export function useOnboardingScreenLogic() {
       title: t('onboarding.slide1.title'),
       subtitle: t('onboarding.slide1.subtitle'),
       accentColor: theme.colors.primary, // Brand Primary
-      lottieFile: require('@/assets/animations/lottie/slide1_tracking.json'),
+      lottieFile: require('@/assets/animations/lottie/Tracking my package.json'),
     },
     {
       title: t('onboarding.slide2.title'),
@@ -59,7 +59,7 @@ export function useOnboardingScreenLogic() {
       title: t('onboarding.slide5.title'),
       subtitle: t('onboarding.slide5.subtitle'),
       accentColor: theme.colors.tertiary, // Emerald Green
-      lottieFile: require('@/assets/animations/lottie/slide5_savings.json'),
+      lottieFile: require('@/assets/animations/lottie/Rocket Launch.json'),
     },
   ];
 

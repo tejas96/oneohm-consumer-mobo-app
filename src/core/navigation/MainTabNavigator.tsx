@@ -15,7 +15,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeScreen } from '@/app/home/screens/HomeScreen';
 import { ProjectScreen } from '@/app/project/screens/ProjectScreen';
 import { DocumentsScreen } from '@/app/documents/screens/DocumentsScreen';
-import { PaymentsScreen } from '@/app/payments/screens/PaymentsScreen';
+import { Payments } from '@/app/payments/screens/Payments';
 import { ProfileScreen } from '@/app/profile/screens/ProfileScreen';
 import { CTTabBar } from '@/shared/components';
 
@@ -47,7 +47,7 @@ export function MainTabNavigator() {
       />
       <Tab.Screen
         name={Route.PAYMENTS_TAB}
-        component={PaymentsScreen}
+        component={Payments}
         options={{ title: 'Payments' }}
       />
       <Tab.Screen

@@ -19,6 +19,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { spacing } from '@/shared/theme';
 import { useAppTheme } from '@/shared/theme';
 import { ThemeToggleButton } from './ThemeToggleButton';
+import { CTStateWrapper, type CTStateWrapperProps } from './CTStateWrapper';
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -32,6 +33,8 @@ interface ScreenWrapperProps {
   showThemeToggle?: boolean;
   /** Safe area edges to pad (default: all edges) */
   edges?: Edge[];
+  /** Optional state configuration for loading, error, and empty states */
+  stateConfig?: Omit<CTStateWrapperProps, 'children'>;
 }
 
 export function ScreenWrapper({
@@ -41,6 +44,7 @@ export function ScreenWrapper({
   ambientGlow = false,
   showThemeToggle = true,
   edges,
+  stateConfig,
 }: ScreenWrapperProps) {
   const theme = useAppTheme();
 
@@ -104,7 +108,11 @@ export function ScreenWrapper({
           </View>
         )}
         <View style={[styles.content, padded && styles.padded, style]}>
-          {children}
+          {stateConfig ? (
+            <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
+          ) : (
+            children
+          )}
         </View>
       </SafeAreaView>
     </View>

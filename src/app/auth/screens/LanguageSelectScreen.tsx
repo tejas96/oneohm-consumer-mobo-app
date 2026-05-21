@@ -9,16 +9,9 @@
  */
 
 import React from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  StatusBar,
-} from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Text as PaperText } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   spacing,
@@ -27,7 +20,7 @@ import {
   borderRadius,
   useAppTheme,
 } from '@/shared/theme';
-import { CTButton, ThemeToggleButton } from '@/shared/components';
+import { ScreenWrapper, CTButton } from '@/shared/components';
 
 import { useLanguageSelectLogic } from '../hooks/useLanguageSelectLogic';
 
@@ -104,116 +97,73 @@ export function LanguageSelectScreen() {
     useLanguageSelectLogic();
   const theme = useAppTheme();
 
-  const overlayColor = theme.colors.statusBarOverlay;
-
-  const barStyle = theme.dark ? 'light-content' : 'dark-content';
-
   return (
-    <View style={[styles.root, { backgroundColor: theme.colors.background }]}>
-      <StatusBar
-        barStyle={barStyle}
-        backgroundColor="transparent"
-        translucent
-      />
-
-      {/* Full-screen Lottie background */}
-      <LottieView
-        source={require('@/assets/animations/lottie/Wind turbine spinning in the background.json')}
-        autoPlay
-        loop
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
-      />
-
-      {/* Theme-adaptive dark/light overlay */}
-      <View style={[styles.overlay, { backgroundColor: overlayColor }]} />
-
-      {/* Theme toggle — top-right, outside safe area flow */}
-      <View style={styles.toggleContainer}>
-        <ThemeToggleButton />
-      </View>
-
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.content}>
-          {/* Header */}
-          <View style={styles.header}>
-            <PaperText
-              variant="displaySmall"
-              style={[styles.title, { color: theme.colors.onBackground }]}
-            >
-              {t('auth.languageSelect')}
-            </PaperText>
-            <Text
-              style={[
-                styles.subtitle,
-                { color: theme.colors.onSurfaceVariant },
-              ]}
-            >
-              {t('auth.languageSelectSubtitle')}
-            </Text>
-          </View>
-
-          {/* Language Cards */}
-          <View style={styles.cardsContainer}>
-            <LanguageOption
-              flag="🇮🇳"
-              label="मराठी  (Marathi)"
-              isSelected={selectedLanguage === 'mr'}
-              onPress={() => handleLanguageSelect('mr')}
-            />
-            <View style={styles.cardSpacer} />
-            <LanguageOption
-              flag="🇬🇧"
-              label="English"
-              isSelected={selectedLanguage === 'en'}
-              onPress={() => handleLanguageSelect('en')}
+    <ScreenWrapper ambientGlow padded={false} showThemeToggle={true}>
+      <View style={styles.content}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.lottieContainer}>
+            <LottieView
+              source={require('@/assets/animations/lottie/Translation Animation.json')}
+              autoPlay
+              loop
+              style={styles.lottie}
             />
           </View>
-
-          {/* Footer */}
-          <View style={styles.footer}>
-            <CTButton
-              variant="primary"
-              size="lg"
-              onPress={handleContinue}
-              style={styles.continueButton}
-            >
-              {t('auth.continue')} →
-            </CTButton>
-            <Text
-              style={[styles.caption, { color: theme.colors.onSurfaceVariant }]}
-            >
-              {t('auth.languageChangeCaption')}
-            </Text>
-          </View>
+          <PaperText
+            variant="displaySmall"
+            style={[styles.title, { color: theme.colors.onBackground }]}
+          >
+            {t('auth.languageSelect')}
+          </PaperText>
+          <Text
+            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
+          >
+            {t('auth.languageSelectSubtitle')}
+          </Text>
         </View>
-      </SafeAreaView>
-    </View>
+
+        {/* Language Cards */}
+        <View style={styles.cardsContainer}>
+          <LanguageOption
+            flag="🇮🇳"
+            label="मराठी  (Marathi)"
+            isSelected={selectedLanguage === 'mr'}
+            onPress={() => handleLanguageSelect('mr')}
+          />
+          <View style={styles.cardSpacer} />
+          <LanguageOption
+            flag="🇬🇧"
+            label="English"
+            isSelected={selectedLanguage === 'en'}
+            onPress={() => handleLanguageSelect('en')}
+          />
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <CTButton
+            variant="primary"
+            size="lg"
+            onPress={handleContinue}
+            style={styles.continueButton}
+          >
+            {t('auth.continue')} →
+          </CTButton>
+          <Text
+            style={[styles.caption, { color: theme.colors.onSurfaceVariant }]}
+          >
+            {t('auth.languageChangeCaption')}
+          </Text>
+        </View>
+      </View>
+    </ScreenWrapper>
   );
 }
 
 const CARD_RADIUS = borderRadius.card;
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  toggleContainer: {
-    position: 'absolute',
-    top: 48,
-    left: spacing.md,
-    zIndex: 10,
-  },
-  safeArea: {
-    flex: 1,
-  },
   content: {
     flex: 1,
     paddingHorizontal: spacing.xl,
@@ -224,6 +174,17 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingTop: spacing.xl,
+  },
+  lottieContainer: {
+    width: 150,
+    height: 150,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  lottie: {
+    width: 180,
+    height: 180,
   },
   title: {
     fontWeight: fontWeight.bold,
@@ -279,6 +240,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     alignItems: 'center',
+    width: '100%',
   },
   continueButton: {
     width: '100%',

@@ -6,10 +6,9 @@
 
 import React from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
-import { ActivityIndicator, Text, Button } from 'react-native-paper';
 
 import { ScreenWrapper } from '@/shared/components';
-import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
+import { spacing, useAppTheme } from '@/shared/theme';
 
 import { useHomeDashboard } from '../hooks/useHomeDashboard';
 import { HomeHeader } from '../components/HomeHeader';
@@ -38,39 +37,6 @@ export function HomeScreen() {
   } = useHomeDashboard();
 
   const renderContent = () => {
-    if (isLoading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text
-            style={[
-              styles.loadingText,
-              { color: theme.colors.onSurfaceVariant },
-            ]}
-          >
-            Loading Dashboard...
-          </Text>
-        </View>
-      );
-    }
-
-    if (isError) {
-      return (
-        <View style={styles.errorContainer}>
-          <Text style={[styles.errorText, { color: theme.colors.error }]}>
-            Unable to load project data.
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => refetch()}
-            style={styles.retryButton}
-          >
-            Retry
-          </Button>
-        </View>
-      );
-    }
-
     if (dashboardState === 'onboarding') {
       return <OnboardingState />;
     }
@@ -118,6 +84,18 @@ export function HomeScreen() {
       ambientGlow={false}
       showThemeToggle={false}
       edges={['top', 'left', 'right']}
+      stateConfig={{
+        state: isLoading ? 'loading' : isError ? 'error' : 'success',
+        loadingConfig: {
+          message: 'Loading Dashboard...',
+        },
+        errorConfig: {
+          title: 'Unable to load project data.',
+          message: 'Please check your connection and try again.',
+          retryText: 'Retry',
+          onRetry: refetch,
+        },
+      }}
     >
       <HomeHeader
         userName={user?.firstName || ''}
@@ -136,28 +114,5 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: spacing['2xl'],
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: fontSize.sm,
-    marginTop: spacing.md,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
-  },
-  errorText: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.bold,
-    marginBottom: spacing.md,
-  },
-  retryButton: {
-    borderRadius: 8,
   },
 });
