@@ -5,6 +5,7 @@ module.exports = {
   setupFiles: [
     require.resolve('react-native-gesture-handler/jestSetup'),
     ...rnJestPreset.setupFiles,
+    './jest.setup.js',
   ],
   // Dependencies under node_modules often ship modern syntax; allow babel-jest to transform
   // react-native-* packages, @react-navigation/*, @tanstack/*, etc.

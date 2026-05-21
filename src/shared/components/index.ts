@@ -1,6 +1,7 @@
 export { ScreenWrapper } from './ScreenWrapper';
 export { LoadingOverlay } from './LoadingOverlay';
 export { ThemeToggleButton } from './ThemeToggleButton';
+export { CTTabBar } from './CTTabBar';
 export { CTButton } from './CTButton';
 export { CTTextInput } from './CTTextInput';
 export { CTCard } from './CTCard';
@@ -13,6 +14,7 @@ export { CTDialog } from './CTDialog';
 export { CTListItem } from './CTListItem';
 export { CTBadge } from './CTBadge';
 export { CTSnackbar } from './CTSnackbar';
+export { CTProgressCircle } from './CTProgressCircle';
 
 // Type exports
 export type { CTButtonProps } from './CTButton';
@@ -27,3 +29,4 @@ export type { CTDialogProps, CTDialogAction } from './CTDialog';
 export type { CTListItemProps, CTListItemLeftIcon } from './CTListItem';
 export type { CTBadgeProps } from './CTBadge';
 export type { CTSnackbarProps } from './CTSnackbar';
+export type { CTProgressCircleProps } from './CTProgressCircle';

@@ -11,7 +11,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { BottomNavigation } from 'react-native-paper';
 
-import { colors, fontSize, fontWeight } from '@/shared/theme';
+import { fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 
 export interface CTBottomNavRoute {
   /** Unique route key */
@@ -45,6 +45,8 @@ export function CTBottomNav({
   onIndexChange,
   renderScene,
 }: CTBottomNavProps) {
+  const theme = useAppTheme();
+
   return (
     <BottomNavigation
       navigationState={navigationState}
@@ -52,15 +54,21 @@ export function CTBottomNav({
       renderScene={({ route }) =>
         renderScene({ route: route as CTBottomNavRoute })
       }
-      barStyle={styles.bar}
-      activeColor={colors.brand.primary}
-      inactiveColor={colors.text.disabled}
+      barStyle={[
+        styles.bar,
+        {
+          backgroundColor: theme.colors.surface,
+          borderTopColor: theme.colors.outlineVariant,
+        },
+      ]}
+      activeColor={theme.colors.primary}
+      inactiveColor={theme.colors.onSurfaceVariant}
       shifting={false}
       labeled={true}
       sceneAnimationEnabled={false}
       theme={{
         colors: {
-          secondaryContainer: colors.brand.primaryGlow,
+          secondaryContainer: theme.colors.primaryContainer,
         },
       }}
     />
@@ -69,9 +77,7 @@ export function CTBottomNav({
 
 const styles = StyleSheet.create({
   bar: {
-    backgroundColor: colors.surface.navBackdrop,
     borderTopWidth: 1,
-    borderTopColor: colors.surface.borderSubtle,
     height: 80,
   },
   label: {

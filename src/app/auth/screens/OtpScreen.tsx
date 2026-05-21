@@ -206,7 +206,7 @@ export function OtpScreen() {
               variant="primary"
               size="lg"
               onPress={handleVerifyOtp}
-              disabled={isPending || otp.length < 6}
+              disabled={isPending}
               loading={isPending}
               style={[styles.button, { shadowColor: theme.colors.primary }]}
             >

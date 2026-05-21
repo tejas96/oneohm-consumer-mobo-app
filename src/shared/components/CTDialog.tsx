@@ -13,10 +13,10 @@ import { Dialog, Portal, Text } from 'react-native-paper';
 
 import {
   borderRadius,
-  colors,
   fontSize,
   fontWeight,
   spacing,
+  useAppTheme,
 } from '@/shared/theme';
 import { CTButton } from './CTButton';
 import type { CTButtonProps } from './CTButton';
@@ -54,19 +54,38 @@ export function CTDialog({
   actions = [],
   dismissable = true,
 }: CTDialogProps) {
+  const theme = useAppTheme();
+
   return (
     <Portal>
       <Dialog
         visible={visible}
         onDismiss={onDismiss}
         dismissable={dismissable}
-        style={styles.dialog}
+        style={[
+          styles.dialog,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.outlineVariant,
+          },
+        ]}
       >
-        <Dialog.Title style={styles.title}>{title}</Dialog.Title>
+        <Dialog.Title style={[styles.title, { color: theme.colors.onSurface }]}>
+          {title}
+        </Dialog.Title>
 
         {message || children ? (
           <Dialog.Content style={styles.content}>
-            {message ? <Text style={styles.message}>{message}</Text> : null}
+            {message ? (
+              <Text
+                style={[
+                  styles.message,
+                  { color: theme.colors.onSurfaceVariant },
+                ]}
+              >
+                {message}
+              </Text>
+            ) : null}
             {children}
           </Dialog.Content>
         ) : null}
@@ -92,15 +111,12 @@ export function CTDialog({
 
 const styles = StyleSheet.create({
   dialog: {
-    backgroundColor: colors.surface.base,
     borderRadius: borderRadius.card,
     borderWidth: 1,
-    borderColor: colors.surface.borderLight,
   },
   title: {
     fontSize: fontSize.headline,
     fontWeight: fontWeight.bold,
-    color: colors.text.primary,
     letterSpacing: -0.2,
   },
   content: {
@@ -108,7 +124,6 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: fontSize.body,
-    color: colors.text.muted,
     lineHeight: 22,
   },
   actions: {

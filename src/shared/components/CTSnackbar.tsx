@@ -9,35 +9,18 @@
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Snackbar } from 'react-native-paper';
+import { Snackbar, Text } from 'react-native-paper';
 import type { Props as PaperSnackbarProps } from 'react-native-paper/lib/typescript/components/Snackbar';
 
 import {
   borderRadius,
-  colors,
   fontSize,
   fontWeight,
   spacing,
+  useAppTheme,
 } from '@/shared/theme';
 
 type SnackbarVariant = 'success' | 'error' | 'warning' | 'info' | 'neutral';
-
-const VARIANT_CONFIG: Record<
-  SnackbarVariant,
-  { accent: string; actionColor: string }
-> = {
-  success: {
-    accent: colors.semantic.success,
-    actionColor: colors.semantic.success,
-  },
-  error: { accent: colors.semantic.error, actionColor: colors.semantic.error },
-  warning: {
-    accent: colors.semantic.warning,
-    actionColor: colors.semantic.warning,
-  },
-  info: { accent: colors.semantic.info, actionColor: colors.semantic.info },
-  neutral: { accent: colors.border.default, actionColor: colors.brand.primary },
-};
 
 export interface CTSnackbarProps
   extends Omit<PaperSnackbarProps, 'children' | 'style'> {
@@ -53,11 +36,50 @@ export function CTSnackbar({
   action,
   ...rest
 }: CTSnackbarProps) {
-  const config = VARIANT_CONFIG[variant];
+  const theme = useAppTheme();
+
+  const getVariantConfig = () => {
+    switch (variant) {
+      case 'success':
+        return {
+          accent: '#10B981',
+          actionColor: '#10B981',
+        };
+      case 'error':
+        return {
+          accent: '#EF4444',
+          actionColor: '#EF4444',
+        };
+      case 'warning':
+        return {
+          accent: '#F59E0B',
+          actionColor: '#F59E0B',
+        };
+      case 'info':
+        return {
+          accent: '#3B82F6',
+          actionColor: '#3B82F6',
+        };
+      case 'neutral':
+      default:
+        return {
+          accent: theme.colors.snackbarNeutralAccent,
+          actionColor: theme.colors.primary,
+        };
+    }
+  };
+
+  const config = getVariantConfig();
 
   return (
     <Snackbar
-      style={styles.snackbar}
+      style={[
+        styles.snackbar,
+        {
+          backgroundColor: theme.colors.snackbarBg,
+          borderColor: theme.colors.snackbarBorderColor,
+        },
+      ]}
       contentStyle={styles.contentWrapper}
       action={
         action
@@ -69,10 +91,10 @@ export function CTSnackbar({
       }
       {...rest}
     >
-      <View style={[styles.row]}>
+      <View style={styles.row}>
         {/* Left accent bar */}
         <View style={[styles.accent, { backgroundColor: config.accent }]} />
-        <View style={styles.messageWrapper}>{message}</View>
+        <Text style={[styles.message, { color: '#FFFFFF' }]}>{message}</Text>
       </View>
     </Snackbar>
   );
@@ -80,10 +102,8 @@ export function CTSnackbar({
 
 const styles = StyleSheet.create({
   snackbar: {
-    backgroundColor: colors.surface.base,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.surface.borderLight,
     marginHorizontal: spacing.md,
     marginBottom: spacing.xl,
   },
@@ -101,11 +121,10 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
     marginRight: spacing.sm,
   },
-  messageWrapper: {
+  message: {
     flex: 1,
     fontSize: fontSize.body,
     fontWeight: fontWeight.medium,
-    color: colors.text.primary,
     lineHeight: 20,
   },
 });

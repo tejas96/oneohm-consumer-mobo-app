@@ -23,10 +23,17 @@ export enum Route {
   MAIN_TABS = 'MainTabs',
   HOME_TAB = 'HomeTab',
   PROJECTS_TAB = 'ProjectsTab',
+  DOCUMENTS_TAB = 'DocumentsTab',
+  PAYMENTS_TAB = 'PaymentsTab',
   PROFILE_TAB = 'ProfileTab',
 
   // ── Main Stack (authenticated) ─────────────
   NOTIFICATIONS = 'Notifications',
   SETTINGS = 'Settings',
   PROJECT_DETAIL = 'ProjectDetail',
+  DOCUMENTS = 'Documents',
+  PAYMENTS = 'Payments',
+  SUPPORT = 'Support',
+  WARRANTY = 'Warranty',
+  PROJECT_SWITCHER = 'ProjectSwitcher',
 }

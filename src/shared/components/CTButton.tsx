@@ -13,7 +13,7 @@ import { StyleSheet } from 'react-native';
 import type { Props as PaperButtonProps } from 'react-native-paper/lib/typescript/components/Button/Button';
 import { Button } from 'react-native-paper';
 
-import { borderRadius, colors, fontSize, spacing } from '@/shared/theme';
+import { borderRadius, fontSize, spacing, useAppTheme } from '@/shared/theme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'glass';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -29,37 +29,6 @@ export interface CTButtonProps
   /** Override Paper mode directly if needed */
   mode?: PaperButtonProps['mode'];
 }
-
-const VARIANT_CONFIG: Record<
-  ButtonVariant,
-  { mode: PaperButtonProps['mode']; buttonColor: string; textColor: string }
-> = {
-  primary: {
-    mode: 'contained',
-    buttonColor: colors.brand.primary,
-    textColor: colors.neutral.white,
-  },
-  secondary: {
-    mode: 'outlined',
-    buttonColor: 'transparent',
-    textColor: colors.brand.primary,
-  },
-  ghost: {
-    mode: 'text',
-    buttonColor: 'transparent',
-    textColor: colors.text.primary,
-  },
-  danger: {
-    mode: 'contained',
-    buttonColor: colors.semantic.error,
-    textColor: colors.neutral.white,
-  },
-  glass: {
-    mode: 'contained',
-    buttonColor: colors.surface.glassStrong,
-    textColor: colors.text.primary,
-  },
-};
 
 const SIZE_CONFIG: Record<
   ButtonSize,
@@ -81,20 +50,62 @@ export function CTButton({
   disabled,
   ...rest
 }: CTButtonProps) {
-  const config = VARIANT_CONFIG[variant];
+  const theme = useAppTheme();
+
+  // Dynamically resolve configuration using the current theme
+  const getVariantConfig = () => {
+    switch (variant) {
+      case 'secondary':
+        return {
+          mode: 'outlined' as const,
+          buttonColor: 'transparent',
+          textColor: theme.colors.primary,
+        };
+      case 'ghost':
+        return {
+          mode: 'text' as const,
+          buttonColor: 'transparent',
+          textColor: theme.colors.onSurface,
+        };
+      case 'danger':
+        return {
+          mode: 'contained' as const,
+          buttonColor: theme.colors.error,
+          textColor: theme.colors.onError,
+        };
+      case 'glass':
+        return {
+          mode: 'contained' as const,
+          buttonColor: theme.colors.buttonGlassBg,
+          textColor: theme.colors.onSurface,
+        };
+      case 'primary':
+      default:
+        return {
+          mode: 'contained' as const,
+          buttonColor: theme.colors.primary,
+          textColor: theme.colors.onPrimary,
+        };
+    }
+  };
+
+  const config = getVariantConfig();
   const sizeConfig = SIZE_CONFIG[size];
   const resolvedMode = modeOverride ?? config.mode;
 
+  const disabledButtonColor = theme.colors.buttonGlassBg;
+  const disabledTextColor = theme.colors.outline;
+
   const secondaryBorder =
     variant === 'secondary'
-      ? { borderColor: disabled ? colors.text.disabled : colors.border.focused }
+      ? { borderColor: disabled ? disabledTextColor : theme.colors.primary }
       : {};
 
   return (
     <Button
       mode={resolvedMode}
-      buttonColor={disabled ? colors.surface.glassStrong : config.buttonColor}
-      textColor={disabled ? colors.text.disabled : config.textColor}
+      buttonColor={disabled ? disabledButtonColor : config.buttonColor}
+      textColor={disabled ? disabledTextColor : config.textColor}
       style={[
         styles.base,
         fullWidth ? styles.fullWidth : undefined,

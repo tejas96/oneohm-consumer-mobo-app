@@ -104,9 +104,7 @@ export function LanguageSelectScreen() {
     useLanguageSelectLogic();
   const theme = useAppTheme();
 
-  const overlayColor = theme.dark
-    ? 'rgba(2, 7, 5, 0.72)'
-    : 'rgba(255, 255, 255, 0.55)';
+  const overlayColor = theme.colors.statusBarOverlay;
 
   const barStyle = theme.dark ? 'light-content' : 'dark-content';
 

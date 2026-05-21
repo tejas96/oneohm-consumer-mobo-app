@@ -201,19 +201,32 @@ export function OnboardingScreen() {
   };
 
   return (
-    <ScreenWrapper padded={false} ambientGlow={false} style={styles.wrapper}>
+    <ScreenWrapper
+      padded={false}
+      ambientGlow={false}
+      style={styles.wrapper}
+      showThemeToggle={false}
+    >
       {/* ─── Particle Effects Layer ─── */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
-        {PARTICLES.map(p => (
-          <FloatingParticle
-            key={p.id}
-            delay={p.delay}
-            left={p.left}
-            size={p.size}
-            duration={p.duration}
-            color={p.color}
-          />
-        ))}
+        {PARTICLES.map(p => {
+          const isPrimary = p.id % 2 !== 0;
+          const baseColor = isPrimary
+            ? theme.colors.primary
+            : theme.colors.secondary;
+          const alpha = isPrimary ? 0.3 : 0.2;
+          const dynamicColor = hexToRgba(baseColor, alpha);
+          return (
+            <FloatingParticle
+              key={p.id}
+              delay={p.delay}
+              left={p.left}
+              size={p.size}
+              duration={p.duration}
+              color={dynamicColor}
+            />
+          );
+        })}
       </View>
 
       {/* ─── Theme Toggle (Top Left) ─── */}

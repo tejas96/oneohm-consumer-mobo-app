@@ -13,15 +13,15 @@
 
 import React from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Surface, Text } from 'react-native-paper';
 
 import {
   borderRadius,
-  colors,
   fontSize,
   fontWeight,
   spacing,
+  useAppTheme,
 } from '@/shared/theme';
 
 type CardVariant = 'glass' | 'solid' | 'elevated';
@@ -74,14 +74,25 @@ function CTCardHeader({
   right,
   style,
 }: CTCardHeaderProps) {
+  const theme = useAppTheme();
+
   return (
     <View style={[headerStyles.container, style]}>
       <View style={headerStyles.row}>
         {left ? <View style={headerStyles.left}>{left}</View> : null}
         <View style={headerStyles.titleGroup}>
-          <Text style={headerStyles.title}>{title}</Text>
+          <Text style={[headerStyles.title, { color: theme.colors.onSurface }]}>
+            {title}
+          </Text>
           {subtitle ? (
-            <Text style={headerStyles.subtitle}>{subtitle}</Text>
+            <Text
+              style={[
+                headerStyles.subtitle,
+                { color: theme.colors.onSurfaceVariant },
+              ]}
+            >
+              {subtitle}
+            </Text>
           ) : null}
         </View>
         {right ? <View style={headerStyles.right}>{right}</View> : null}
@@ -98,27 +109,6 @@ function CTCardActions({ children, style }: CTCardActionsProps) {
   return <View style={[actionsStyles.container, style]}>{children}</View>;
 }
 
-// ─── Variant surface styles ────────────────────────────────────────
-
-const VARIANT_STYLES: Record<CardVariant, ViewStyle> = {
-  glass: {
-    backgroundColor: colors.surface.glassBase,
-    borderWidth: 1,
-    borderColor: colors.surface.borderLight,
-  },
-  solid: {
-    backgroundColor: colors.surface.base,
-  },
-  elevated: {
-    backgroundColor: colors.surface.elevated,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 16 },
-    shadowOpacity: 0.7,
-    shadowRadius: 32,
-    elevation: 10,
-  },
-};
-
 // ─── Main Component ───────────────────────────────────────────────
 
 export function CTCard({
@@ -130,9 +120,47 @@ export function CTCard({
   accessibilityLabel,
   testID,
 }: CTCardProps) {
+  const theme = useAppTheme();
+
+  const getVariantStyles = (): ViewStyle => {
+    switch (variant) {
+      case 'solid':
+        return {
+          backgroundColor: theme.colors.cardSolidBg,
+        };
+      case 'elevated':
+        return {
+          backgroundColor: theme.colors.cardElevatedBg,
+          shadowColor: theme.colors.cardShadowColor,
+          shadowOffset: theme.colors.cardShadowOffset,
+          shadowOpacity: theme.colors.cardShadowOpacity,
+          shadowRadius: theme.colors.cardShadowRadius,
+          elevation: theme.colors.cardElevation,
+        };
+      case 'glass':
+      default:
+        return {
+          backgroundColor: theme.colors.cardGlassBg,
+          borderWidth: 1,
+          borderColor: theme.colors.outlineVariant,
+          ...Platform.select({
+            ios: {
+              shadowColor: theme.colors.cardShadowColor,
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 1,
+              shadowRadius: 16,
+            },
+            android: {
+              elevation: theme.colors.cardGlassElevation,
+            },
+          }),
+        };
+    }
+  };
+
   const surface = (
     <Surface
-      style={[styles.card, VARIANT_STYLES[variant], style]}
+      style={[styles.card, getVariantStyles(), style]}
       elevation={variant === 'elevated' ? 4 : 0}
     >
       <View style={[styles.inner, innerStyle]}>{children}</View>
@@ -194,13 +222,11 @@ const headerStyles = StyleSheet.create({
   title: {
     fontSize: fontSize.subhead,
     fontWeight: fontWeight.bold,
-    color: colors.text.primary,
     letterSpacing: -0.1,
   },
   subtitle: {
     fontSize: fontSize.caption,
     fontWeight: fontWeight.medium,
-    color: colors.text.muted,
     marginTop: 2,
     textTransform: 'uppercase',
     letterSpacing: 0.5,

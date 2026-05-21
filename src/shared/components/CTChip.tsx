@@ -14,10 +14,10 @@ import type { Props as PaperChipProps } from 'react-native-paper/lib/typescript/
 
 import {
   borderRadius,
-  colors,
   fontSize,
   fontWeight,
   spacing,
+  useAppTheme,
 } from '@/shared/theme';
 
 type ChipStatus =
@@ -38,42 +38,6 @@ export interface CTChipProps
   style?: PaperChipProps['style'];
 }
 
-const STATUS_CONFIG: Record<
-  ChipStatus,
-  { bg: string; text: string; border: string }
-> = {
-  success: {
-    bg: colors.semantic.successLight,
-    text: colors.semantic.success,
-    border: colors.semantic.success,
-  },
-  warning: {
-    bg: colors.semantic.warningLight,
-    text: colors.semantic.warning,
-    border: colors.semantic.warning,
-  },
-  error: {
-    bg: colors.semantic.errorLight,
-    text: colors.semantic.error,
-    border: colors.semantic.error,
-  },
-  info: {
-    bg: colors.semantic.infoLight,
-    text: colors.semantic.info,
-    border: colors.semantic.info,
-  },
-  neutral: {
-    bg: colors.surface.glassBase,
-    text: colors.text.muted,
-    border: colors.border.default,
-  },
-  brand: {
-    bg: colors.brand.primaryGlow,
-    text: colors.brand.primary,
-    border: colors.brand.primary,
-  },
-};
-
 const SIZE_STYLES: Record<
   ChipSize,
   { fontSize: number; height: number; paddingHorizontal: number }
@@ -90,8 +54,55 @@ export function CTChip({
   textStyle,
   ...rest
 }: CTChipProps) {
-  const config = STATUS_CONFIG[status];
+  const theme = useAppTheme();
+
+  const getColors = () => {
+    switch (status) {
+      case 'success':
+        return {
+          bg: theme.colors.tertiaryContainer,
+          text: theme.colors.onTertiaryContainer,
+          border: theme.colors.tertiary,
+        };
+      case 'error':
+        return {
+          bg: theme.colors.errorContainer,
+          text: theme.colors.onErrorContainer,
+          border: theme.colors.error,
+        };
+      case 'warning':
+        return {
+          bg: theme.colors.warningBgChip,
+          text: theme.colors.warningText,
+          border: theme.colors.warningBorder,
+        };
+      case 'info':
+        return {
+          bg: theme.colors.infoBgChip,
+          text: theme.colors.infoText,
+          border: theme.colors.infoBorder,
+        };
+      case 'brand':
+        return {
+          bg: theme.colors.primaryContainer,
+          text: theme.colors.onPrimaryContainer,
+          border: theme.colors.primary,
+        };
+      case 'neutral':
+      default:
+        return {
+          bg: theme.colors.glassBgStrong,
+          text: theme.colors.onSurfaceVariant,
+          border: theme.colors.outlineVariant,
+        };
+    }
+  };
+
+  const config = getColors();
   const sizeStyle = SIZE_STYLES[size];
+  const resolvedBorderColor = config.border.startsWith('#')
+    ? `${config.border}40`
+    : config.border;
 
   return (
     <Chip
@@ -101,7 +112,7 @@ export function CTChip({
         styles.base,
         {
           backgroundColor: config.bg,
-          borderColor: `${config.border}40`,
+          borderColor: resolvedBorderColor,
           height: sizeStyle.height,
           paddingHorizontal: sizeStyle.paddingHorizontal,
         },
@@ -113,6 +124,7 @@ export function CTChip({
           fontSize: sizeStyle.fontSize,
           color: config.text,
           fontWeight: fontWeight.black,
+          marginVertical: 2,
         },
         textStyle,
       ]}

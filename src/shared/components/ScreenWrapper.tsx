@@ -13,11 +13,12 @@
 import React from 'react';
 import type { ViewStyle } from 'react-native';
 import { StatusBar, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { spacing } from '@/shared/theme';
 import { useAppTheme } from '@/shared/theme';
+import { ThemeToggleButton } from './ThemeToggleButton';
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -27,6 +28,10 @@ interface ScreenWrapperProps {
   padded?: boolean;
   /** Render ambient floating glow orbs behind content */
   ambientGlow?: boolean;
+  /** Whether to show the theme mode toggle button (default: true) */
+  showThemeToggle?: boolean;
+  /** Safe area edges to pad (default: all edges) */
+  edges?: Edge[];
 }
 
 export function ScreenWrapper({
@@ -34,6 +39,8 @@ export function ScreenWrapper({
   style,
   padded = true,
   ambientGlow = false,
+  showThemeToggle = true,
+  edges,
 }: ScreenWrapperProps) {
   const theme = useAppTheme();
 
@@ -90,7 +97,12 @@ export function ScreenWrapper({
         </>
       ) : null}
 
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={edges}>
+        {showThemeToggle && (
+          <View style={styles.toggleRow}>
+            <ThemeToggleButton />
+          </View>
+        )}
         <View style={[styles.content, padded && styles.padded, style]}>
           {children}
         </View>
@@ -106,6 +118,12 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: 'transparent',
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
   content: {
     flex: 1,

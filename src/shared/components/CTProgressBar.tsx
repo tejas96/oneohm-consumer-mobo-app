@@ -18,10 +18,10 @@ import type { Props as PaperProgressBarProps } from 'react-native-paper/lib/type
 
 import {
   borderRadius,
-  colors,
   fontSize,
   fontWeight,
   spacing,
+  useAppTheme,
 } from '@/shared/theme';
 
 type ProgressVariant = 'brand' | 'status';
@@ -42,12 +42,6 @@ export interface CTProgressBarProps
   style?: StyleProp<ViewStyle>;
 }
 
-const STATUS_COLORS: Record<ProgressStatus, string> = {
-  success: colors.semantic.success,
-  warning: colors.semantic.warning,
-  error: colors.semantic.error,
-};
-
 export function CTProgressBar({
   progress = 0,
   variant = 'brand',
@@ -58,23 +52,46 @@ export function CTProgressBar({
   style,
   ...rest
 }: CTProgressBarProps) {
+  const theme = useAppTheme();
   const pct = Math.round(progress * 100);
   const labelText = label ?? `${pct}%`;
 
+  const getStatusColor = (progStatus: ProgressStatus) => {
+    switch (progStatus) {
+      case 'success':
+        return theme.colors.tertiary; // Accessible emerald green
+      case 'warning':
+        return theme.colors.warningText;
+      case 'error':
+        return theme.colors.error;
+    }
+  };
+
   // For gradient variant: overlay a thin colored View on the track
   const fillColor =
-    variant === 'status' ? STATUS_COLORS[status] : colors.brand.primary;
+    variant === 'status' ? getStatusColor(status) : theme.colors.primary;
 
   return (
     <View style={[styles.wrapper, style]}>
       {showLabel ? (
         <View style={styles.labelRow}>
-          <Text style={styles.label}>{labelText}</Text>
+          <Text style={[styles.label, { color: theme.colors.primary }]}>
+            {labelText}
+          </Text>
         </View>
       ) : null}
 
       {/* Track */}
-      <View style={[styles.track, { height }]}>
+      <View
+        style={[
+          styles.track,
+          {
+            height,
+            backgroundColor: theme.colors.glassBgStrong,
+            borderColor: theme.colors.outlineVariant,
+          },
+        ]}
+      >
         {/* Fill */}
         <View
           style={[
@@ -111,16 +128,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: fontSize.micro,
     fontWeight: fontWeight.black,
-    color: colors.brand.primary,
     letterSpacing: 0.5,
   },
   track: {
     width: '100%',
-    backgroundColor: colors.surface.glassBase,
     borderRadius: borderRadius.full,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: colors.surface.borderSubtle,
   },
   fill: {
     borderRadius: borderRadius.full,

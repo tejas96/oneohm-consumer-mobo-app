@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Home V2 (Ambient Hub) — OneOhm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#76c044',
+                            dark: '#5ea031',
+                            secondary: '#0d74b8',
+                            glow: 'rgba(118, 192, 68, 0.15)'
+                        },
+                        surface: {
+                            root: '#020705',
+                            card: '#0D2A1F',
+                            elevated: '#14382A',
+                            border: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="project-context.js"></script>
+    <script src="language-context.js"></script>
+    <style>
+        :root {
+            --brand-primary: #76c044;
+            --brand-secondary: #0d74b8;
+            --bg-main: #020705;
+            --bg-grad: linear-gradient(180deg, #020705 0%, #061810 100%);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-strong: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --nav-bg: rgba(2, 7, 5, 0.94);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+        }
+        .glass-strong {
+            background: var(--glass-strong);
+            backdrop-filter: blur(32px);
+            border: 1px solid var(--glass-border);
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Sun rays pulse animation */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.15; }
+            50% { transform: scale(1.15); opacity: 0.3; }
+        }
+        .ambient-glow {
+            animation: pulseGlow 6s ease-in-out infinite;
+        }
+
+        /* SVG Solar pulse */
+        @keyframes solarPulse {
+            0% { stroke-dashoffset: 100; opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { stroke-dashoffset: 0; opacity: 0.3; }
+        }
+        .solar-ray {
+            stroke-dasharray: 20 10;
+            animation: solarPulse 3s linear infinite;
+        }
+
+        /* SVG Energy Ring rotation */
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .active-ring {
+            transform-origin: center;
+            animation: rotateRing 20s linear infinite;
+        }
+
+        /* Confetti particle animation */
+        @keyframes confettiFall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(80vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            animation: confettiFall 3s linear forwards;
+        }
+    </style>
+</head>
+<body class="bg-surface-root">
+<div class="max-w-md mx-auto min-h-screen relative pb-28" style="background: var(--bg-grad);">
+
+    <!-- Ambient glows -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] h-[350px] pointer-events-none ambient-glow" style="background: radial-gradient(ellipse at 50% 0%, rgba(118,192,68,0.18) 0%, transparent 75%);"></div>
+    <div id="statusIndicatorGlow" class="absolute top-44 left-1/2 -translate-x-1/2 w-[220px] h-[220px] pointer-events-none rounded-full blur-[80px]" style="background: rgba(118,192,68,0.06);"></div>
+
+    <!-- ═══ State Switcher (Demo Only) ═══ -->
+    <div class="relative z-50 px-6 pt-4 flex justify-between gap-1">
+        <button onclick="switchState('progress')" id="btn-state-progress" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-brand-primary text-black transition-all">In Progress</button>
+        <button onclick="switchState('empty')" id="btn-state-empty" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider glass text-white/60 transition-all">No Project</button>
+        <button onclick="switchState('completed')" id="btn-state-completed" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider glass text-white/60 transition-all">Completed</button>
+    </div>
+
+    <!-- Confetti Container -->
+    <div id="confettiContainer" class="absolute inset-0 pointer-events-none overflow-hidden z-40"></div>
+
+    <!-- ═══ Header ═══ -->
+    <div class="relative z-10 px-6 pt-8 pb-4">
+        <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs opacity-40 font-medium mb-1" id="greeting">Good Morning</p>
+                <h1 class="text-[24px] font-bold mb-2">Raj Kumar</h1>
+
+                <!-- Switcher Dropdown -->
+                <a id="switcherLink" href="13-switch-project.html?from=05-home-v2.html"
+                   class="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-2xl transition-all active:scale-[0.97]"
+                   style="background:rgba(255,255,255,0.04); border:1px solid var(--glass-border);">
+                    <div class="w-2 h-2 rounded-full bg-brand-primary" id="projStatusDot" style="box-shadow: 0 0 8px #76c044;"></div>
+                    <span class="text-[12px] font-semibold text-white/80 truncate max-w-[150px]" id="projLabel">5 kW Solar System</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </a>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2.5 ml-3 mt-1">
+                <a href="12-notifications.html" class="relative w-11 h-11 rounded-2xl glass flex items-center justify-center shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <div class="absolute -top-0.5 -right-0.5 w-[9px] h-[9px] rounded-full bg-red-500 border-2 border-surface-root"></div>
+                </a>
+                <a href="11-profile.html" class="w-11 h-11 rounded-full overflow-hidden border-2 border-brand-primary/25 shrink-0">
+                    <div class="w-full h-full bg-gradient-to-br from-brand-primary/25 to-brand-secondary/15 flex items-center justify-center">
+                        <span class="text-[11px] font-bold text-white animate-pulse">RK</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ State 1 & 3: Circular Central Ring / Widget ═══ -->
+    <div id="activeWidgetSection" class="relative z-10 px-6 py-4 flex flex-col items-center">
+        <div class="relative w-48 h-48 flex items-center justify-center">
+            
+            <!-- Progress / Energy SVG Ring -->
+            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <!-- Track -->
+                <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.03)" stroke-width="6" fill="transparent" />
+                <!-- Active Indicator -->
+                <circle id="progressCircle" class="transition-all duration-1000" cx="50" cy="50" r="42" 
+                        stroke="url(#ringGrad)" stroke-width="7" fill="transparent" 
+                        stroke-dasharray="263.8" stroke-dashoffset="145" stroke-linecap="round" />
+                <!-- Linear Gradient Definition -->
+                <defs>
+                    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#76c044" />
+                        <stop offset="100%" stop-color="#0d74b8" />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- Centered Core Metrics (Tapping opens details sheet) -->
+            <div class="absolute flex flex-col items-center text-center">
+                <span id="centerSmallText" class="text-[10px] uppercase font-bold tracking-wider text-white/40">5 kW System</span>
+                <span id="centerMainValue" class="text-[32px] font-black text-white tracking-tight mt-0.5">45%</span>
+                <span id="centerStatusPill" class="mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-yellow-500 bg-yellow-500/10 border border-yellow-500/20">In Progress</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ State 2: No Projects (Empty State Animation Panel) ═══ -->
+    <div id="emptyWidgetSection" class="hidden relative z-10 px-6 py-8 flex flex-col items-center text-center">
+        <!-- SVG Lottie-like Animation Visual -->
+        <div class="relative w-48 h-48 flex items-center justify-center glass rounded-full overflow-hidden mb-6 animate-pulse" style="border-color: rgba(234, 179, 8, 0.15)">
+            <div class="absolute inset-0 bg-gradient-to-b from-yellow-500/5 to-transparent"></div>
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="none">
+                <!-- Outer spinning orbit ring representing validation progress -->
+                <circle cx="50" cy="50" r="38" stroke="rgba(255, 255, 255, 0.05)" stroke-width="2"/>
+                <circle cx="50" cy="50" r="38" stroke="#EAB308" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="60 180" class="animate-spin" style="transform-origin: 50% 50%;"/>
+                
+                <!-- Folder/Document shape -->
+                <path d="M35 30 H55 L65 40 V70 H35 Z" fill="rgba(255, 255, 255, 0.02)" stroke="white" stroke-width="2" stroke-linejoin="round" opacity="0.8"/>
+                <path d="M55 30 V40 H65" stroke="white" stroke-width="2" stroke-linejoin="round" opacity="0.8"/>
+                
+                <!-- Onboarding content representation lines -->
+                <line x1="42" y1="50" x2="58" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+                <line x1="42" y1="56" x2="52" y2="56" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
+                
+                <!-- Pulsing badge representing verification/validation process -->
+                <circle cx="65" cy="65" r="10" fill="#EAB308"/>
+                <path d="M62 65 L64 67 L68 63" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+        <h3 class="text-[18px] font-extrabold text-white mb-2">Profile Onboarding</h3>
+        <p class="text-[13px] text-white/50 max-w-[280px] leading-relaxed mb-6">We are currently setting up your customer profile and validating your solar quote details. Once the onboarding process is 100% complete and converted into an active project, your tracking dashboard will launch here.</p>
+        
+        <!-- Status Indicator Card -->
+        <div class="glass-strong px-4 py-3 rounded-2xl inline-flex items-center gap-2 border border-yellow-500/10">
+            <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+            <span class="text-[10px] font-bold text-yellow-500 uppercase tracking-wide">Stage: Onboarding & Verification</span>
+        </div>
+    </div>
+
+    <!-- ═══ Live Dynamic Action/Status Banner ═══ -->
+    <div id="liveStatusBanner" class="relative z-10 px-6 mb-4">
+        <!-- In Progress Alert -->
+        <div id="banner-progress" class="flex items-start gap-3 p-4 rounded-3xl border border-yellow-500/20" style="background: rgba(245,158,11,0.06);">
+            <div class="w-8 h-8 rounded-xl bg-yellow-500/10 flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EAB308" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-bold text-yellow-500 uppercase tracking-wide">Next Step Required</p>
+                <p class="text-[13px] text-white/80 mt-0.5 leading-snug">Verify site assessment report and sign structure NOC.</p>
+                <a href="07-documents.html" class="inline-flex items-center gap-1.5 mt-2 text-[11px] font-bold text-yellow-500 active:scale-[0.98]">
+                    <span>Review Documents</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Completed Status -->
+        <div id="banner-completed" class="hidden flex items-start gap-3 p-4 rounded-3xl border border-brand-primary/20" style="background: rgba(118,192,68,0.06);">
+            <div class="w-8 h-8 rounded-xl bg-brand-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-[11px] font-bold text-brand-primary uppercase tracking-wide">System Connected</p>
+                <p class="text-[13px] text-white/80 mt-0.5 leading-snug">Your 5 kW Solar generation is grid-active and export is online.</p>
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-brand-primary animate-ping"></span>
+                    <span class="text-[11px] font-bold text-white/50">Grid Connected</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Payments Dashboard Summary Card ═══ -->
+    <div id="paymentsLedgerSection" class="relative z-10 px-6 mb-6">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-[11px] font-bold text-white/40 uppercase tracking-wider">Payment Snapshot</h3>
+            <span class="text-[9px] font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20 px-2 py-0.5 rounded-full">● On Track</span>
+        </div>
+        
+        <!-- Summary Card Container -->
+        <a href="08-payments-v2.html" class="block glass rounded-3xl p-5 hover:bg-white/[0.04] transition-all border border-white/5 active:scale-[0.99]">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-white/40">Total to OneOhm</span>
+                    <p class="text-[20px] font-black text-white mt-0.5" id="dashTotalValue">₹2,85,000</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-brand-primary">Paid to OneOhm</span>
+                    <p class="text-[20px] font-black text-brand-primary mt-0.5" id="dashAmountPaid">₹85,500</p>
+                </div>
+            </div>
+
+            <!-- Two-colored progress bar -->
+            <div class="relative w-full h-2 bg-white/5 rounded-full overflow-hidden mb-4">
+                <div id="dashPaidBar" class="absolute left-0 top-0 h-full bg-brand-primary rounded-full" style="width: 30%"></div>
+            </div>
+
+            <!-- Subsidy & Net Cost Breakdown -->
+            <div class="grid grid-cols-2 gap-4 pt-3.5 border-t border-white/5">
+                <div>
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-white/30">Expected Subsidy</span>
+                    <p class="text-[13px] font-bold text-brand-secondary mt-0.5" id="dashSubsidy">+ ₹1,14,000</p>
+                    <p class="text-[8px] text-white/40 mt-0.5">Direct Govt Refund</p>
+                </div>
+                <div class="text-right border-l border-white/5 pl-4">
+                    <span class="text-[9px] uppercase font-bold tracking-wider text-white/30">Your Net Cost</span>
+                    <p class="text-[13px] font-bold text-white mt-0.5" id="dashNetCost">₹1,71,000</p>
+                    <p class="text-[8px] text-white/40 mt-0.5">Ultimate Investment</p>
+                </div>
+            </div>
+
+            <!-- Dates / Period -->
+            <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span class="text-[9px] text-white/40 font-semibold" id="dashProjectDates">Oct 10, 2025 – Dec 15, 2025</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <span class="text-[9px] text-brand-primary font-bold">View Timeline</span>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="3" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- ═══ System Analytics Yield (Only Completed State) ═══ -->
+    <div id="analyticsSection" class="hidden relative z-10 px-6 mb-6">
+        <h3 class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-3">Live Yield Stats</h3>
+        <div class="grid grid-cols-3 gap-3">
+            <div class="glass p-3.5 rounded-2xl text-center">
+                <p class="text-[9px] text-white/40 font-bold uppercase">Daily Yield</p>
+                <p class="text-[16px] font-black text-brand-primary mt-1">24.8 kWh</p>
+                <p class="text-[9px] text-white/30 mt-0.5">Today</p>
+            </div>
+            <div class="glass p-3.5 rounded-2xl text-center">
+                <p class="text-[9px] text-white/40 font-bold uppercase">CO2 Offset</p>
+                <p class="text-[16px] font-black text-emerald-400 mt-1">925 kg</p>
+                <p class="text-[9px] text-emerald-400/60 font-semibold mt-0.5">45 Trees 🌳</p>
+            </div>
+            <div class="glass p-3.5 rounded-2xl text-center">
+                <p class="text-[9px] text-white/40 font-bold uppercase">Savings</p>
+                <p class="text-[16px] font-black text-white mt-1">₹8,250</p>
+                <p class="text-[9px] text-white/30 mt-0.5">This Month</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Quick Actions Grid ═══ -->
+    <div id="quickActionsSection" class="relative z-10 px-6">
+        <h3 class="text-[11px] font-bold text-white/40 uppercase tracking-wider mb-3">Quick Actions</h3>
+        <div class="grid grid-cols-2 gap-3">
+            <a href="09-service.html" class="glass rounded-2xl p-4 active:scale-[0.98] transition-all flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-white/80">Support</p>
+                    <p class="text-[9px] text-white/30">Get service</p>
+                </div>
+            </a>
+            <a href="07-documents.html" class="glass rounded-2xl p-4 active:scale-[0.98] transition-all flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-secondary/10 flex items-center justify-center shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d74b8" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-white/80">Documents</p>
+                    <p class="text-[9px] text-white/30">View NOC & certs</p>
+                </div>
+            </a>
+            <a href="10-team.html" class="glass rounded-2xl p-4 active:scale-[0.98] transition-all flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="1.8" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-white/80">Your Team</p>
+                    <p class="text-[9px] text-white/30">Contact crew</p>
+                </div>
+            </a>
+            <a id="switcherActionCard" href="13-switch-project.html?from=05-home-v2.html" class="glass rounded-2xl p-4 active:scale-[0.98] transition-all flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center shrink-0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l9-7 9 7"/><path d="M9 22V12h6v10"/><path d="M21 9v13"/><path d="M3 9v13"/></svg>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-white/80">Properties</p>
+                    <p class="text-[9px] text-white/30">All accounts</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 max-w-md mx-auto" style="background: var(--nav-bg); backdrop-filter: blur(30px); border-top: 1px solid var(--glass-border);">
+        <div class="flex justify-around items-center py-2.5 px-4 pb-7">
+            <a href="05-home-v2.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#76c044" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="text-[10px] font-semibold text-brand-primary" id="nav-home">Home</span><div class="w-1 h-1 rounded-full bg-brand-primary"></div></a>
+            <a href="06-project.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="text-[10px] opacity-30" id="nav-project">Project</span></a>
+            <a href="07-documents.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="text-[10px] opacity-30" id="nav-docs">Docs</span></a>
+            <a href="08-payments-v2.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg><span class="text-[10px] opacity-30" id="nav-payments">Payments</span></a>
+            <a href="11-profile.html" class="flex flex-col items-center gap-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="opacity-30" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="text-[10px] opacity-30" id="nav-profile">Profile</span></a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // State Swapping logic for demo purposes
+    function switchState(state) {
+        // Reset button states
+        ['progress', 'empty', 'completed'].forEach(s => {
+            const btn = document.getElementById('btn-state-' + s);
+            if (s === state) {
+                btn.className = "flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-brand-primary text-black transition-all";
+            } else {
+                btn.className = "flex-1 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider glass text-white/60 transition-all";
+            }
+        });
+
+        // Get elements
+        const activeWidget = document.getElementById('activeWidgetSection');
+        const emptyWidget = document.getElementById('emptyWidgetSection');
+        const progressBanner = document.getElementById('banner-progress');
+        const completedBanner = document.getElementById('banner-completed');
+        const ledgerSection = document.getElementById('paymentsLedgerSection');
+        const analyticsSection = document.getElementById('analyticsSection');
+        const quickActionsSection = document.getElementById('quickActionsSection');
+        const switcherLink = document.getElementById('switcherLink');
+        const switcherActionCard = document.getElementById('switcherActionCard');
+        const projStatusDot = document.getElementById('projStatusDot');
+        const glow = document.getElementById('statusIndicatorGlow');
+
+        if (state === 'progress') {
+            // Setup views
+            activeWidget.classList.remove('hidden');
+            emptyWidget.classList.add('hidden');
+            progressBanner.classList.remove('hidden');
+            completedBanner.classList.add('hidden');
+            ledgerSection.classList.remove('hidden');
+            analyticsSection.classList.add('hidden');
+            quickActionsSection.classList.remove('hidden');
+            switcherLink.style.display = 'inline-flex';
+            switcherActionCard.style.display = 'flex';
+
+            // Ring logic
+            document.getElementById('progressCircle').setAttribute('stroke-dashoffset', '145');
+            document.getElementById('centerSmallText').textContent = "5 kW System";
+            document.getElementById('centerMainValue').textContent = "45%";
+            const pill = document.getElementById('centerStatusPill');
+            pill.textContent = "In Progress";
+            pill.className = "mt-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-yellow-500 bg-yellow-500/10 border border-yellow-500/20";
+            
+            projStatusDot.style.background = '#76c044';
+            projStatusDot.style.boxShadow = '0 0 8px #76c044';
+            glow.style.background = 'rgba(118,192,68,0.06)';
+
+        } else if (state === 'empty') {
+            // Setup views
+            activeWidget.classList.add('hidden');
+            emptyWidget.classList.remove('hidden');
+            progressBanner.classList.add('hidden');
+            completedBanner.classList.add('hidden');
+            ledgerSection.classList.add('hidden');
+            analyticsSection.classList.add('hidden');
+            quickActionsSection.classList.add('hidden');
+            switcherLink.style.display = 'none';
+            switcherActionCard.style.display = 'none';
+
+            glow.style.background = 'rgba(118,192,68,0.02)';
+
+        } else if (state === 'completed') {
+            // Setup views
+            activeWidget.classList.remove('hidden');
+            emptyWidget.classList.add('hidden');
+            progressBanner.classList.add('hidden');
+            completedBanner.classList.remove('hidden');
+            ledgerSection.classList.remove('hidden');
+            analyticsSection.classList.add('hidden');
+            quickActionsSection.classList.remove('hidden');
+            switcherLink.style.display = 'inline-flex';
+            switcherActionCard.style.display = 'flex';
+
+            // Ring logic
+            document.getElementById('progressCircle').setAttribute('stroke-dashoffset', '0');
+            document.getElementById('centerSmallText').textContent = "5 kW System";
+            document.getElementById('centerMainValue').textContent = "100%";
+            const pill = document.getElementById('centerStatusPill');
+            pill.textContent = "Grid Active";
+            pill.className = "mt-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold text-brand-primary bg-brand-primary/10 border border-brand-primary/20";
+            
+            projStatusDot.style.background = '#76c044';
+            projStatusDot.style.boxShadow = '0 0 8px #76c044';
+            glow.style.background = 'rgba(118,192,68,0.12)';
+
+            // Trigger Confetti
+            triggerConfetti();
+        }
+    }
+
+    // Confetti particles generator
+    function triggerConfetti() {
+        const container = document.getElementById('confettiContainer');
+        container.innerHTML = '';
+        const colorsList = ['#76c044', '#0d74b8', '#10B981', '#F59E0B', '#FFFFFF'];
+        for (let i = 0; i < 50; i++) {
+            const p = document.createElement('div');
+            p.className = 'confetti';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.backgroundColor = colorsList[Math.floor(Math.random() * colorsList.length)];
+            p.style.transform = `scale(${Math.random() * 0.6 + 0.4})`;
+            p.style.animationDelay = Math.random() * 0.8 + 's';
+            p.style.animationDuration = Math.random() * 2 + 1.5 + 's';
+            container.appendChild(p);
+        }
+    }
+
+    // Toggle accordion milestones
+    function toggleTerm(id) {
+        const details = document.getElementById('details-term-' + id);
+        const chevron = document.getElementById('chevron-term-' + id);
+        if (details.classList.contains('hidden')) {
+            details.classList.remove('hidden');
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            details.classList.add('hidden');
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Dynamic data binding from project-context.js on page load
+    const activeProject = getActiveProject();
+    if (activeProject) {
+        const rawTotalValue = activeProject.totalValue || 285000;
+        const rawSubsidy = activeProject.subsidy || 0;
+        const rawPaid = activeProject.amountPaid || 0;
+        
+        const calculatedNetCost = rawTotalValue - rawSubsidy;
+
+        // Format utility
+        function formatINR(amount) {
+            return '₹' + amount.toLocaleString('en-IN');
+        }
+
+        // Bind values to DOM
+        document.getElementById('dashTotalValue').textContent = formatINR(rawTotalValue);
+        document.getElementById('dashAmountPaid').textContent = formatINR(rawPaid);
+        document.getElementById('dashSubsidy').textContent = '+ ' + formatINR(rawSubsidy);
+        document.getElementById('dashNetCost').textContent = formatINR(calculatedNetCost);
+        
+        // Progress bar calculation
+        const percent = Math.round((rawPaid / rawTotalValue) * 100);
+        document.getElementById('dashPaidBar').style.width = percent + '%';
+
+        // Project Period dates
+        if (activeProject.startDate) {
+            document.getElementById('dashProjectDates').textContent = activeProject.startDate + ' – Dec 15, 2025';
+        }
+    }
+</script>
+</body>
+</html>

@@ -14,18 +14,18 @@ import { Divider, Icon, List, TouchableRipple } from 'react-native-paper';
 
 import {
   borderRadius,
-  colors,
   fontSize,
   fontWeight,
   spacing,
+  useAppTheme,
 } from '@/shared/theme';
 
 export interface CTListItemLeftIcon {
   /** Material icon name */
   name: string;
-  /** Icon tint color (defaults to brand.primary) */
+  /** Icon tint color (defaults to theme.colors.primary) */
   color?: string;
-  /** Container background color (defaults to primaryGlow) */
+  /** Container background color (defaults to theme.colors.primaryContainer) */
   bgColor?: string;
 }
 
@@ -58,17 +58,22 @@ export function CTListItem({
   onPress,
   style,
 }: CTListItemProps) {
+  const theme = useAppTheme();
+
   const left = leftIcon
     ? () => (
         <View
           style={[
             styles.iconContainer,
-            { backgroundColor: leftIcon.bgColor ?? colors.brand.primaryGlow },
+            {
+              backgroundColor:
+                leftIcon.bgColor ?? theme.colors.primaryContainer,
+            },
           ]}
         >
           <Icon
             source={leftIcon.name}
-            color={leftIcon.color ?? colors.brand.primary}
+            color={leftIcon.color ?? theme.colors.primary}
             size={18}
           />
         </View>
@@ -83,7 +88,7 @@ export function CTListItem({
             {showChevron && !rightContent ? (
               <Icon
                 source="chevron-right"
-                color={colors.text.disabled}
+                color={theme.colors.outline}
                 size={20}
               />
             ) : null}
@@ -98,11 +103,21 @@ export function CTListItem({
         description={description ?? undefined}
         left={left}
         right={right}
-        titleStyle={styles.title}
-        descriptionStyle={styles.description}
+        titleStyle={[styles.title, { color: theme.colors.onSurface }]}
+        descriptionStyle={[
+          styles.description,
+          { color: theme.colors.onSurfaceVariant },
+        ]}
         style={[styles.item, style]}
       />
-      {showDivider ? <Divider style={styles.divider} /> : null}
+      {showDivider ? (
+        <Divider
+          style={[
+            styles.divider,
+            { backgroundColor: theme.colors.outlineVariant },
+          ]}
+        />
+      ) : null}
     </>
   );
 
@@ -110,7 +125,7 @@ export function CTListItem({
     return (
       <TouchableRipple
         onPress={onPress}
-        rippleColor={colors.surface.glassHover}
+        rippleColor={theme.colors.customRipple}
         borderless={false}
       >
         {inner}
@@ -143,15 +158,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize.body,
     fontWeight: fontWeight.semibold,
-    color: colors.text.primary,
   },
   description: {
     fontSize: fontSize.caption,
-    color: colors.text.muted,
     marginTop: 2,
   },
   divider: {
-    backgroundColor: colors.border.subtle,
     marginLeft: spacing.md + 36 + spacing.sm,
   },
 });

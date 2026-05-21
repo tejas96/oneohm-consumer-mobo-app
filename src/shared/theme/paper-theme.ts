@@ -81,7 +81,7 @@ const sharedRoundness = borderRadius.card;
 
 // ─── Shared brand colors (same in both themes) ─────────────────────
 
-const brandColors = {
+const darkBrandColors = {
   primary: colors.brand.primary,
   onPrimary: colors.neutral.black,
   primaryContainer: colors.brand.primaryGlow,
@@ -100,6 +100,25 @@ const brandColors = {
   onErrorContainer: colors.semantic.error,
 };
 
+const lightBrandColors = {
+  primary: '#4D8B25', // Accessible brand green that passes WCAG AA contrast (4.5+:1) on white
+  onPrimary: colors.neutral.white,
+  primaryContainer: 'rgba(118, 192, 68, 0.12)', // Subtle light green background tint
+  onPrimaryContainer: '#22480b', // Rich dark green text for readability
+  secondary: '#0a5c92', // Accessible brand blue for text/icons on white
+  onSecondary: colors.neutral.white,
+  secondaryContainer: 'rgba(13, 116, 184, 0.08)',
+  onSecondaryContainer: '#043457',
+  tertiary: '#059669', // Accessible emerald
+  onTertiary: colors.neutral.white,
+  tertiaryContainer: 'rgba(16, 185, 129, 0.08)',
+  onTertiaryContainer: '#064e3b',
+  error: '#DC2626', // Accessible red
+  onError: colors.neutral.white,
+  errorContainer: 'rgba(239, 68, 68, 0.08)',
+  onErrorContainer: '#7f1d1d',
+};
+
 // ─── Dark Theme ────────────────────────────────────────────────────
 
 export const darkPaperTheme = {
@@ -107,7 +126,7 @@ export const darkPaperTheme = {
   roundness: sharedRoundness,
   colors: {
     ...MD3DarkTheme.colors,
-    ...brandColors,
+    ...darkBrandColors,
     surface: '#061810',
     onSurface: '#FFFFFF',
     surfaceVariant: 'rgba(255, 255, 255, 0.08)',
@@ -125,6 +144,60 @@ export const darkPaperTheme = {
       level4: 'rgba(255, 255, 255, 0.12)',
       level5: 'rgba(255, 255, 255, 0.15)',
     },
+
+    // Custom Semantic / Design System Extensions
+    // Glassmorphism overlays
+    glassBgSubtle: 'rgba(255, 255, 255, 0.03)',
+    glassBgMedium: 'rgba(255, 255, 255, 0.04)',
+    glassBgStrong: 'rgba(255, 255, 255, 0.05)',
+    statusBarOverlay: 'rgba(2, 7, 5, 0.72)',
+
+    // Ripple & Interactive properties
+    customRipple: 'rgba(255, 255, 255, 0.12)',
+    buttonGlassBg: 'rgba(255, 255, 255, 0.08)',
+    iconMuted: 'rgba(255, 255, 255, 0.4)',
+    circularProgressBg: 'rgba(255, 255, 255, 0.03)',
+
+    // Custom Card slots
+    cardSolidBg: '#061810',
+    cardElevatedBg: '#14382A',
+    cardGlassBg: 'rgba(255, 255, 255, 0.03)',
+    cardShadowColor: 'transparent',
+    cardShadowOffset: { width: 0, height: 16 },
+    cardShadowOpacity: 0.7,
+    cardShadowRadius: 32,
+    cardElevation: 10,
+    cardGlassElevation: 0,
+
+    // Custom Snackbar slots
+    snackbarBg: '#061810',
+    snackbarBorderColor: 'rgba(255, 255, 255, 0.08)',
+    snackbarNeutralAccent: 'rgba(255, 255, 255, 0.15)',
+
+    // Custom status color bands (unsupported natively in MD3 standard slots)
+    brandSuccess: '#76c044',
+    brandSuccessBg: 'rgba(118, 192, 68, 0.06)',
+    brandSuccessBorder: 'rgba(118, 192, 68, 0.2)',
+    brandSuccessIconBg: 'rgba(118, 192, 68, 0.1)',
+
+    warningText: '#F59E0B',
+    warningBg: 'rgba(245, 158, 11, 0.06)',
+    warningBgChip: 'rgba(245, 158, 11, 0.15)',
+    warningBorder: 'rgba(245, 158, 11, 0.2)',
+    warningIconBg: 'rgba(234, 179, 8, 0.1)',
+    warningAccent: '#EAB308',
+
+    infoText: '#3B82F6',
+    infoBgChip: 'rgba(59, 130, 246, 0.15)',
+    infoBorder: '#3B82F6',
+
+    // Extra Accents
+    brandPurple: '#A855F7',
+    brandBlue: '#0d74b8',
+    brandGray: '#A1A1AA',
+
+    // Navigation Bar
+    navBarBg: 'rgba(6, 24, 16, 0.94)',
   },
   fonts: sharedFonts,
 };
@@ -136,7 +209,7 @@ export const lightPaperTheme = {
   roundness: sharedRoundness,
   colors: {
     ...MD3LightTheme.colors,
-    ...brandColors,
+    ...lightBrandColors,
     surface: '#F8FAFB',
     onSurface: '#0F172A',
     surfaceVariant: 'rgba(0, 0, 0, 0.05)',
@@ -154,6 +227,60 @@ export const lightPaperTheme = {
       level4: 'rgba(0, 0, 0, 0.09)',
       level5: 'rgba(0, 0, 0, 0.12)',
     },
+
+    // Custom Semantic / Design System Extensions
+    // Glassmorphism overlays
+    glassBgSubtle: 'rgba(0, 0, 0, 0.02)',
+    glassBgMedium: 'rgba(0, 0, 0, 0.03)',
+    glassBgStrong: 'rgba(0, 0, 0, 0.05)',
+    statusBarOverlay: 'rgba(255, 255, 255, 0.55)',
+
+    // Ripple & Interactive properties
+    customRipple: 'rgba(0, 0, 0, 0.06)',
+    buttonGlassBg: 'rgba(0, 0, 0, 0.05)',
+    iconMuted: 'rgba(0, 0, 0, 0.4)',
+    circularProgressBg: 'rgba(0, 0, 0, 0.04)',
+
+    // Custom Card slots
+    cardSolidBg: '#F1F5F2',
+    cardElevatedBg: '#FFFFFF',
+    cardGlassBg: '#FFFFFF',
+    cardShadowColor: 'rgba(0, 0, 0, 0.04)',
+    cardShadowOffset: { width: 0, height: 8 },
+    cardShadowOpacity: 0.08,
+    cardShadowRadius: 16,
+    cardElevation: 4,
+    cardGlassElevation: 2,
+
+    // Custom Snackbar slots
+    snackbarBg: '#1E293B',
+    snackbarBorderColor: 'rgba(255, 255, 255, 0.12)',
+    snackbarNeutralAccent: 'rgba(255, 255, 255, 0.3)',
+
+    // Custom status color bands (unsupported natively in MD3 standard slots)
+    brandSuccess: '#5ea031',
+    brandSuccessBg: 'rgba(118, 192, 68, 0.08)',
+    brandSuccessBorder: 'rgba(118, 192, 68, 0.15)',
+    brandSuccessIconBg: 'rgba(118, 192, 68, 0.12)',
+
+    warningText: '#D97706',
+    warningBg: 'rgba(245, 158, 11, 0.08)',
+    warningBgChip: 'rgba(245, 158, 11, 0.08)',
+    warningBorder: 'rgba(245, 158, 11, 0.15)',
+    warningIconBg: 'rgba(234, 179, 8, 0.12)',
+    warningAccent: '#B45309',
+
+    infoText: '#1E40AF',
+    infoBgChip: 'rgba(59, 130, 246, 0.08)',
+    infoBorder: '#2563EB',
+
+    // Extra Accents
+    brandPurple: '#7C3AED',
+    brandBlue: '#0a5c92',
+    brandGray: '#4B5563',
+
+    // Navigation Bar
+    navBarBg: 'rgba(255, 255, 255, 0.94)',
   },
   fonts: sharedFonts,
 };

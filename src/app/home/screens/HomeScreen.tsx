@@ -2,64 +2,162 @@
  * Home Screen — Main dashboard for authenticated consumers
  *
  * Layer: app/home/screens
- * Pattern: Container (will be expanded with FDAL hooks for projects, etc.)
  */
 
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
+import { ActivityIndicator, Text, Button } from 'react-native-paper';
 
-import { useAuthStore } from '@/core/auth';
-import { useLogout } from '@/data/resources/auth.resource';
 import { ScreenWrapper } from '@/shared/components';
-import { colors, fontSize, spacing } from '@/shared/theme';
+import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
+
+import { useHomeDashboard } from '../hooks/useHomeDashboard';
+import { HomeHeader } from '../components/HomeHeader';
+import { OnboardingState } from '../components/OnboardingState';
+import { ProgressWidget } from '../components/ProgressWidget';
+import { PaymentSnapshot } from '../components/PaymentSnapshot';
+import { QuickActions } from '../components/QuickActions';
+import { BannerAlert } from '../components/BannerAlert';
 
 export function HomeScreen() {
-  const user = useAuthStore(state => state.user);
-  const logout = useLogout();
+  const theme = useAppTheme();
+  const {
+    user,
+    activeProject,
+    dashboardState,
+    isLoading,
+    isError,
+    refetch,
+    financials,
+    navigateToPayments,
+    navigateToDocuments,
+    navigateToSupport,
+    navigateToWarranty,
+    navigateToProjectSwitcher,
+    navigateToNotifications,
+  } = useHomeDashboard();
+
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text
+            style={[
+              styles.loadingText,
+              { color: theme.colors.onSurfaceVariant },
+            ]}
+          >
+            Loading Dashboard...
+          </Text>
+        </View>
+      );
+    }
+
+    if (isError) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: theme.colors.error }]}>
+            Unable to load project data.
+          </Text>
+          <Button
+            mode="contained"
+            onPress={() => refetch()}
+            style={styles.retryButton}
+          >
+            Retry
+          </Button>
+        </View>
+      );
+    }
+
+    if (dashboardState === 'onboarding') {
+      return <OnboardingState />;
+    }
+
+    // Otherwise, render full active tracking dashboard inside scrollview
+    return (
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={refetch}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
+        }
+      >
+        {activeProject ? (
+          <>
+            <ProgressWidget activeProject={activeProject} />
+            <BannerAlert
+              activeProject={activeProject}
+              onPress={navigateToDocuments}
+            />
+            <PaymentSnapshot
+              activeProject={activeProject}
+              financials={financials}
+              onTimelinePress={navigateToPayments}
+            />
+            <QuickActions
+              onDocumentsPress={navigateToDocuments}
+              onSupportPress={navigateToSupport}
+              onWarrantyPress={navigateToWarranty}
+            />
+          </>
+        ) : null}
+      </ScrollView>
+    );
+  };
 
   return (
-    <ScreenWrapper>
-      <View style={styles.container}>
-        <Text style={styles.greeting}>
-          Welcome{user?.firstName ? `, ${user.firstName}` : ''}! 👋
-        </Text>
-        <Text style={styles.subtitle}>Your solar journey starts here.</Text>
-
-        <View style={styles.spacer} />
-
-        <Button
-          mode="outlined"
-          onPress={() => logout.mutate()}
-          loading={logout.isPending}
-          style={styles.logoutButton}
-        >
-          Logout
-        </Button>
-      </View>
+    <ScreenWrapper
+      padded={false}
+      ambientGlow={false}
+      showThemeToggle={false}
+      edges={['top', 'left', 'right']}
+    >
+      <HomeHeader
+        userName={user?.firstName || ''}
+        activeProject={activeProject}
+        onNotificationsPress={navigateToNotifications}
+        onProjectSwitcherPress={navigateToProjectSwitcher}
+      />
+      <View style={styles.content}>{renderContent()}</View>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
-    paddingTop: spacing['4xl'],
   },
-  greeting: {
-    fontSize: fontSize['2xl'],
-    fontWeight: '700',
-    color: colors.text.primary,
+  scrollContent: {
+    paddingBottom: spacing['2xl'],
   },
-  subtitle: {
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: fontSize.sm,
+    marginTop: spacing.md,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.xl,
+  },
+  errorText: {
     fontSize: fontSize.md,
-    color: colors.text.secondary,
-    marginTop: spacing.xs,
+    fontWeight: fontWeight.bold,
+    marginBottom: spacing.md,
   },
-  spacer: {
-    flex: 1,
-  },
-  logoutButton: {
-    marginBottom: spacing['2xl'],
+  retryButton: {
+    borderRadius: 8,
   },
 });

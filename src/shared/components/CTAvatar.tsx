@@ -12,7 +12,7 @@ import { StyleSheet, View } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import type { AvatarImageSource } from 'react-native-paper/lib/typescript/components/Avatar/AvatarImage';
 
-import { colors } from '@/shared/theme';
+import { useAppTheme } from '@/shared/theme';
 
 type AvatarType = 'text' | 'image' | 'icon';
 type AvatarSize = 'sm' | 'md' | 'lg';
@@ -46,10 +46,14 @@ export function CTAvatar({
   initials = '?',
   imageSource,
   icon = 'account',
-  backgroundColor = colors.brand.primaryGlow,
+  backgroundColor,
   borderColor,
 }: CTAvatarProps) {
+  const theme = useAppTheme();
   const px = SIZE_MAP[size];
+
+  const resolvedBgColor = backgroundColor ?? theme.colors.primaryContainer;
+  const resolvedTextColor = theme.colors.onPrimaryContainer;
 
   const avatar = (() => {
     switch (type) {
@@ -60,8 +64,8 @@ export function CTAvatar({
           <Avatar.Icon
             size={px}
             icon={icon}
-            style={{ backgroundColor }}
-            color={colors.text.primary}
+            style={{ backgroundColor: resolvedBgColor }}
+            color={resolvedTextColor}
           />
         );
       case 'text':
@@ -70,8 +74,8 @@ export function CTAvatar({
           <Avatar.Text
             size={px}
             label={initials.slice(0, 2).toUpperCase()}
-            style={{ backgroundColor }}
-            color={colors.text.primary}
+            style={{ backgroundColor: resolvedBgColor }}
+            color={resolvedTextColor}
             labelStyle={styles.label}
           />
         );

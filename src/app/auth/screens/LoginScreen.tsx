@@ -32,7 +32,7 @@ export function LoginScreen() {
   const theme = useAppTheme();
 
   return (
-    <ScreenWrapper ambientGlow padded={false}>
+    <ScreenWrapper ambientGlow padded={false} showThemeToggle={false}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

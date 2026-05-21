@@ -15,6 +15,7 @@ import type { AuthStackParamList } from '@/core/navigation';
 import { Route } from '@/core/navigation';
 import { useVerifyOtp, useRequestOtp } from '@/data/resources/auth.resource';
 import { useTranslation } from '@/core/i18n';
+import { useAuthStore } from '@/core/auth';
 
 export function useOtpScreenLogic() {
   const { params } = useRoutes<Route.OTP>();
@@ -53,26 +54,21 @@ export function useOtpScreenLogic() {
     return () => stopTimer();
   }, [startTimer, stopTimer]);
 
-  const handleVerifyOtp = () => {
-    if (otp.length < 6) {
-      Toast.show({
-        type: 'error',
-        text1: t('common.error'),
-        text2: 'Please enter a valid 6-digit OTP',
-      });
-      return;
-    }
+  const setAuthenticated = useAuthStore(state => state.setAuthenticated);
 
-    verifyOtp.mutate(
-      { phone, otp },
+  const handleVerifyOtp = async () => {
+    // BYPASS FOR UI TESTING: Log in automatically with mock data
+    await setAuthenticated(
       {
-        onError: error => {
-          Toast.show({
-            type: 'error',
-            text1: t('common.error'),
-            text2: error.message || 'Invalid OTP',
-          });
-        },
+        accessToken: 'mock-access-token',
+        refreshToken: 'mock-refresh-token',
+      },
+      {
+        id: 'mock-user-id',
+        phone: phone || '9999999999',
+        firstName: 'Tejas',
+        lastName: 'Rajput',
+        email: 'tejas@oneohm.in',
       },
     );
   };

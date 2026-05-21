@@ -57,6 +57,8 @@ export interface OtpParams {
 export type MainTabParamList = {
   [Route.HOME_TAB]: undefined;
   [Route.PROJECTS_TAB]: undefined;
+  [Route.DOCUMENTS_TAB]: undefined;
+  [Route.PAYMENTS_TAB]: undefined;
   [Route.PROFILE_TAB]: undefined;
 };
 
@@ -69,6 +71,9 @@ export type MainStackParamList = {
   [Route.NOTIFICATIONS]: undefined;
   [Route.SETTINGS]: undefined;
   [Route.PROJECT_DETAIL]: ProjectDetailParams;
+  [Route.SUPPORT]: undefined;
+  [Route.WARRANTY]: undefined;
+  [Route.PROJECT_SWITCHER]: undefined;
 };
 
 /** Params for viewing a project's details */
