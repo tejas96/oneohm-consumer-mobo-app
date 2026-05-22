@@ -2,6 +2,15 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+// Clean up the autolinking cmake file during configuration if we are running a clean task
+// to prevent CMake from failing due to missing codegen directories in node_modules.
+if (gradle.startParameter.taskNames.any { it.contains("clean") }) {
+    def autolinkingCmake = file("build/generated/autolinking/src/main/jni/Android-autolinking.cmake")
+    if (autolinkingCmake.exists()) {
+        autolinkingCmake.delete()
+    }
+}
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
