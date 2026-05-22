@@ -33,14 +33,22 @@ export function useSubmitFeedback() {
 
   return useMutation({
     mutationFn: ({
+      projectId,
       memberId,
       rating,
       comment,
     }: {
+      projectId: string;
       memberId: string;
       rating: number;
       comment: string;
-    }) => TeamService.submitTeamMemberFeedback(memberId, rating, comment),
+    }) =>
+      TeamService.submitTeamMemberFeedback(
+        projectId,
+        memberId,
+        rating,
+        comment,
+      ),
     onSuccess: () => {
       // Invalidate all team queries to force instant re-render with updated ratings
       queryClient.invalidateQueries({ queryKey: teamKeys.all });

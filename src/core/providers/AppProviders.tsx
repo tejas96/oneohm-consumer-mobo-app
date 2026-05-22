@@ -23,6 +23,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { darkPaperTheme, lightPaperTheme } from '@/shared/theme';
 import { useThemeStore } from '@/core/theme';
+import { setGlobalNavigator } from '@/core/notifications';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,7 +58,9 @@ export function AppProviders({ children }: AppProvidersProps) {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <PaperProvider theme={activeTheme}>
-            <NavigationContainer>{children}</NavigationContainer>
+            <NavigationContainer ref={setGlobalNavigator}>
+              {children}
+            </NavigationContainer>
           </PaperProvider>
         </QueryClientProvider>
         <Toast />

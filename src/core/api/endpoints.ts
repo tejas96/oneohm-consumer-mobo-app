@@ -59,6 +59,10 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `/projects/${id}`,
     /** GET — Get project timeline */
     TIMELINE: (id: string) => `/projects/${id}/timeline`,
+    /** GET — Get project team members */
+    TEAM: (id: string) => `/projects/${id}/team`,
+    /** POST — Submit feedback for a team member */
+    FEEDBACK: (id: string) => `/projects/${id}/team/feedback`,
   },
 } as const;
 

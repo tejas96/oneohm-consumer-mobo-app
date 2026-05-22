@@ -10,6 +10,6 @@ module.exports = {
   // Dependencies under node_modules often ship modern syntax; allow babel-jest to transform
   // react-native-* packages, @react-navigation/*, @tanstack/*, etc.
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|react-native-[\\w.-]+|@react-native(-community)?|@react-native-async-storage|@react-navigation|@tanstack|zustand)/)',
+    'node_modules/(?!((jest-)?react-native|react-native-[\\w.-]+|@react-native(-community)?|@react-native-firebase|@react-native-async-storage|@react-navigation|@tanstack|zustand)/)',
   ],
 };

@@ -39,3 +39,36 @@ jest.mock('@gorhom/bottom-sheet', () => {
     BottomSheetBackdrop: () => null,
   };
 });
+
+// React Native Firebase App & Messaging mocks for Jest
+jest.mock('@react-native-firebase/app', () => {
+  return {
+    initializeApp: jest.fn(),
+    app: jest.fn(() => ({
+      options: {},
+    })),
+  };
+});
+
+jest.mock('@react-native-firebase/messaging', () => {
+  const messaging = jest.fn(() => ({
+    requestPermission: jest.fn(() => Promise.resolve(1)), // AUTHORIZED
+    getToken: jest.fn(() => Promise.resolve('mock-fcm-token')),
+    onTokenRefresh: jest.fn(() => jest.fn()),
+    onMessage: jest.fn(() => jest.fn()),
+    onNotificationOpenedApp: jest.fn(() => jest.fn()),
+    getInitialNotification: jest.fn(() => Promise.resolve(null)),
+  }));
+
+  messaging.AuthorizationStatus = {
+    NOT_DETERMINED: -1,
+    DENIED: 0,
+    AUTHORIZED: 1,
+    PROVISIONAL: 2,
+  };
+
+  return {
+    __esModule: true,
+    default: messaging,
+  };
+});

@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/core/auth';
 import type { OtpRequestPayload, OtpVerifyPayload } from '@/core/auth';
+import { FcmManager } from '@/core/notifications';
 
 import { authKeys } from '../query-keys';
 import { AuthService } from '../services';
@@ -46,6 +47,9 @@ export function useVerifyOtp(options?: MutationOptions) {
         response.user,
       );
       queryClient.invalidateQueries({ queryKey: authKeys.currentUser() });
+
+      // Asynchronously trigger FCM setup & token sync for the newly logged in user
+      FcmManager.requestPermissions();
     },
     meta: options?.meta,
   });

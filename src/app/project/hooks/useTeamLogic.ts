@@ -197,6 +197,7 @@ export function useTeamLogic() {
 
     submitFeedbackMutation.mutate(
       {
+        projectId,
         memberId: selectedMember.id,
         rating,
         comment: comment.trim(),
