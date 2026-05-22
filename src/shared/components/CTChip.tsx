@@ -1,16 +1,14 @@
 /**
  * CTChip — Carbon Titanium Themed Chip
  *
- * Extends React Native Paper `Chip` with semantic status color mapping
- * and size variants aligned to Carbon Titanium tokens.
+ * A robust presentational status badge / chip component aligned to Carbon Titanium tokens.
+ * Resolves vertical truncation issues when custom heights are applied.
  *
  * Layer: shared/components (Presentational)
  */
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { Chip } from 'react-native-paper';
-import type { Props as PaperChipProps } from 'react-native-paper/lib/typescript/components/Chip/Chip';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
 
 import {
   borderRadius,
@@ -29,13 +27,19 @@ type ChipStatus =
   | 'brand';
 type ChipSize = 'sm' | 'md';
 
-export interface CTChipProps
-  extends Omit<PaperChipProps, 'selectedColor' | 'style'> {
+export interface CTChipProps {
+  /** The text content to display inside the chip */
+  children: React.ReactNode;
   /** Semantic color preset */
   status?: ChipStatus;
   /** Size scale */
   size?: ChipSize;
-  style?: PaperChipProps['style'];
+  /** Custom view styles */
+  style?: any;
+  /** Custom text styles */
+  textStyle?: any;
+  /** Optional click handler */
+  onPress?: () => void;
 }
 
 const SIZE_STYLES: Record<
@@ -47,11 +51,12 @@ const SIZE_STYLES: Record<
 };
 
 export function CTChip({
+  children,
   status = 'neutral',
   size = 'md',
-  mode = 'flat',
   style,
   textStyle,
+  onPress,
   ...rest
 }: CTChipProps) {
   const theme = useAppTheme();
@@ -104,10 +109,8 @@ export function CTChip({
     ? `${config.border}40`
     : config.border;
 
-  return (
-    <Chip
-      mode={mode}
-      selectedColor={config.text}
+  const content = (
+    <View
       style={[
         styles.base,
         {
@@ -118,28 +121,46 @@ export function CTChip({
         },
         style,
       ]}
-      textStyle={[
-        styles.text,
-        {
-          fontSize: sizeStyle.fontSize,
-          color: config.text,
-          fontWeight: fontWeight.black,
-          marginVertical: 2,
-        },
-        textStyle,
-      ]}
       {...rest}
-    />
+    >
+      <Text
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        style={[
+          styles.text,
+          {
+            fontSize: sizeStyle.fontSize,
+            color: config.text,
+            fontWeight: fontWeight.black,
+            lineHeight: sizeStyle.height - 2,
+          },
+          textStyle,
+        ]}
+      >
+        {children}
+      </Text>
+    </View>
   );
+
+  if (onPress) {
+    return <Pressable onPress={onPress}>{content}</Pressable>;
+  }
+
+  return content;
 }
 
 const styles = StyleSheet.create({
   base: {
     borderRadius: borderRadius.full,
     borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
   },
   text: {
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    textAlign: 'center',
   },
 });

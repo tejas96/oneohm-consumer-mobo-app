@@ -14,6 +14,7 @@ import type { Props as PaperSnackbarProps } from 'react-native-paper/lib/typescr
 
 import {
   borderRadius,
+  colors,
   fontSize,
   fontWeight,
   spacing,
@@ -42,23 +43,23 @@ export function CTSnackbar({
     switch (variant) {
       case 'success':
         return {
-          accent: '#10B981',
-          actionColor: '#10B981',
+          accent: theme.colors.tertiary,
+          actionColor: theme.colors.tertiary,
         };
       case 'error':
         return {
-          accent: '#EF4444',
-          actionColor: '#EF4444',
+          accent: theme.colors.error,
+          actionColor: theme.colors.error,
         };
       case 'warning':
         return {
-          accent: '#F59E0B',
-          actionColor: '#F59E0B',
+          accent: theme.colors.warningText,
+          actionColor: theme.colors.warningText,
         };
       case 'info':
         return {
-          accent: '#3B82F6',
-          actionColor: '#3B82F6',
+          accent: theme.colors.infoText,
+          actionColor: theme.colors.infoText,
         };
       case 'neutral':
       default:
@@ -94,7 +95,9 @@ export function CTSnackbar({
       <View style={styles.row}>
         {/* Left accent bar */}
         <View style={[styles.accent, { backgroundColor: config.accent }]} />
-        <Text style={[styles.message, { color: '#FFFFFF' }]}>{message}</Text>
+        <Text style={[styles.message, { color: colors.neutral.white }]}>
+          {message}
+        </Text>
       </View>
     </Snackbar>
   );

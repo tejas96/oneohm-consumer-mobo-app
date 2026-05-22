@@ -16,6 +16,9 @@ export { CTBadge } from './CTBadge';
 export { CTSnackbar } from './CTSnackbar';
 export { CTProgressCircle } from './CTProgressCircle';
 export { CTStateWrapper } from './CTStateWrapper';
+export { CTOnboardingPlaceholder } from './CTOnboardingPlaceholder';
+export { CTPremiumHeader } from './CTPremiumHeader';
+export { ProjectSwitcherBottomSheet } from './ProjectSwitcherBottomSheet';
 
 // Type exports
 export type { CTButtonProps } from './CTButton';
@@ -32,3 +35,5 @@ export type { CTBadgeProps } from './CTBadge';
 export type { CTSnackbarProps } from './CTSnackbar';
 export type { CTProgressCircleProps } from './CTProgressCircle';
 export type { CTStateWrapperProps, ScreenState } from './CTStateWrapper';
+export type { CTOnboardingPlaceholderProps } from './CTOnboardingPlaceholder';
+export type { CTPremiumHeaderProps } from './CTPremiumHeader';

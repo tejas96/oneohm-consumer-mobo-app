@@ -9,19 +9,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { useAuthStore } from '@/core/auth';
 import { Route, type MainStackParamList } from '@/core/navigation';
-import { useProjects } from '@/data/resources/project.resource';
-
-import { create } from 'zustand';
-
-interface ProjectSelectionState {
-  selectedProjectId: string | null;
-  setSelectedProjectId: (id: string | null) => void;
-}
-
-export const useProjectSelectionStore = create<ProjectSelectionState>(set => ({
-  selectedProjectId: 'proj-pune', // Pune Res. initially active
-  setSelectedProjectId: id => set({ selectedProjectId: id }),
-}));
+import { useActiveProject } from '@/shared/hooks';
+import { useProjectSelectionStore } from '@/core/project/project.store';
 
 export type DashboardState = 'onboarding' | 'in_progress' | 'completed';
 
@@ -29,20 +18,12 @@ export function useHomeDashboard() {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
   const user = useAuthStore(state => state.user);
-  const selectedProjectId = useProjectSelectionStore(
-    state => state.selectedProjectId,
+  const setSwitcherVisible = useProjectSelectionStore(
+    state => state.setSwitcherVisible,
   );
 
-  // Fetch projects from query resource
-  const { data: projects, isLoading, isError, refetch } = useProjects();
-
-  // Active project selection (support toggling mock project / onboarding state)
-  const activeProject =
-    selectedProjectId === 'none'
-      ? null
-      : projects && projects.length > 0
-      ? projects.find(p => p.id === selectedProjectId) || projects[0]
-      : null;
+  const { activeProject, projects, isLoading, isError, refetch } =
+    useActiveProject();
 
   // Resolve overall dashboard state
   let dashboardState: DashboardState = 'onboarding';
@@ -68,8 +49,12 @@ export function useHomeDashboard() {
     navigation.navigate(Route.DOCUMENTS_TAB as any);
   const navigateToSupport = () => navigation.navigate(Route.SUPPORT);
   const navigateToWarranty = () => navigation.navigate(Route.WARRANTY);
-  const navigateToProjectSwitcher = () =>
-    navigation.navigate(Route.PROJECT_SWITCHER);
+  const navigateToProjectTeam = () => {
+    if (activeProject) {
+      navigation.navigate(Route.PROJECT_TEAM, { projectId: activeProject.id });
+    }
+  };
+  const navigateToProjectSwitcher = () => setSwitcherVisible(true);
   const navigateToNotifications = () =>
     navigation.navigate(Route.NOTIFICATIONS);
   const navigateToProfile = () =>
@@ -93,10 +78,12 @@ export function useHomeDashboard() {
     },
 
     // Handlers
+    hasMultipleProjects: projects.length > 1,
     navigateToPayments,
     navigateToDocuments,
     navigateToSupport,
     navigateToWarranty,
+    navigateToProjectTeam,
     navigateToProjectSwitcher,
     navigateToNotifications,
     navigateToProfile,

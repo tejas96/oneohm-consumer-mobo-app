@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import { CTCard } from '@/shared/components';
+import { CTCard, CTButton } from '@/shared/components';
 import {
   useAppTheme,
   spacing,
@@ -17,6 +17,7 @@ interface MyProjectsProps {
   projects: Project[];
   selectedProjectId: string | null;
   onSwitch: (projId: string, projName: string) => void;
+  onViewAll: () => void;
   t: (key: TranslationKey) => string;
 }
 
@@ -24,6 +25,7 @@ export function MyProjects({
   projects,
   selectedProjectId,
   onSwitch,
+  onViewAll,
   t,
 }: MyProjectsProps) {
   const theme = useAppTheme();
@@ -39,11 +41,17 @@ export function MyProjects({
         >
           {t('profile.myProjects')}
         </Text>
-        <TouchableOpacity activeOpacity={0.7}>
-          <Text style={[styles.viewAllText, { color: theme.colors.primary }]}>
+        {projects.length > 1 && (
+          <CTButton
+            variant="ghost"
+            size="sm"
+            compact={true}
+            labelStyle={styles.viewAllText}
+            onPress={onViewAll}
+          >
             {t('profile.viewAll')}
-          </Text>
-        </TouchableOpacity>
+          </CTButton>
+        )}
       </View>
 
       <View style={styles.projectListStack}>
@@ -60,7 +68,11 @@ export function MyProjects({
             <CTCard
               key={proj.id}
               variant="glass"
-              onPress={() => onSwitch(proj.id, proj.label)}
+              onPress={
+                projects.length > 1
+                  ? () => onSwitch(proj.id, proj.label)
+                  : undefined
+              }
               style={[isActive && { borderColor: theme.colors.primary }]}
               innerStyle={styles.projectCardInner}
             >

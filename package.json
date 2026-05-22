@@ -14,6 +14,7 @@
     "postinstall": "node -e \"const fs = require('fs'); const file = 'node_modules/react-native-keychain/android/build.gradle'; if (fs.existsSync(file)) { let content = fs.readFileSync(file, 'utf8'); content = content.replace(/apply plugin: [\\\"']com.adarshr.test-logger[\\\"']/g, '// apply plugin: \\\"com.adarshr.test-logger\\\"'); fs.writeFileSync(file, content, 'utf8'); }\""
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^5.2.14",
     "@react-native-async-storage/async-storage": "^3.0.2",
     "@react-navigation/bottom-tabs": "^7.16.1",
     "@react-navigation/native": "^7.2.4",

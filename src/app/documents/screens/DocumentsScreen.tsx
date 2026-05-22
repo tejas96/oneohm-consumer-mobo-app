@@ -1,31 +1,195 @@
 /**
- * Documents Screen — User documents tab
+ * Documents Screen — Project document viewer with search and category filtering
  *
  * Layer: app/documents/screens
  */
 
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { StyleSheet, View, FlatList } from 'react-native';
+import { Text, Searchbar, IconButton } from 'react-native-paper';
 
-import { ScreenWrapper } from '@/shared/components';
-import { spacing, fontSize, useAppTheme } from '@/shared/theme';
+import {
+  ScreenWrapper,
+  CTOnboardingPlaceholder,
+  CTCard,
+  CTChip,
+  CTPremiumHeader,
+} from '@/shared/components';
+import {
+  spacing,
+  fontSize,
+  fontWeight,
+  borderRadius,
+  useAppTheme,
+} from '@/shared/theme';
+
+import { useTranslation } from '@/core/i18n';
+import { useDocumentsLogic } from '../hooks/useDocumentsLogic';
 
 export function DocumentsScreen() {
   const theme = useAppTheme();
+  const { t } = useTranslation();
+  const {
+    activeProject,
+    isOnboarding,
+    isLoading,
+    isError,
+    refetch,
+    categories,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
+    filteredDocs,
+    handleDownload,
+    handleBack,
+    handleSwitchProject,
+    hasMultipleProjects,
+  } = useDocumentsLogic();
+
+  const renderContent = () => {
+    if (isOnboarding) {
+      return (
+        <CTOnboardingPlaceholder
+          title="Documents Setting Up"
+          description="We are currently preparing your project contracts, engineering schematics, and DISCOM approval NOCs. You'll be able to download them here once onboarding is completed."
+          lottieSource={require('@/assets/animations/lottie/slide3_team.json')}
+          statusText="Stage: Onboarding & Verification"
+          status="warning"
+        />
+      );
+    }
+
+    return (
+      <View style={styles.innerContainer}>
+        {/* Search Bar */}
+        <Searchbar
+          placeholder={t('documents.searchPlaceholder')}
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          style={[
+            styles.searchBar,
+            {
+              backgroundColor: theme.colors.surfaceVariant,
+            },
+          ]}
+          placeholderTextColor={theme.colors.onSurfaceVariant}
+          iconColor={theme.colors.onSurfaceVariant}
+          inputStyle={[styles.searchInput, { color: theme.colors.onSurface }]}
+        />
+
+        {/* Categories row */}
+        <View style={styles.categoriesRow}>
+          <FlatList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={[...categories]}
+            keyExtractor={item => item}
+            renderItem={({ item }) => {
+              const isSelected = selectedCategory === item;
+              return (
+                <CTChip
+                  status={isSelected ? 'brand' : 'neutral'}
+                  onPress={() => setSelectedCategory(item)}
+                  style={styles.chip}
+                >
+                  {item}
+                </CTChip>
+              );
+            }}
+          />
+        </View>
+
+        {/* Documents FlatList */}
+        <FlatList
+          data={filteredDocs}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={{ color: theme.colors.onSurfaceVariant }}>
+                {t('documents.emptyState')}
+              </Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <CTCard
+              variant="glass"
+              style={styles.card}
+              innerStyle={styles.cardInner}
+              onPress={() => handleDownload(item.title)}
+            >
+              <View style={styles.cardRow}>
+                <IconButton
+                  icon="file-pdf-box"
+                  iconColor={theme.colors.error}
+                  size={24}
+                  style={[
+                    styles.iconBg,
+                    { backgroundColor: theme.colors.errorContainer },
+                  ]}
+                />
+                <View style={styles.cardTextContainer}>
+                  <Text
+                    style={[styles.docTitle, { color: theme.colors.onSurface }]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {item.title}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.metadataText,
+                      { color: theme.colors.onSurfaceVariant },
+                    ]}
+                  >
+                    {item.date} • {item.size}
+                  </Text>
+                </View>
+                <View style={styles.actionContainer}>
+                  <IconButton
+                    icon="download"
+                    iconColor={theme.colors.primary}
+                    size={20}
+                    style={styles.downloadIcon}
+                    onPress={() => handleDownload(item.title)}
+                  />
+                </View>
+              </View>
+            </CTCard>
+          )}
+        />
+      </View>
+    );
+  };
 
   return (
-    <ScreenWrapper edges={['top', 'left', 'right']}>
-      <View style={styles.container}>
-        <Text style={[styles.title, { color: theme.colors.onBackground }]}>
-          Documents
-        </Text>
-        <Text
-          style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
-        >
-          Under Construction
-        </Text>
-      </View>
+    <ScreenWrapper
+      padded={false}
+      edges={['top', 'left', 'right']}
+      showThemeToggle={false}
+      stateConfig={{
+        state: isLoading ? 'loading' : isError ? 'error' : 'success',
+        loadingConfig: {
+          message: 'Loading Documents...',
+        },
+        errorConfig: {
+          title: 'Unable to load documents.',
+          message: 'Please check your connection and try again.',
+          retryText: 'Retry',
+          onRetry: refetch,
+        },
+      }}
+    >
+      <CTPremiumHeader
+        title={t('documents.title')}
+        activeProject={activeProject}
+        onBack={handleBack}
+        onSwitchProject={handleSwitchProject}
+        hasMultipleProjects={hasMultipleProjects}
+      />
+      <View style={styles.container}>{renderContent()}</View>
     </ScreenWrapper>
   );
 }
@@ -33,16 +197,79 @@ export function DocumentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
   },
-  title: {
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: spacing.xl,
+  },
+  headerContainer: {
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+  headerTitle: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: fontWeight.black,
   },
-  subtitle: {
-    fontSize: fontSize.md,
-    marginTop: spacing.sm,
+  headerSubtitle: {
+    fontSize: fontSize.caption,
+    marginTop: spacing.xs,
+  },
+  searchBar: {
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+  },
+  searchInput: {
+    fontSize: fontSize.body,
+  },
+  categoriesRow: {
+    marginBottom: spacing.lg,
+  },
+  chip: {
+    marginRight: spacing.sm,
+  },
+  listContent: {
+    paddingBottom: spacing.xl,
+  },
+  card: {
+    marginBottom: spacing.md,
+  },
+  cardInner: {
+    padding: spacing.md,
+  },
+  cardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBg: {
+    margin: 0,
+    borderRadius: borderRadius.sm,
+  },
+  cardTextContainer: {
+    flex: 1,
+    marginLeft: spacing.sm,
+    justifyContent: 'center',
+  },
+  docTitle: {
+    fontSize: fontSize.body,
+    fontWeight: fontWeight.bold,
+  },
+  metadataText: {
+    fontSize: fontSize.caption,
+    marginTop: spacing.micro,
+  },
+  actionContainer: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  statusChip: {
+    marginBottom: spacing.xs,
+  },
+  downloadIcon: {
+    margin: 0,
+  },
+  emptyContainer: {
+    padding: spacing.xl,
+    alignItems: 'center',
   },
 });

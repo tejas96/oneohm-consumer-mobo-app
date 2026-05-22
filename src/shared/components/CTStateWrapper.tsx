@@ -9,8 +9,8 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View, Text } from 'react-native';
-import { ActivityIndicator, Icon } from 'react-native-paper';
+import { Animated, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Icon, Text } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
 
 import {
@@ -20,6 +20,7 @@ import {
   fontWeight,
   lineHeight,
   useAppTheme,
+  hexToRgba,
 } from '@/shared/theme';
 import { CTButton } from './CTButton';
 
@@ -34,7 +35,7 @@ export interface CTStateWrapperProps {
     /** Description message below the indicator (e.g. "Fetching accounts...") */
     message?: string;
     /** Optional custom lottie source asset */
-    lottieSource?: any;
+    lottieSource?: React.ComponentProps<typeof LottieView>['source'];
     /** Dimensions of the loading illustration */
     size?: number;
   };
@@ -50,7 +51,7 @@ export interface CTStateWrapperProps {
     /** Callback triggered when clicking recovery button */
     onRetry?: () => void;
     /** Optional custom error lottie source asset */
-    lottieSource?: any;
+    lottieSource?: React.ComponentProps<typeof LottieView>['source'];
     /** Dimensions of the error illustration */
     size?: number;
   };
@@ -66,7 +67,7 @@ export interface CTStateWrapperProps {
     /** Callback triggered when clicking action button */
     onAction?: () => void;
     /** Optional custom empty state lottie source asset */
-    lottieSource?: any;
+    lottieSource?: React.ComponentProps<typeof LottieView>['source'];
     /** Dimensions of the empty illustration */
     size?: number;
   };
@@ -189,7 +190,7 @@ export function CTStateWrapper({
               <View
                 style={[
                   styles.iconCircle,
-                  { backgroundColor: `${theme.colors.error}15` },
+                  { backgroundColor: hexToRgba(theme.colors.error, 0.08) },
                 ]}
               >
                 <Icon
@@ -255,7 +256,7 @@ export function CTStateWrapper({
               <View
                 style={[
                   styles.iconCircle,
-                  { backgroundColor: `${theme.colors.primary}12` },
+                  { backgroundColor: hexToRgba(theme.colors.primary, 0.07) },
                 ]}
               >
                 <Icon

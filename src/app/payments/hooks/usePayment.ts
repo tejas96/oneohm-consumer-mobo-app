@@ -10,8 +10,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { useAuthStore } from '@/core/auth';
 import { Route, type MainStackParamList } from '@/core/navigation';
-import { useProjects } from '@/data/resources/project.resource';
-import { useProjectSelectionStore } from '@/app/home/hooks/useHomeDashboard';
+import { useProjects } from '@/data';
+import { useProjectSelectionStore } from '@/core/project/project.store';
 import type { TranslationKey } from '@/core/i18n';
 
 export interface Installment {
@@ -42,6 +42,9 @@ export function usePayment() {
   const selectedProjectId = useProjectSelectionStore(
     state => state.selectedProjectId,
   );
+  const setSwitcherVisible = useProjectSelectionStore(
+    state => state.setSwitcherVisible,
+  );
 
   // Fetch projects from resource
   const { data: projects, isLoading, isError, refetch } = useProjects();
@@ -56,8 +59,8 @@ export function usePayment() {
 
   // Accordion toggle state (tracks which term IDs are expanded)
   const [expandedTerms, setExpandedTerms] = useState<Record<number, boolean>>({
-    1: true, // Term 1 expanded by default
-    2: true, // Term 2 expanded by default
+    1: false,
+    2: false,
     3: false,
     4: false,
     5: false,
@@ -292,7 +295,7 @@ export function usePayment() {
 
   // Navigations
   const handleBack = () => navigation.navigate(Route.HOME_TAB as any);
-  const handleSwitchProject = () => navigation.navigate(Route.PROJECT_SWITCHER);
+  const handleSwitchProject = () => setSwitcherVisible(true);
 
   return {
     user,
@@ -318,5 +321,6 @@ export function usePayment() {
     handleBack,
     handleSwitchProject,
     formatCurrency,
+    hasMultipleProjects: (projects || []).length > 1,
   };
 }

@@ -1,34 +1,44 @@
 /**
- * PaymentsHeader — transculent Glass Header for Payments screen
+ * CTPremiumHeader — Reusable high-fidelity Glass Header
  *
- * Layer: app/payments/components (Presentational)
+ * Composes a translucent background with standard visual styling:
+ *   - Left-aligned custom-bordered back button (navigates back)
+ *   - Title & subtitle showing active project details
+ *   - Right-aligned active project switcher badge with status indicator
+ *
+ * Layer: shared/components (Presentational)
  */
 
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
-import { useTranslation } from '@/core/i18n';
 import type { Project } from '@/data/types';
 import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 
-interface PaymentsHeaderProps {
+export interface CTPremiumHeaderProps {
+  /** Page title string */
+  title: string;
+  /** Active project details */
   activeProject: Project | null;
-  onBack: () => void;
-  onSwitchProject: () => void;
+  /** Left back action handler */
+  onBack?: () => void;
+  /** Project switcher badge press handler */
+  onSwitchProject?: () => void;
+  /** Whether the user has more than 1 project */
   hasMultipleProjects?: boolean;
 }
 
-export function PaymentsHeader({
+export function CTPremiumHeader({
+  title,
   activeProject,
   onBack,
   onSwitchProject,
   hasMultipleProjects = true,
-}: PaymentsHeaderProps) {
-  const { t } = useTranslation();
+}: CTPremiumHeaderProps) {
   const theme = useAppTheme();
 
-  // Resolve project status indicator color
+  // Resolve project status indicator color dynamically from theme
   const getStatusColor = () => {
     if (!activeProject) return theme.colors.outline;
     if (activeProject.status === 'COMPLETED') {
@@ -43,24 +53,26 @@ export function PaymentsHeader({
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity
-        style={[
-          styles.backButton,
-          {
-            backgroundColor: theme.colors.glassBgSubtle,
-            borderColor: theme.colors.outlineVariant,
-          },
-        ]}
-        onPress={onBack}
-        activeOpacity={0.8}
-      >
-        <IconButton
-          icon="chevron-left"
-          size={20}
-          iconColor={theme.colors.onSurface}
-          style={styles.iconButton}
-        />
-      </TouchableOpacity>
+      {onBack ? (
+        <TouchableOpacity
+          style={[
+            styles.backButton,
+            {
+              backgroundColor: theme.colors.glassBgSubtle,
+              borderColor: theme.colors.outlineVariant,
+            },
+          ]}
+          onPress={onBack}
+          activeOpacity={0.8}
+        >
+          <IconButton
+            icon="chevron-left"
+            size={20}
+            iconColor={theme.colors.onSurface}
+            style={styles.iconButton}
+          />
+        </TouchableOpacity>
+      ) : null}
 
       {/* Title & Project Details */}
       <View style={styles.titleContainer}>
@@ -68,14 +80,11 @@ export function PaymentsHeader({
           style={[styles.title, { color: theme.colors.onSurface }]}
           numberOfLines={1}
         >
-          {t('payments.title')}
+          {title}
         </Text>
         {activeProject ? (
           <Text
-            style={[
-              styles.subtitle,
-              { color: theme.colors.onSurfaceVariant, opacity: 0.6 },
-            ]}
+            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
             numberOfLines={1}
           >
             {activeProject.label} · {activeProject.id}
@@ -84,7 +93,7 @@ export function PaymentsHeader({
       </View>
 
       {/* Switch Project */}
-      {activeProject ? (
+      {activeProject && onSwitchProject ? (
         hasMultipleProjects ? (
           <TouchableOpacity
             style={[
@@ -178,6 +187,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 2,
     fontWeight: fontWeight.medium,
+    opacity: 0.6,
   },
   switcherBadge: {
     paddingHorizontal: spacing.sm,

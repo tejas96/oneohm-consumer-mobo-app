@@ -10,8 +10,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuthStore } from '@/core/auth';
 import { useTranslation } from '@/core/i18n';
 import { Route, type MainStackParamList } from '@/core/navigation';
-import { useProjects } from '@/data/resources/project.resource';
-import { useProjectSelectionStore } from '@/app/home/hooks/useHomeDashboard';
+import { useProjectSelectionStore } from '@/core/project/project.store';
+import { useActiveProject } from '@/shared/hooks';
 
 export function useProfileLogic() {
   const navigation =
@@ -21,19 +21,22 @@ export function useProfileLogic() {
 
   const { t, currentLanguage, setLanguage } = useTranslation();
 
-  const selectedProjectId = useProjectSelectionStore(
-    state => state.selectedProjectId,
-  );
   const setSelectedProjectId = useProjectSelectionStore(
     state => state.setSelectedProjectId,
   );
+  const setSwitcherVisible = useProjectSelectionStore(
+    state => state.setSwitcherVisible,
+  );
 
-  // Fetch projects from query resource
-  const { data: projects = [], isLoading, isError, refetch } = useProjects();
-
-  // Active project selection
-  const activeProject =
-    projects.find(p => p.id === selectedProjectId) || projects[0] || null;
+  const {
+    selectedProjectId,
+    activeProject,
+    isOnboarding,
+    projects,
+    isLoading,
+    isError,
+    refetch,
+  } = useActiveProject();
 
   // Calculate aggregates across all projects
   const totalCapacity = projects.reduce((sum, p) => sum + (p.capacity || 0), 0);
@@ -66,6 +69,7 @@ export function useProfileLogic() {
     setLanguage,
     selectedProjectId,
     activeProject,
+    isOnboarding,
     projects,
     isLoading,
     isError,
@@ -84,5 +88,6 @@ export function useProfileLogic() {
     navigateToSupport,
     navigateToWarranty,
     handleSwitchProject,
+    openProjectSwitcher: () => setSwitcherVisible(true),
   };
 }

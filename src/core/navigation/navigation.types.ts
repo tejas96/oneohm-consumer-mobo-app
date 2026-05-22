@@ -73,7 +73,7 @@ export type MainStackParamList = {
   [Route.PROJECT_DETAIL]: ProjectDetailParams;
   [Route.SUPPORT]: undefined;
   [Route.WARRANTY]: undefined;
-  [Route.PROJECT_SWITCHER]: undefined;
+  [Route.PROJECT_TEAM]: { projectId: string };
 };
 
 /** Params for viewing a project's details */

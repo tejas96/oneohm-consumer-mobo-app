@@ -14,12 +14,14 @@ interface QuickActionsProps {
   onDocumentsPress: () => void;
   onSupportPress: () => void;
   onWarrantyPress: () => void;
+  onTeamPress: () => void;
 }
 
 export function QuickActions({
   onDocumentsPress,
   onSupportPress,
   onWarrantyPress,
+  onTeamPress,
 }: QuickActionsProps) {
   const { t } = useTranslation();
   const theme = useAppTheme();
@@ -32,29 +34,29 @@ export function QuickActions({
 
   const actions = [
     {
-      label: t('dashboard.actions.team'),
-      sublabel: 'Get service',
+      label: t('dashboard.actions.support'),
+      sublabel: t('dashboard.actions.supportSub'),
       icon: 'cog-outline',
       onPress: onSupportPress,
       color: theme.colors.primary, // Accessible green in light mode
     },
     {
       label: t('dashboard.actions.documents'),
-      sublabel: 'View NOC & certs',
+      sublabel: t('dashboard.actions.documentsSub'),
       icon: 'file-document-outline',
       onPress: onDocumentsPress,
       color: theme.colors.brandBlue, // Accessible blue in light mode
     },
     {
-      label: 'Your Team',
-      sublabel: 'Contact crew',
+      label: t('dashboard.actions.team'),
+      sublabel: t('dashboard.actions.teamSub'),
       icon: 'account-group-outline',
-      onPress: onSupportPress,
+      onPress: onTeamPress,
       color: theme.colors.brandPurple, // Accessible purple in light mode
     },
     {
-      label: 'Properties',
-      sublabel: 'All accounts',
+      label: t('dashboard.actions.properties'),
+      sublabel: t('dashboard.actions.propertiesSub'),
       icon: 'home-outline',
       onPress: onWarrantyPress,
       color: theme.colors.brandGray, // Dynamic gray

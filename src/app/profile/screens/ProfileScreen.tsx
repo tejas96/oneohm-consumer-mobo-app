@@ -6,15 +6,16 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Text, Portal, Snackbar } from 'react-native-paper';
+import { Text, Portal, Snackbar, IconButton } from 'react-native-paper';
 
-import { ScreenWrapper } from '@/shared/components';
+import { ScreenWrapper, CTCard } from '@/shared/components';
 import {
   spacing,
   fontSize,
   fontWeight,
   useAppTheme,
   borderRadius,
+  lineHeight,
 } from '@/shared/theme';
 import { useProfileLogic } from '../hooks/useProfileLogic';
 
@@ -36,6 +37,7 @@ export function ProfileScreen() {
     setLanguage,
     selectedProjectId,
     activeProject,
+    isOnboarding,
     projects,
     isLoading,
     aggregates,
@@ -43,6 +45,7 @@ export function ProfileScreen() {
     navigateToSupport,
     navigateToWarranty,
     handleSwitchProject,
+    openProjectSwitcher,
   } = useProfileLogic();
 
   const [snackbarVisible, setSnackbarVisible] = React.useState(false);
@@ -94,11 +97,39 @@ export function ProfileScreen() {
           projects={projects}
           selectedProjectId={selectedProjectId}
           onSwitch={onSwitch}
+          onViewAll={openProjectSwitcher}
           t={t}
         />
 
         {/* Active Project breakdown details list */}
-        <ActiveProjectDetails activeProject={activeProject} t={t} />
+        {isOnboarding ? (
+          <CTCard
+            variant="glass"
+            style={styles.noticeCard}
+            innerStyle={styles.noticeCardInner}
+          >
+            <IconButton
+              icon="information-outline"
+              iconColor={theme.colors.warningText}
+              size={24}
+              style={[
+                styles.noticeIconBg,
+                { backgroundColor: theme.colors.warningBg },
+              ]}
+            />
+            <Text
+              style={[
+                styles.noticeText,
+                { color: theme.colors.onSurfaceVariant },
+              ]}
+            >
+              Technical specifications and property details will populate here
+              once project onboarding is complete.
+            </Text>
+          </CTCard>
+        ) : (
+          <ActiveProjectDetails activeProject={activeProject} t={t} />
+        )}
 
         {/* Settings options list (Notifications, Support, Warranty, Logout) */}
         <AccountSettings
@@ -164,5 +195,25 @@ const styles = StyleSheet.create({
   snackbarText: {
     fontSize: fontSize.caption,
     fontWeight: fontWeight.semibold,
+  },
+  noticeCard: {
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.xl,
+  },
+  noticeCardInner: {
+    padding: spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  noticeIconBg: {
+    margin: 0,
+    borderRadius: borderRadius.sm,
+  },
+  noticeText: {
+    fontSize: fontSize.caption,
+    textAlign: 'center',
+    lineHeight: lineHeight.caption,
+    maxWidth: 260,
   },
 });

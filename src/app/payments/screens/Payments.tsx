@@ -7,14 +7,13 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 
-import { ScreenWrapper } from '@/shared/components';
+import { ScreenWrapper, CTOnboardingPlaceholder } from '@/shared/components';
 import { spacing, useAppTheme } from '@/shared/theme';
 
 import { usePayment } from '../hooks/usePayment';
 import { PaymentsHeader } from '../components/PaymentsHeader';
 import { FinancialSummary } from '../components/FinancialSummary';
 import { TimelineTracker } from '../components/TimelineTracker';
-import { OnboardingState } from '@/app/home/components/OnboardingState';
 
 export function Payments() {
   const theme = useAppTheme();
@@ -31,12 +30,21 @@ export function Payments() {
     handleBack,
     handleSwitchProject,
     formatCurrency,
+    hasMultipleProjects,
   } = usePayment();
 
   const renderContent = () => {
     // Onboarding State fallback if activeProject is absent
     if (!activeProject) {
-      return <OnboardingState />;
+      return (
+        <CTOnboardingPlaceholder
+          title="Payment Milestones"
+          description="Your customized solar installation payment milestone schedule will generate here. Complete onboarding to view payment stages."
+          lottieSource={require('@/assets/animations/lottie/slide4_payments.json')}
+          statusText="Stage: Setup & Verification"
+          status="warning"
+        />
+      );
     }
 
     // Main scrollable list of components
@@ -91,6 +99,7 @@ export function Payments() {
         activeProject={activeProject}
         onBack={handleBack}
         onSwitchProject={handleSwitchProject}
+        hasMultipleProjects={hasMultipleProjects}
       />
       <View style={styles.content}>{renderContent()}</View>
     </ScreenWrapper>

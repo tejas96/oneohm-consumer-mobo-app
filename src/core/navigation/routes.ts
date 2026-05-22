@@ -35,5 +35,5 @@ export enum Route {
   PAYMENTS = 'Payments',
   SUPPORT = 'Support',
   WARRANTY = 'Warranty',
-  PROJECT_SWITCHER = 'ProjectSwitcher',
+  PROJECT_TEAM = 'ProjectTeam',
 }

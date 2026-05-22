@@ -28,13 +28,15 @@ export interface CTButtonProps
   fullWidth?: boolean;
   /** Override Paper mode directly if needed */
   mode?: PaperButtonProps['mode'];
+  /** Optional custom text color override */
+  textColor?: string;
 }
 
 const SIZE_CONFIG: Record<
   ButtonSize,
   { paddingVertical: number; fontSize: number }
 > = {
-  sm: { paddingVertical: spacing.xs, fontSize: fontSize.caption },
+  sm: { paddingVertical: spacing['2xs'], fontSize: fontSize.caption },
   md: { paddingVertical: spacing.sm, fontSize: fontSize.body },
   lg: { paddingVertical: spacing.md, fontSize: fontSize.subhead },
 };
@@ -44,6 +46,7 @@ export function CTButton({
   size = 'md',
   fullWidth = false,
   mode: modeOverride,
+  textColor: customTextColor,
   style,
   contentStyle,
   labelStyle,
@@ -105,7 +108,7 @@ export function CTButton({
     <Button
       mode={resolvedMode}
       buttonColor={disabled ? disabledButtonColor : config.buttonColor}
-      textColor={disabled ? disabledTextColor : config.textColor}
+      textColor={disabled ? disabledTextColor : (customTextColor ?? config.textColor)}
       style={[
         styles.base,
         fullWidth ? styles.fullWidth : undefined,

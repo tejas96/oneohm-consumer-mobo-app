@@ -43,7 +43,7 @@ export function ProgressWidget({ activeProject }: ProgressWidgetProps) {
         <CTChip
           status={isCompleted ? 'success' : 'warning'}
           size="sm"
-          style={{ marginTop: 2 }}
+          style={{ marginTop: 2, alignSelf: 'center' }}
         >
           {statusLabel}
         </CTChip>
@@ -59,17 +59,14 @@ const styles = StyleSheet.create({
     marginVertical: spacing.lg,
   },
   systemSize: {
-    fontSize: 10,
+    fontSize: 36,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
-    letterSpacing: 1.2,
-    opacity: 0.7,
   },
   percentage: {
-    fontSize: 36,
+    fontSize: 10,
     fontWeight: fontWeight.black,
-    lineHeight: 40,
-    marginVertical: 4,
     letterSpacing: -1,
+    opacity: 0.7,
   },
 });

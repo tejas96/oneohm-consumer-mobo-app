@@ -5,19 +5,14 @@ import { Text, IconButton } from 'react-native-paper';
 import { useTranslation } from '@/core/i18n';
 import type { TranslationKey } from '@/core/i18n/i18n.types';
 import type { Project } from '@/data/types';
-import {
-  colors,
-  spacing,
-  fontSize,
-  fontWeight,
-  useAppTheme,
-} from '@/shared/theme';
+import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 
 interface HomeHeaderProps {
   userName?: string;
   activeProject: Project | null;
   onNotificationsPress: () => void;
   onProjectSwitcherPress: () => void;
+  hasMultipleProjects?: boolean;
 }
 
 export function HomeHeader({
@@ -25,6 +20,7 @@ export function HomeHeader({
   activeProject,
   onNotificationsPress,
   onProjectSwitcherPress,
+  hasMultipleProjects = true,
 }: HomeHeaderProps) {
   const { t } = useTranslation();
   const theme = useAppTheme();
@@ -66,6 +62,7 @@ export function HomeHeader({
             ]}
             onPress={onProjectSwitcherPress}
             activeOpacity={0.7}
+            disabled={!hasMultipleProjects}
           >
             <View style={styles.row}>
               <View
@@ -75,11 +72,11 @@ export function HomeHeader({
                     backgroundColor:
                       activeProject.status === 'COMPLETED'
                         ? theme.colors.primary
-                        : colors.semantic.warning,
+                        : theme.colors.warningText,
                     shadowColor:
                       activeProject.status === 'COMPLETED'
                         ? theme.colors.primary
-                        : colors.semantic.warning,
+                        : theme.colors.warningText,
                   },
                 ]}
               />
@@ -89,12 +86,14 @@ export function HomeHeader({
               >
                 {activeProject.label}
               </Text>
-              <IconButton
-                icon="chevron-down"
-                size={14}
-                style={styles.chevron}
-                iconColor={theme.colors.iconMuted}
-              />
+              {hasMultipleProjects && (
+                <IconButton
+                  icon="chevron-down"
+                  size={14}
+                  style={styles.chevron}
+                  iconColor={theme.colors.iconMuted}
+                />
+              )}
             </View>
           </TouchableOpacity>
         ) : null}

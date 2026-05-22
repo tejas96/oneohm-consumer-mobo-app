@@ -32,8 +32,10 @@ export function HomeScreen() {
     navigateToDocuments,
     navigateToSupport,
     navigateToWarranty,
+    navigateToProjectTeam,
     navigateToProjectSwitcher,
     navigateToNotifications,
+    hasMultipleProjects,
   } = useHomeDashboard();
 
   const renderContent = () => {
@@ -71,6 +73,7 @@ export function HomeScreen() {
               onDocumentsPress={navigateToDocuments}
               onSupportPress={navigateToSupport}
               onWarrantyPress={navigateToWarranty}
+              onTeamPress={navigateToProjectTeam}
             />
           </>
         ) : null}
@@ -102,6 +105,7 @@ export function HomeScreen() {
         activeProject={activeProject}
         onNotificationsPress={navigateToNotifications}
         onProjectSwitcherPress={navigateToProjectSwitcher}
+        hasMultipleProjects={hasMultipleProjects}
       />
       <View style={styles.content}>{renderContent()}</View>
     </ScreenWrapper>

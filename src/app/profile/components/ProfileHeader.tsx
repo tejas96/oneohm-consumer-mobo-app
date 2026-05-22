@@ -1,20 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
-import Svg, {
-  Defs,
-  LinearGradient as SvgLinearGradient,
-  Rect,
-  Stop,
-} from 'react-native-svg';
+import { CTAvatar } from '@/shared/components';
 import {
   useAppTheme,
   spacing,
   fontSize,
   fontWeight,
   borderRadius,
-  hexToRgba,
-  colors,
 } from '@/shared/theme';
 import type { TranslationKey } from '@/core/i18n/i18n.types';
 
@@ -46,60 +39,14 @@ export function ProfileHeader({ user, totalProjects, t }: ProfileHeaderProps) {
 
   return (
     <View style={styles.header}>
-      <View
-        style={[
-          styles.avatarGradient,
-          {
-            borderColor: theme.colors.outlineVariant,
-            ...Platform.select({
-              ios: {
-                shadowColor: hexToRgba(colors.neutral.black, 0.25),
-              },
-            }),
-          },
-        ]}
-      >
-        <View style={StyleSheet.absoluteFill}>
-          <Svg height="100%" width="100%">
-            <Defs>
-              <SvgLinearGradient
-                id="avatarGrad"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="100%"
-              >
-                <Stop
-                  offset="0%"
-                  stopColor={hexToRgba(
-                    theme.colors.primary,
-                    theme.dark ? 0.22 : 0.12,
-                  )}
-                  stopOpacity={1}
-                />
-                <Stop
-                  offset="100%"
-                  stopColor={hexToRgba(
-                    theme.colors.brandBlue || theme.colors.secondary,
-                    theme.dark ? 0.14 : 0.06,
-                  )}
-                  stopOpacity={1}
-                />
-              </SvgLinearGradient>
-            </Defs>
-            <Rect
-              width="100%"
-              height="100%"
-              fill="url(#avatarGrad)"
-              rx={borderRadius['2xl']}
-              ry={borderRadius['2xl']}
-            />
-          </Svg>
-        </View>
-        <Text style={[styles.avatarText, { color: theme.colors.primary }]}>
-          {initials}
-        </Text>
-      </View>
+      <CTAvatar
+        type="text"
+        size="xl"
+        initials={initials}
+        useGradient={true}
+        borderColor={theme.colors.outlineVariant}
+        style={{ marginBottom: spacing.md }}
+      />
 
       <Text style={[styles.name, { color: theme.colors.onBackground }]}>
         {displayName}
@@ -140,26 +87,6 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: spacing.xl,
-  },
-  avatarGradient: {
-    width: 96,
-    height: 96,
-    borderRadius: borderRadius['2xl'],
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    marginBottom: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 1,
-        shadowRadius: 24,
-      },
-    }),
-  },
-  avatarText: {
-    fontSize: fontSize['3xl'],
-    fontWeight: fontWeight.bold,
   },
   name: {
     fontSize: fontSize.title,

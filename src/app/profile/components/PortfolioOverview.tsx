@@ -107,5 +107,6 @@ const styles = StyleSheet.create({
   statsLabel: {
     fontSize: fontSize.micro,
     opacity: 0.6,
+    textAlign: 'center',
   },
 });

@@ -26,6 +26,8 @@ export interface CTDialogAction {
   onPress: () => void;
   /** CTButton variant — defaults to 'ghost' for cancel, 'primary' for confirm */
   variant?: CTButtonProps['variant'];
+  /** Optional extra props for the CTButton */
+  buttonProps?: Omit<CTButtonProps, 'variant' | 'onPress' | 'children'>;
 }
 
 export interface CTDialogProps {
@@ -98,6 +100,7 @@ export function CTDialog({
                 variant={action.variant ?? (i === 0 ? 'ghost' : 'primary')}
                 size="sm"
                 onPress={action.onPress}
+                {...action.buttonProps}
               >
                 {action.label}
               </CTButton>
