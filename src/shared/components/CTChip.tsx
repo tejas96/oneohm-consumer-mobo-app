@@ -8,7 +8,8 @@
  */
 
 import React from 'react';
-import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { StyleSheet, View, Pressable } from 'react-native';
+import { Text } from 'react-native-paper';
 
 import {
   borderRadius,

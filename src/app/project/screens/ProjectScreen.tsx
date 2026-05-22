@@ -174,12 +174,12 @@ export function ProjectScreen() {
       stateConfig={{
         state: isLoading ? 'loading' : isError ? 'error' : 'success',
         loadingConfig: {
-          message: 'Loading Project Details...',
+          message: t('common.stateConfig.loadingProject'),
         },
         errorConfig: {
-          title: 'Unable to load project data.',
-          message: 'Please check your connection and try again.',
-          retryText: 'Retry',
+          title: t('common.stateConfig.errorTitleProject'),
+          message: t('common.stateConfig.errorMessage'),
+          retryText: t('common.retry'),
           onRetry: refetch,
         },
       }}

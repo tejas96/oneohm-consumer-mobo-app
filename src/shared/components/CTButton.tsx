@@ -108,7 +108,9 @@ export function CTButton({
     <Button
       mode={resolvedMode}
       buttonColor={disabled ? disabledButtonColor : config.buttonColor}
-      textColor={disabled ? disabledTextColor : (customTextColor ?? config.textColor)}
+      textColor={
+        disabled ? disabledTextColor : customTextColor ?? config.textColor
+      }
       style={[
         styles.base,
         fullWidth ? styles.fullWidth : undefined,

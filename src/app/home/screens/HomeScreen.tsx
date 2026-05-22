@@ -9,6 +9,7 @@ import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 
 import { ScreenWrapper } from '@/shared/components';
 import { spacing, useAppTheme } from '@/shared/theme';
+import { useTranslation } from '@/core/i18n';
 
 import { useHomeDashboard } from '../hooks/useHomeDashboard';
 import { HomeHeader } from '../components/HomeHeader';
@@ -20,6 +21,7 @@ import { BannerAlert } from '../components/BannerAlert';
 
 export function HomeScreen() {
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const {
     user,
     activeProject,
@@ -90,12 +92,12 @@ export function HomeScreen() {
       stateConfig={{
         state: isLoading ? 'loading' : isError ? 'error' : 'success',
         loadingConfig: {
-          message: 'Loading Dashboard...',
+          message: t('common.stateConfig.loadingDashboard'),
         },
         errorConfig: {
-          title: 'Unable to load project data.',
-          message: 'Please check your connection and try again.',
-          retryText: 'Retry',
+          title: t('common.stateConfig.errorTitleDashboard'),
+          message: t('common.stateConfig.errorMessage'),
+          retryText: t('common.retry'),
           onRetry: refetch,
         },
       }}

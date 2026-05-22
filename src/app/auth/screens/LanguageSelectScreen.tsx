@@ -9,8 +9,8 @@
  */
 
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { Text as PaperText } from 'react-native-paper';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
 
 import {
@@ -21,6 +21,17 @@ import {
   useAppTheme,
 } from '@/shared/theme';
 import { ScreenWrapper, CTButton } from '@/shared/components';
+
+// Component-level layout & typography tokens
+const LOTTIE_CONTAINER_SIZE = 150;
+const LOTTIE_SIZE = 180;
+const FLAG_FONT_SIZE = 28;
+const FLAG_LINE_HEIGHT = 34;
+const RADIO_SIZE = 26;
+const RADIO_BORDER_RADIUS = RADIO_SIZE / 2;
+const CHECKMARK_FONT_SIZE = 14;
+const CHECKMARK_LINE_HEIGHT = 16;
+const CAPTION_LINE_HEIGHT = 18;
 
 import { useLanguageSelectLogic } from '../hooks/useLanguageSelectLogic';
 
@@ -110,12 +121,12 @@ export function LanguageSelectScreen() {
               style={styles.lottie}
             />
           </View>
-          <PaperText
+          <Text
             variant="displaySmall"
             style={[styles.title, { color: theme.colors.onBackground }]}
           >
             {t('auth.languageSelect')}
-          </PaperText>
+          </Text>
           <Text
             style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
           >
@@ -176,15 +187,15 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
   },
   lottieContainer: {
-    width: 150,
-    height: 150,
+    width: LOTTIE_CONTAINER_SIZE,
+    height: LOTTIE_CONTAINER_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
   lottie: {
-    width: 180,
-    height: 180,
+    width: LOTTIE_SIZE,
+    height: LOTTIE_SIZE,
   },
   title: {
     fontWeight: fontWeight.bold,
@@ -216,27 +227,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flag: {
-    fontSize: 28,
+    fontSize: FLAG_FONT_SIZE,
     marginRight: spacing.md,
-    lineHeight: 34,
+    lineHeight: FLAG_LINE_HEIGHT,
   },
   langLabel: {
     fontSize: fontSize.headline,
     flexShrink: 1,
   },
   radioOuter: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: RADIO_SIZE,
+    height: RADIO_SIZE,
+    borderRadius: RADIO_BORDER_RADIUS,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: spacing.md,
   },
   checkMark: {
-    fontSize: 14,
+    fontSize: CHECKMARK_FONT_SIZE,
     fontWeight: 'bold',
-    lineHeight: 16,
+    lineHeight: CHECKMARK_LINE_HEIGHT,
   },
   footer: {
     alignItems: 'center',
@@ -249,7 +260,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.caption,
     textAlign: 'center',
     marginTop: spacing.md,
-    lineHeight: 18,
+    lineHeight: CAPTION_LINE_HEIGHT,
     paddingHorizontal: spacing.lg,
   },
 });

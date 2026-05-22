@@ -18,7 +18,7 @@ import {
   CTTextInput,
 } from '@/shared/components';
 import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
-import { useTranslation } from '@/core/i18n';
+import { useTranslation, type TranslationKey } from '@/core/i18n';
 import { useTeamLogic } from '../hooks/useTeamLogic';
 import type { TeamMember } from '@/data/types/team.types';
 
@@ -115,7 +115,7 @@ export function TeamScreen() {
                 { color: theme.colors.onSurfaceVariant },
               ]}
             >
-              {t(item.roleKey as any)}
+              {t(item.roleKey as TranslationKey)}
             </Text>
 
             <View style={styles.ratingAndReviewsRow}>
@@ -191,12 +191,12 @@ export function TeamScreen() {
       stateConfig={{
         state: isLoading ? 'loading' : isError ? 'error' : 'success',
         loadingConfig: {
-          message: 'Loading Team Details...',
+          message: t('common.stateConfig.loadingTeam'),
         },
         errorConfig: {
-          title: 'Unable to load project team.',
-          message: 'Please check your connection and try again.',
-          retryText: 'Retry',
+          title: t('common.stateConfig.errorTitleTeam'),
+          message: t('common.stateConfig.errorMessage'),
+          retryText: t('common.retry'),
           onRetry: refetch,
         },
       }}
@@ -265,7 +265,7 @@ export function TeamScreen() {
                     { color: theme.colors.onSurfaceVariant },
                   ]}
                 >
-                  {t(selectedMember.roleKey as any)}
+                  {t(selectedMember.roleKey as TranslationKey)}
                 </Text>
               </View>
             </View>
@@ -371,17 +371,17 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
   },
   inlineStarIcon: {
-    margin: 0,
-    padding: 0,
-    width: 16,
-    height: 16,
+    margin: spacing.none,
+    padding: spacing.none,
+    width: spacing.md,
+    height: spacing.md,
   },
   ratingValueText: {
     fontSize: fontSize.caption,
     fontWeight: fontWeight.medium,
   },
   cardDivider: {
-    height: 1,
+    height: StyleSheet.hairlineWidth,
     marginVertical: spacing.md,
   },
   actionButtonsContainer: {
@@ -425,13 +425,13 @@ const styles = StyleSheet.create({
     marginVertical: spacing.xs,
   },
   interactiveStar: {
-    margin: 0,
+    margin: spacing.none,
   },
   textInputContainer: {
     marginTop: spacing.xs,
   },
   commentInput: {
-    minHeight: 80,
+    minHeight: spacing['4xl'] + spacing.md,
     textAlignVertical: 'top',
   },
   dialogLoading: {

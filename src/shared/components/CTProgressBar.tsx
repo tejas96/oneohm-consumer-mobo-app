@@ -12,8 +12,8 @@
 
 import React from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { StyleSheet, Text, View } from 'react-native';
-import { ProgressBar } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
+import { ProgressBar, Text } from 'react-native-paper';
 import type { Props as PaperProgressBarProps } from 'react-native-paper/lib/typescript/components/ProgressBar';
 
 import {

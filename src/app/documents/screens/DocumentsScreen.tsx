@@ -172,12 +172,12 @@ export function DocumentsScreen() {
       stateConfig={{
         state: isLoading ? 'loading' : isError ? 'error' : 'success',
         loadingConfig: {
-          message: 'Loading Documents...',
+          message: t('common.stateConfig.loadingDocuments'),
         },
         errorConfig: {
-          title: 'Unable to load documents.',
-          message: 'Please check your connection and try again.',
-          retryText: 'Retry',
+          title: t('common.stateConfig.errorTitleDocuments'),
+          message: t('common.stateConfig.errorMessage'),
+          retryText: t('common.retry'),
           onRetry: refetch,
         },
       }}

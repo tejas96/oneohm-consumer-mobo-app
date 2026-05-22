@@ -9,6 +9,7 @@ import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 
 import { ScreenWrapper, CTOnboardingPlaceholder } from '@/shared/components';
 import { spacing, useAppTheme } from '@/shared/theme';
+import { useTranslation } from '@/core/i18n';
 
 import { usePayment } from '../hooks/usePayment';
 import { PaymentsHeader } from '../components/PaymentsHeader';
@@ -17,6 +18,7 @@ import { TimelineTracker } from '../components/TimelineTracker';
 
 export function Payments() {
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const {
     activeProject,
     isLoading,
@@ -85,12 +87,12 @@ export function Payments() {
       stateConfig={{
         state: isLoading ? 'loading' : isError ? 'error' : 'success',
         loadingConfig: {
-          message: 'Loading Payment Journey...',
+          message: t('common.stateConfig.loadingPayments'),
         },
         errorConfig: {
-          title: 'Unable to load payments data.',
-          message: 'Please check your connection and try again.',
-          retryText: 'Retry',
+          title: t('common.stateConfig.errorTitlePayments'),
+          message: t('common.stateConfig.errorMessage'),
+          retryText: t('common.retry'),
           onRetry: refetch,
         },
       }}

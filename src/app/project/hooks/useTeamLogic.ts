@@ -104,7 +104,7 @@ export function useTeamLogic() {
 
     // Clean phone number (strip + or non-numeric characters for WhatsApp API)
     const numericPhone = phone.replace(/[^0-9]/g, '');
-    const messageText = `Hi ${name}, reaching out regarding my solar installation.`;
+    const messageText = t('team.whatsappTemplate').replace('{name}', name);
     const whatsappUrl = `whatsapp://send?phone=${numericPhone}&text=${encodeURIComponent(
       messageText,
     )}`;
@@ -120,7 +120,7 @@ export function useTeamLogic() {
         if (canOpenSms) {
           Toast.show({
             type: 'info',
-            text1: 'WhatsApp Not Installed',
+            text1: t('team.whatsappNotInstalled'),
             text2: t('team.whatsappErr'),
           });
           await Linking.openURL(smsUrl);
@@ -209,11 +209,11 @@ export function useTeamLogic() {
           });
           closeFeedbackModal();
         },
-        onError: (err: any) => {
+        onError: (err: Error) => {
           Toast.show({
             type: 'error',
             text1: t('common.error'),
-            text2: err.message || 'Failed to submit review.',
+            text2: err.message || t('team.submitError'),
           });
         },
       },

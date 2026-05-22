@@ -106,10 +106,8 @@ export function FinancialSummary({
             style={[
               styles.highlightRow,
               {
-                backgroundColor:
-                  theme.colors.brandSuccessBg || 'rgba(118, 192, 68, 0.04)',
-                borderColor:
-                  theme.colors.brandSuccessBorder || 'rgba(118, 192, 68, 0.15)',
+                backgroundColor: theme.colors.brandSuccessBg,
+                borderColor: theme.colors.brandSuccessBorder,
               },
             ]}
           >

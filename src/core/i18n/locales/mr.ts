@@ -60,6 +60,19 @@ export const mr: Dictionary = {
     skip: 'वगळा',
     error: 'एक त्रुटी आली',
     retry: 'पुन्हा प्रयत्न करा',
+    stateConfig: {
+      loadingDashboard: 'डॅशबोर्ड लोड करत आहे...',
+      loadingTeam: 'संघ तपशील लोड करत आहे...',
+      loadingProject: 'प्रकल्प तपशील लोड करत आहे...',
+      loadingDocuments: 'दस्तऐवज लोड करत आहे...',
+      loadingPayments: 'पेमेंट प्रवास लोड करत आहे...',
+      errorTitleDashboard: 'प्रकल्प डेटा लोड करण्यात अक्षम.',
+      errorTitleTeam: 'प्रकल्प संघ लोड करण्यात अक्षम.',
+      errorTitleProject: 'प्रकल्प डेटा लोड करण्यात अक्षम.',
+      errorTitleDocuments: 'दस्तऐवज लोड करण्यात अक्षम.',
+      errorTitlePayments: 'पेमेंट डेटा लोड करण्यात अक्षम.',
+      errorMessage: 'कृपया तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा.',
+    },
   },
   dashboard: {
     greetingMorning: 'शुभ प्रभात',
@@ -99,6 +112,9 @@ export const mr: Dictionary = {
   },
   payments: {
     title: 'पेमेंट मागोवा',
+    targetLabel: 'लक्ष्य: {amount} ({percent}%)',
+    expectedRecovery: 'अपेक्षित वसुली',
+    installmentsBadge: '{count} हप्ते',
     valuation: 'प्रकल्प मूल्यांकन',
     tracker: 'टप्पा पेमेंट ट्रॅकर',
     agreementCost: 'करार किंमत (वनओमला देय)',
@@ -214,6 +230,10 @@ export const mr: Dictionary = {
   },
   team: {
     title: 'प्रकल्प संघ',
+    whatsappTemplate:
+      'नमस्कार {name}, माझ्या सोलर इन्स्टॉलेशनच्या संदर्पात संपर्क साधत आहे.',
+    whatsappNotInstalled: 'व्हॉट्सॲप इन्स्टॉल केलेले नाही',
+    submitError: 'अभिप्राय सबमिट करण्यात अपयशी.',
     role_manager: 'प्रकल्प व्यवस्थापक / पर्यवेक्षक',
     role_technician: 'सोलर इन्स्टॉलेशन तंत्रज्ञ',
     role_executive: 'ग्राहक संबंध प्रतिनिधी',

@@ -8,8 +8,8 @@
  */
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Badge } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
+import { Badge, Text } from 'react-native-paper';
 
 import { borderRadius, colors, fontSize, fontWeight } from '@/shared/theme';
 

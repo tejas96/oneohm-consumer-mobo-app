@@ -58,6 +58,19 @@ export const en = {
     skip: 'Skip',
     error: 'An error occurred',
     retry: 'Retry',
+    stateConfig: {
+      loadingDashboard: 'Loading Dashboard...',
+      loadingTeam: 'Loading Team Details...',
+      loadingProject: 'Loading Project Details...',
+      loadingDocuments: 'Loading Documents...',
+      loadingPayments: 'Loading Payment Journey...',
+      errorTitleDashboard: 'Unable to load project data.',
+      errorTitleTeam: 'Unable to load project team.',
+      errorTitleProject: 'Unable to load project data.',
+      errorTitleDocuments: 'Unable to load documents.',
+      errorTitlePayments: 'Unable to load payments data.',
+      errorMessage: 'Please check your connection and try again.',
+    },
   },
   dashboard: {
     greetingMorning: 'Good Morning',
@@ -97,6 +110,9 @@ export const en = {
   },
   payments: {
     title: 'Payment Journey',
+    targetLabel: 'Target: {amount} ({percent}%)',
+    expectedRecovery: 'Expected Recovery',
+    installmentsBadge: '{count} Inst.',
     valuation: 'Project Valuation',
     tracker: 'Milestone Journey Tracker',
     agreementCost: 'Agreement Cost (Payable to OneOhm)',
@@ -212,6 +228,10 @@ export const en = {
   },
   team: {
     title: 'Project Team',
+    whatsappTemplate:
+      'Hi {name}, reaching out regarding my solar installation.',
+    whatsappNotInstalled: 'WhatsApp Not Installed',
+    submitError: 'Failed to submit review.',
     role_manager: 'Project Manager / Supervisor',
     role_technician: 'Solar Installation Technician',
     role_executive: 'Customer Care Representative',

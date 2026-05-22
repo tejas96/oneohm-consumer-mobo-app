@@ -20,6 +20,10 @@ import { spacing, fontWeight, useAppTheme } from '@/shared/theme';
 import { CTChip, CTProgressBar } from '@/shared/components';
 import type { PaymentMilestone } from '../hooks/usePayment';
 
+import { TimelineDot } from './TimelineDot';
+import { ExpandedInstallments } from './ExpandedInstallments';
+import { ExpandedSubsidyBullets } from './ExpandedSubsidyBullets';
+
 // Enable LayoutAnimation for Android
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -33,6 +37,18 @@ interface TimelineNodeProps {
   onToggle: () => void;
   formatCurrency: (value: number) => string;
 }
+
+// Component-level layout & typography tokens
+const TEXT_MICRO_SIZE = 9;
+const TEXT_SMALL_SIZE = 9.5;
+const TEXT_CAPTION_SIZE = 10;
+const TEXT_TITLE_SIZE = 12;
+const TEXT_SUBSIDY_SIZE = 11;
+
+const LOCK_ICON_SIZE = 16;
+const CHEVRON_ICON_SIZE = 18;
+const CARD_RADIUS = 20;
+const HAIRLINE_BORDER = 0.5;
 
 export function TimelineNode({
   milestone,
@@ -97,13 +113,10 @@ export function TimelineNode({
   // Highlight specific cards with border outlines
   const getCardBorderColor = () => {
     if (status === 'PAID') {
-      return theme.colors.brandSuccessBorder || 'rgba(118, 192, 68, 0.2)';
+      return theme.colors.brandSuccessBorder;
     }
     if (status === 'PARTIAL') {
-      return theme.colors.warningBorder || 'rgba(245, 158, 11, 0.2)';
-    }
-    if (status === 'APPROVED' || status === 'CREDITED') {
-      return theme.colors.outlineVariant;
+      return theme.colors.warningBorder;
     }
     return theme.colors.outlineVariant;
   };
@@ -116,51 +129,12 @@ export function TimelineNode({
     return theme.colors.glassBgStrong;
   };
 
-  // Render Left Halo Indicator Dot
-  const renderDot = () => {
-    let dotColor = theme.colors.outlineVariant;
-    let ringColor = 'transparent';
-
-    if (status === 'PAID' || status === 'CREDITED') {
-      dotColor = theme.colors.brandSuccess || theme.colors.primary;
-      ringColor = theme.colors.brandSuccessIconBg || 'rgba(118, 192, 68, 0.12)';
-    } else if (status === 'PARTIAL' || status === 'DUE') {
-      dotColor = theme.colors.warningText;
-      ringColor = theme.colors.warningBg || 'rgba(245, 158, 11, 0.12)';
-    } else if (status === 'APPROVED') {
-      dotColor = theme.colors.secondary;
-      ringColor = theme.colors.infoBgChip || 'rgba(13, 116, 184, 0.12)';
-    }
-
-    const hasRing = ringColor !== 'transparent';
-
-    return (
-      <View style={styles.dotContainer}>
-        {hasRing ? (
-          <View style={[styles.dotRing, { backgroundColor: ringColor }]}>
-            <View style={[styles.dotSolid, { backgroundColor: dotColor }]} />
-          </View>
-        ) : (
-          <View
-            style={[
-              styles.dotLocked,
-              {
-                backgroundColor: theme.colors.background,
-                borderColor: theme.colors.outlineVariant,
-              },
-            ]}
-          />
-        )}
-      </View>
-    );
-  };
-
   return (
     <View
       style={[styles.rowContainer, status === 'LOCKED' && { opacity: 0.5 }]}
     >
       {/* Left connector column */}
-      {renderDot()}
+      <TimelineDot status={status} />
 
       {/* Main card */}
       <View style={styles.cardContainer}>
@@ -204,7 +178,9 @@ export function TimelineNode({
                       { color: theme.colors.onSurfaceVariant, opacity: 0.5 },
                     ]}
                   >
-                    Target: {formatCurrency(targetValue)} ({percentage}%)
+                    {t('payments.targetLabel')
+                      .replace('{amount}', formatCurrency(targetValue))
+                      .replace('{percent}', percentage.toString())}
                   </Text>
                   {status === 'PARTIAL' ? (
                     <Text
@@ -237,7 +213,7 @@ export function TimelineNode({
                       { color: theme.colors.onSurfaceVariant, opacity: 0.5 },
                     ]}
                   >
-                    Expected Recovery
+                    {t('payments.expectedRecovery')}
                   </Text>
                   <Text
                     style={[
@@ -296,21 +272,24 @@ export function TimelineNode({
                       { color: theme.colors.onSurfaceVariant, opacity: 0.6 },
                     ]}
                   >
-                    {installments.length} Inst.
+                    {t('payments.installmentsBadge').replace(
+                      '{count}',
+                      installments.length.toString(),
+                    )}
                   </Text>
                 </View>
               )}
               {status === 'LOCKED' ? (
                 <IconButton
                   icon="lock-outline"
-                  size={16}
+                  size={LOCK_ICON_SIZE}
                   iconColor={theme.colors.iconMuted}
                   style={styles.lockIcon}
                 />
               ) : (
                 <IconButton
                   icon={isExpanded ? 'chevron-up' : 'chevron-down'}
-                  size={18}
+                  size={CHEVRON_ICON_SIZE}
                   iconColor={theme.colors.iconMuted}
                   style={styles.chevronIcon}
                 />
@@ -327,120 +306,19 @@ export function TimelineNode({
               ]}
             >
               {installments.length > 0 ? (
-                <View style={styles.installmentsContainer}>
-                  <Text
-                    style={[
-                      styles.detailsHeading,
-                      { color: theme.colors.onSurfaceVariant, opacity: 0.5 },
-                    ]}
-                  >
-                    {t('payments.installmentTimeline')}
-                  </Text>
-                  {installments.map((inst, i) => (
-                    <View
-                      key={i}
-                      style={[
-                        styles.installmentRow,
-                        i < installments.length - 1 && {
-                          borderBottomColor: theme.colors.outlineVariant,
-                          borderBottomWidth: 0.5,
-                        },
-                      ]}
-                    >
-                      <View style={styles.installmentInfo}>
-                        <Text
-                          style={[
-                            styles.installmentTitle,
-                            { color: theme.colors.onSurface },
-                          ]}
-                        >
-                          {inst.title}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.installmentSubtitle,
-                            {
-                              color: theme.colors.onSurfaceVariant,
-                              opacity: 0.5,
-                            },
-                          ]}
-                        >
-                          {inst.subtitle}
-                        </Text>
-                      </View>
-                      <Text
-                        style={[
-                          styles.installmentAmount,
-                          { color: theme.colors.onSurface },
-                        ]}
-                      >
-                        {formatCurrency(inst.amount)}
-                      </Text>
-                    </View>
-                  ))}
-
-                  {/* Partial terms show final balance indicator */}
-                  {status === 'PARTIAL' && (
-                    <View style={styles.remainingTermRow}>
-                      <Text
-                        style={[
-                          styles.remainingLabel,
-                          {
-                            color: theme.colors.onSurfaceVariant,
-                            opacity: 0.5,
-                          },
-                        ]}
-                      >
-                        {t('payments.remainingTermBalance')}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.remainingValue,
-                          { color: theme.colors.warningText },
-                        ]}
-                      >
-                        {formatCurrency(targetValue - amountPaid)}
-                      </Text>
-                    </View>
-                  )}
-                </View>
+                <ExpandedInstallments
+                  installments={installments}
+                  status={status}
+                  targetValue={targetValue}
+                  amountPaid={amountPaid}
+                  formatCurrency={formatCurrency}
+                />
               ) : infoBulletKeys && infoBulletKeys.length > 0 ? (
                 /* Govt Subsidy Bullet Details */
-                <View style={styles.bulletsContainer}>
-                  <Text
-                    style={[
-                      styles.detailsHeading,
-                      { color: theme.colors.onSurfaceVariant, opacity: 0.6 },
-                    ]}
-                  >
-                    {infoTextKey ? t(infoTextKey) : ''}
-                  </Text>
-                  <View style={styles.bulletsList}>
-                    {infoBulletKeys.map((bulletKey, idx) => (
-                      <View key={idx} style={styles.bulletRow}>
-                        <Text
-                          style={[
-                            styles.bulletDot,
-                            { color: theme.colors.secondary },
-                          ]}
-                        >
-                          •
-                        </Text>
-                        <Text
-                          style={[
-                            styles.bulletText,
-                            {
-                              color: theme.colors.onSurfaceVariant,
-                              opacity: 0.7,
-                            },
-                          ]}
-                        >
-                          {t(bulletKey)}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
+                <ExpandedSubsidyBullets
+                  infoTextKey={infoTextKey}
+                  infoBulletKeys={infoBulletKeys}
+                />
               ) : infoTextKey ? (
                 /* Simple message fallback */
                 <View style={styles.messageBlock}>
@@ -469,38 +347,12 @@ const styles = StyleSheet.create({
     paddingLeft: spacing.lg,
     paddingRight: spacing.lg,
   },
-  dotContainer: {
-    width: 24,
-    alignItems: 'center',
-    position: 'absolute',
-    left: 17,
-    top: 20,
-    zIndex: 10,
-  },
-  dotRing: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dotSolid: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  dotLocked: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 2,
-  },
   cardContainer: {
     flex: 1,
     paddingLeft: 30, // Make room for vertical connector line
   },
   card: {
-    borderRadius: 20,
+    borderRadius: CARD_RADIUS,
     borderWidth: 1,
     overflow: 'hidden',
   },
@@ -518,7 +370,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   termName: {
-    fontSize: 12,
+    fontSize: TEXT_TITLE_SIZE,
     fontWeight: fontWeight.bold,
     flexShrink: 1,
   },
@@ -530,26 +382,26 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   targetLabel: {
-    fontSize: 9.5,
+    fontSize: TEXT_SMALL_SIZE,
     fontWeight: fontWeight.semibold,
   },
   dueLabel: {
-    fontSize: 10,
+    fontSize: TEXT_CAPTION_SIZE,
     fontWeight: fontWeight.black,
   },
   receivedLabel: {
-    fontSize: 10,
+    fontSize: TEXT_CAPTION_SIZE,
     fontWeight: fontWeight.bold,
   },
   subsidyRecovery: {
-    fontSize: 11,
+    fontSize: TEXT_SUBSIDY_SIZE,
     fontWeight: fontWeight.bold,
   },
   progressBar: {
     marginTop: 8,
   },
   deadlineText: {
-    fontSize: 9,
+    fontSize: TEXT_MICRO_SIZE,
     fontWeight: fontWeight.medium,
     marginTop: 8,
   },
@@ -570,89 +422,21 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     padding: spacing.md,
   },
-  detailsHeading: {
-    fontSize: 9.5,
-    fontWeight: fontWeight.bold,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
-  },
-  installmentsContainer: {
-    gap: spacing.sm,
-  },
-  installmentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.xs,
-  },
-  installmentInfo: {
-    flex: 1,
-    paddingRight: spacing.sm,
-  },
-  installmentTitle: {
-    fontSize: 11,
-    fontWeight: fontWeight.bold,
-  },
-  installmentSubtitle: {
-    fontSize: 9,
-    marginTop: 1,
-  },
-  installmentAmount: {
-    fontSize: 11.5,
-    fontWeight: fontWeight.black,
-  },
-  remainingTermRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: spacing.xs,
-    paddingTop: spacing.xs,
-  },
-  remainingLabel: {
-    fontSize: 10,
-    fontWeight: fontWeight.bold,
-  },
-  remainingValue: {
-    fontSize: 11.5,
-    fontWeight: fontWeight.black,
-  },
-  bulletsContainer: {
-    paddingVertical: spacing.xs,
-  },
-  bulletsList: {
-    marginTop: spacing.xs,
-    gap: spacing.xs,
-  },
-  bulletRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  bulletDot: {
-    fontSize: 12,
-    marginRight: 6,
-    lineHeight: 14,
-  },
-  bulletText: {
-    fontSize: 9.5,
-    flex: 1,
-    lineHeight: 14,
-  },
   messageBlock: {
     paddingVertical: spacing.xs,
   },
   messageText: {
-    fontSize: 10,
+    fontSize: TEXT_CAPTION_SIZE,
     lineHeight: 15,
   },
   instBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
-    borderWidth: 0.5,
+    borderWidth: HAIRLINE_BORDER,
   },
   instBadgeText: {
-    fontSize: 8.5,
+    fontSize: TEXT_MICRO_SIZE - 0.5, // 8.5
     fontWeight: fontWeight.semibold,
   },
   statusChip: {
@@ -664,7 +448,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusChipText: {
-    fontSize: 8.5,
+    fontSize: TEXT_MICRO_SIZE - 0.5, // 8.5
     lineHeight: 10,
     marginVertical: 0,
     marginHorizontal: 4,

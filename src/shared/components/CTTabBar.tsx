@@ -53,6 +53,7 @@ export function CTTabBar({
           backgroundColor: theme.colors.navBarBg,
           borderTopColor: theme.colors.outlineVariant,
           paddingBottom: insets.bottom > 0 ? insets.bottom : spacing.md,
+          shadowColor: theme.colors.shadow,
         },
       ]}
     >
@@ -143,7 +144,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.12,
         shadowRadius: 16,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     alignItems: 'center',
-    gap: 3,
+    gap: spacing.micro,
   },
   label: {
     fontSize: fontSize.micro,
