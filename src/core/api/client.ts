@@ -15,7 +15,7 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 
-import { config } from '@/core/config';
+import { configService } from '@/core/config';
 
 import { setupInterceptors } from './interceptors';
 
@@ -24,8 +24,8 @@ import { setupInterceptors } from './interceptors';
 // ============================================
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: config.api.url,
-  timeout: config.api.timeout,
+  baseURL: configService.getApiUrl(),
+  timeout: configService.getApiTimeout(),
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -35,7 +35,7 @@ const apiClient: AxiosInstance = axios.create({
 setupInterceptors(apiClient);
 
 if (__DEV__) {
-  console.log('🔌 API Client initialized with URL:', config.api.url);
+  console.log('🔌 API Client initialized with URL:', configService.getApiUrl());
 }
 
 // ============================================

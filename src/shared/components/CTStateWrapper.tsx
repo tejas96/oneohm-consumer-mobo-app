@@ -12,6 +12,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Icon, Text } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
+import sandyLoadingAnimation from '@/assets/animations/lottie/Sandy Loading.json';
 
 import {
   spacing,
@@ -29,6 +30,9 @@ export type ScreenState = 'success' | 'loading' | 'error' | 'empty';
 export interface CTStateWrapperProps {
   /** The current state of the screen wrapper */
   state?: ScreenState;
+
+  /** Whether to use Lottie animation or standard spinner for loading state (default: 'lottie') */
+  loadingMode?: 'lottie' | 'indicator';
 
   /** Configuration for the Loading state */
   loadingConfig?: {
@@ -115,6 +119,7 @@ function AnimatedGate({ children }: { children: React.ReactNode }) {
 
 export function CTStateWrapper({
   state = 'success',
+  loadingMode = 'lottie',
   loadingConfig,
   errorConfig,
   emptyConfig,
@@ -130,8 +135,10 @@ export function CTStateWrapper({
   // Loading state
   if (state === 'loading') {
     const message = loadingConfig?.message;
-    const lottieSource = loadingConfig?.lottieSource;
-    const size = loadingConfig?.size ?? 140;
+    const lottieSource =
+      loadingConfig?.lottieSource ??
+      (loadingMode === 'lottie' ? sandyLoadingAnimation : undefined);
+    const size = loadingConfig?.size ?? (loadingMode === 'lottie' ? 180 : 140);
 
     return (
       <AnimatedGate>

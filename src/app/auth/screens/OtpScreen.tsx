@@ -13,8 +13,7 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import { Text } from 'react-native-paper';
-import Svg, { Polyline } from 'react-native-svg';
+import { Text, IconButton } from 'react-native-paper';
 
 import { ScreenWrapper, CTButton } from '@/shared/components';
 import { useAppTheme } from '@/shared/theme';
@@ -64,7 +63,6 @@ export function OtpScreen() {
                 ? theme.colors.primary
                 : theme.colors.outlineVariant,
             },
-            isFocused ? styles.otpBoxFocused : styles.otpBoxNormal,
           ]}
         >
           <Text style={[styles.otpText, { color: theme.colors.onBackground }]}>
@@ -77,14 +75,18 @@ export function OtpScreen() {
   };
 
   return (
-    <ScreenWrapper ambientGlow padded={false}>
+    <ScreenWrapper ambientGlow padded={false} showThemeToggle={false}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.content}>
           {/* Back Button */}
-          <Pressable
+          <IconButton
+            icon="chevron-left"
+            size={20}
+            iconColor={theme.colors.onBackground}
+            rippleColor="transparent"
             onPress={handleGoBack}
             style={[
               styles.backButton,
@@ -93,19 +95,7 @@ export function OtpScreen() {
                 borderColor: theme.colors.outlineVariant,
               },
             ]}
-          >
-            <Svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={theme.colors.onBackground}
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
-              <Polyline points="15 18 9 12 15 6" />
-            </Svg>
-          </Pressable>
+          />
 
           {/* Heading */}
           <View style={styles.headingContainer}>
@@ -136,7 +126,7 @@ export function OtpScreen() {
             <RNTextInput
               ref={inputRef}
               value={otp}
-              onChangeText={setOtp}
+              onChangeText={text => setOtp(text.replace(/\D/g, ''))}
               keyboardType="number-pad"
               maxLength={6}
               style={styles.hiddenInput}
@@ -265,7 +255,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 56,
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -320,12 +310,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 24,
     elevation: 4,
-  },
-  otpBoxFocused: {
-    borderWidth: 2,
-  },
-  otpBoxNormal: {
-    borderWidth: 1,
   },
   phoneHighlight: {
     fontWeight: '500',

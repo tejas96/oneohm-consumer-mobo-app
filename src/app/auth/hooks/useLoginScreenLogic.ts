@@ -7,10 +7,12 @@
  */
 
 import { useState } from 'react';
+import Toast from 'react-native-toast-message';
 
 import { Route, useAppNavigation } from '@/core/navigation';
 import { useRequestOtp } from '@/data/resources/auth.resource';
 import { useTranslation } from '@/core/i18n';
+import { normalizePhoneToE164 } from '@/shared/utils/format';
 
 export function useLoginScreenLogic() {
   const [phone, setPhone] = useState('');
@@ -19,29 +21,34 @@ export function useLoginScreenLogic() {
   const { t, currentLanguage, setLanguage } = useTranslation();
 
   const handleRequestOtp = () => {
-    // Skip phone length validation and mutation for time being to allow quick testing/preview of OTP screen
-    /*
+    if (requestOtp.isPending) return;
+
     if (phone.length < 10) {
-      Toast.show({ type: 'error', text1: t('common.error') });
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: 'Please enter a valid 10-digit mobile number',
+      });
       return;
     }
 
+    const formattedPhone = normalizePhoneToE164(phone);
+
     requestOtp.mutate(
-      { phone },
+      { phone: formattedPhone },
       {
         onSuccess: () => {
-          navigation.navigate(Route.OTP, { phone });
+          navigation.navigate(Route.OTP, { phone: formattedPhone });
         },
         onError: error => {
           Toast.show({
             type: 'error',
-            text1: error.message || t('common.error'),
+            text1: t('common.error'),
+            text2: error.message || 'Failed to send OTP. Please try again.',
           });
         },
       },
     );
-    */
-    navigation.navigate(Route.OTP, { phone: phone || '9876543210' });
   };
 
   const handleLanguageChange = async (lang: 'en' | 'mr') => {

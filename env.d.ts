@@ -6,9 +6,17 @@ declare module '@env' {
   export const API_URL: string;
   export const API_TIMEOUT: string;
   export const APP_NAME: string;
-  export const APP_ENV: string;
-  export const ENABLE_ANALYTICS: string;
-  export const ENABLE_CRASH_REPORTING: string;
+  export const APP_ENV: 'development' | 'staging' | 'production';
+  export const ENABLE_ANALYTICS: 'true' | 'false';
+  export const ENABLE_CRASH_REPORTING: 'true' | 'false';
+}
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      NODE_ENV: 'development' | 'production' | 'test';
+    }
+  }
 }
 
 declare module 'react-native-vector-icons/MaterialCommunityIcons' {

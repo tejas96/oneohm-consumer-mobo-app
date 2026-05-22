@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Keyboard } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { useRoutes, useAppNavigation } from '@/core/navigation';
@@ -15,7 +16,6 @@ import type { AuthStackParamList } from '@/core/navigation';
 import { Route } from '@/core/navigation';
 import { useVerifyOtp, useRequestOtp } from '@/data/resources/auth.resource';
 import { useTranslation } from '@/core/i18n';
-import { useAuthStore } from '@/core/auth';
 
 export function useOtpScreenLogic() {
   const { params } = useRoutes<Route.OTP>();
@@ -54,27 +54,58 @@ export function useOtpScreenLogic() {
     return () => stopTimer();
   }, [startTimer, stopTimer]);
 
-  const setAuthenticated = useAuthStore(state => state.setAuthenticated);
+  const handleVerifyOtp = useCallback(() => {
+    if (verifyOtp.isPending) return;
 
-  const handleVerifyOtp = async () => {
-    // BYPASS FOR UI TESTING: Log in automatically with mock data
-    await setAuthenticated(
+    if (otp.length < 6) {
+      Toast.show({
+        type: 'error',
+        text1: t('common.error'),
+        text2: 'Please enter a valid 6-digit OTP code',
+      });
+      return;
+    }
+
+    Keyboard.dismiss();
+
+    verifyOtp.mutate(
       {
-        accessToken: 'mock-access-token',
-        refreshToken: 'mock-refresh-token',
+        phone,
+        otp,
+        loginUserType: 'customer',
       },
       {
-        id: 'mock-user-id',
-        phone: phone || '9999999999',
-        firstName: 'Tejas',
-        lastName: 'Rajput',
-        email: 'tejas@oneohm.in',
+        onError: error => {
+          Toast.show({
+            type: 'error',
+            text1: t('common.error'),
+            text2: error.message || 'OTP verification failed',
+          });
+        },
       },
     );
-  };
+  }, [otp, phone, verifyOtp, t]);
+
+  const handleVerifyOtpRef = useRef(handleVerifyOtp);
+  useEffect(() => {
+    handleVerifyOtpRef.current = handleVerifyOtp;
+  }, [handleVerifyOtp]);
+
+  const lastVerifiedOtpRef = useRef('');
+
+  useEffect(() => {
+    if (otp.length === 6) {
+      if (otp !== lastVerifiedOtpRef.current) {
+        lastVerifiedOtpRef.current = otp;
+        handleVerifyOtpRef.current();
+      }
+    } else {
+      lastVerifiedOtpRef.current = '';
+    }
+  }, [otp]);
 
   const handleResendOtp = () => {
-    if (timer > 0) return;
+    if (timer > 0 || requestOtp.isPending) return;
 
     requestOtp.mutate(
       { phone },

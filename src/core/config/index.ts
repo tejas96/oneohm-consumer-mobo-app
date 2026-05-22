@@ -1,4 +1,4 @@
-export { config } from './env';
+export { config, configService } from './config.service';
 export {
   PAGINATION,
   HTTP_STATUS,

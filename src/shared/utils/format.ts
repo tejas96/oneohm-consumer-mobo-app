@@ -17,4 +17,5 @@ export {
   formatTimeAgo,
   getFullName,
   getInitials,
+  normalizePhoneToE164,
 } from '@tejas96/shared';

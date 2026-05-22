@@ -51,14 +51,16 @@ jest.mock('@react-native-firebase/app', () => {
 });
 
 jest.mock('@react-native-firebase/messaging', () => {
-  const messaging = jest.fn(() => ({
+  const mockMessagingInstance = {
     requestPermission: jest.fn(() => Promise.resolve(1)), // AUTHORIZED
     getToken: jest.fn(() => Promise.resolve('mock-fcm-token')),
     onTokenRefresh: jest.fn(() => jest.fn()),
     onMessage: jest.fn(() => jest.fn()),
     onNotificationOpenedApp: jest.fn(() => jest.fn()),
     getInitialNotification: jest.fn(() => Promise.resolve(null)),
-  }));
+  };
+
+  const messaging = jest.fn(() => mockMessagingInstance);
 
   messaging.AuthorizationStatus = {
     NOT_DETERMINED: -1,
@@ -70,5 +72,20 @@ jest.mock('@react-native-firebase/messaging', () => {
   return {
     __esModule: true,
     default: messaging,
+    getMessaging: jest.fn(() => mockMessagingInstance),
   };
 });
+
+// Mock @env environment variables for testing context
+jest.mock(
+  '@env',
+  () => ({
+    API_URL: 'https://staging.api.oneohm.com',
+    API_TIMEOUT: '30000',
+    APP_NAME: 'OneOhmTest',
+    APP_ENV: 'development',
+    ENABLE_ANALYTICS: 'false',
+    ENABLE_CRASH_REPORTING: 'false',
+  }),
+  { virtual: true },
+);

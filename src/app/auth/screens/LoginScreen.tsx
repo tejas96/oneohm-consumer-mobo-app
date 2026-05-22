@@ -189,7 +189,7 @@ export function LoginScreen() {
                 maxLength={10}
                 placeholder={t('auth.mobileNumberPlaceholder')}
                 value={phone}
-                onChangeText={setPhone}
+                onChangeText={text => setPhone(text.replace(/\D/g, ''))}
                 autoFocus
               />
             </View>

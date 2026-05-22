@@ -28,7 +28,7 @@ export function ProfileHeader({ user, totalProjects, t }: ProfileHeaderProps) {
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'User';
   const userPhone = user?.phone || '';
-  const userEmail = user?.email || 'raj@email.com';
+  const userEmail = user?.email || '';
 
   const initials = displayName
     .split(' ')
@@ -55,7 +55,8 @@ export function ProfileHeader({ user, totalProjects, t }: ProfileHeaderProps) {
       <Text
         style={[styles.contactInfo, { color: theme.colors.onSurfaceVariant }]}
       >
-        {userPhone} · {userEmail}
+        {userPhone}
+        {userEmail ? ` · ${userEmail}` : ''}
       </Text>
 
       <View

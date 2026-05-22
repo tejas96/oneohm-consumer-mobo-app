@@ -26,6 +26,7 @@ export interface OtpRequestResponse {
 export interface OtpVerifyPayload {
   phone: string;
   otp: string;
+  loginUserType: string;
 }
 
 /** Login response from backend (OTP verify or direct login) */
