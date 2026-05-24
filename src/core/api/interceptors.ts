@@ -65,7 +65,14 @@ function setupRequestInterceptor(client: AxiosInstance): void {
       }
 
       // Inject organization ID from auth store (centralized — no duplication in resources)
-      const orgId = useAuthStore.getState().user?.organizationId;
+      const user = useAuthStore.getState().user as any;
+      let orgId = user?.organizationId;
+      if (!orgId && user?.profiles && Array.isArray(user.profiles)) {
+        const primaryProfile =
+          user.profiles.find((p: any) => p.isPrimary) || user.profiles[0];
+        orgId = primaryProfile?.organizationId;
+      }
+
       if (orgId && !requestConfig.headers['X-Organization-Id']) {
         requestConfig.headers['X-Organization-Id'] = orgId;
       }

@@ -22,6 +22,7 @@ import { SessionService } from './session.service';
 import { TokenService } from './token.service';
 import { useI18nStore } from '@/core/i18n';
 import { useThemeStore } from '@/core/theme';
+import { usePropertySelectionStore } from '@/core/project/project.store';
 
 type AuthStore = AuthState & AuthActions;
 
@@ -64,6 +65,7 @@ export const useAuthStore = create<AuthStore>((set, get) => {
       try {
         await useI18nStore.getState().initializeLanguage();
         await useThemeStore.getState().initializeTheme();
+        await usePropertySelectionStore.getState().initializeSelectedProperty();
         const hasTokens = await TokenService.hasTokens();
         if (hasTokens) {
           // Attempt to fetch current user profile to validate the session
@@ -87,6 +89,18 @@ export const useAuthStore = create<AuthStore>((set, get) => {
           isLoading: false,
           isHydrated: true,
         });
+      }
+    },
+
+    refreshUser: async () => {
+      try {
+        const { AuthService } = await import('@/data/services/auth.service');
+        const user = await AuthService.getCurrentUser();
+        set({ user });
+      } catch (error) {
+        if (__DEV__) {
+          console.error('[AuthStore] Failed to refresh user:', error);
+        }
       }
     },
   };

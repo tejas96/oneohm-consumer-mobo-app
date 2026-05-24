@@ -4,7 +4,7 @@
  * Layer: app/documents/screens
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { Text, Searchbar, IconButton } from 'react-native-paper';
 
@@ -25,8 +25,14 @@ import {
 
 import { useTranslation } from '@/core/i18n';
 import { useDocumentsLogic } from '../hooks/useDocumentsLogic';
+import {
+  PropertySwitcherBottomSheet,
+  type PropertySwitcherBottomSheetRef,
+} from '@/shared/components/PropertySwitcherBottomSheet';
 
 export function DocumentsScreen() {
+  const switcherRef = useRef<PropertySwitcherBottomSheetRef>(null);
+
   const theme = useAppTheme();
   const { t } = useTranslation();
   const {
@@ -43,7 +49,6 @@ export function DocumentsScreen() {
     filteredDocs,
     handleDownload,
     handleBack,
-    handleSwitchProject,
     hasMultipleProjects,
   } = useDocumentsLogic();
 
@@ -51,10 +56,10 @@ export function DocumentsScreen() {
     if (isOnboarding) {
       return (
         <CTOnboardingPlaceholder
-          title="Documents Setting Up"
-          description="We are currently preparing your project contracts, engineering schematics, and DISCOM approval NOCs. You'll be able to download them here once onboarding is completed."
-          lottieSource={require('@/assets/animations/lottie/slide3_team.json')}
-          statusText="Stage: Onboarding & Verification"
+          title={t('documents.onboardingTitle')}
+          description={t('documents.onboardingDesc')}
+          lottieSource={require('@/assets/animations/lottie/Scanning Document.json')}
+          statusText={t('documents.onboardingStage')}
           status="warning"
         />
       );
@@ -186,10 +191,11 @@ export function DocumentsScreen() {
         title={t('documents.title')}
         activeProject={activeProject}
         onBack={handleBack}
-        onSwitchProject={handleSwitchProject}
+        onSwitchProject={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
       <View style={styles.container}>{renderContent()}</View>
+      <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );
 }
@@ -201,19 +207,6 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     paddingHorizontal: spacing.xl,
-  },
-  headerContainer: {
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.sm,
-  },
-  headerTitle: {
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.black,
-  },
-  headerSubtitle: {
-    fontSize: fontSize.caption,
-    marginTop: spacing.xs,
   },
   searchBar: {
     borderRadius: borderRadius.md,
@@ -261,9 +254,6 @@ const styles = StyleSheet.create({
   actionContainer: {
     alignItems: 'flex-end',
     justifyContent: 'center',
-  },
-  statusChip: {
-    marginBottom: spacing.xs,
   },
   downloadIcon: {
     margin: 0,

@@ -1,39 +1,62 @@
 /**
- * Project Types — Project type definitions
+ * Project & Property Types — Synchronized from monorepo shared library
  *
  * Layer: data/types
  */
 
-export type ProjectStatus =
-  | 'PLANNING'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'ON_HOLD';
+import type {
+  CustomerProperty as SharedCustomerProperty,
+  Quote as SharedQuote,
+  QuoteVersion as SharedQuoteVersion,
+  ProjectStatus,
+  PropertyStatus,
+  PropertyType,
+  PricingBreakdown,
+  QuoteSnapshot,
+  PaymentMilestone,
+} from '@tejas96/shared';
 
-export interface CustomerProperty {
-  propertyName: string;
-  propertyType: string;
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-  consumerNumber: string;
-  consumerName: string;
-  discomName: string;
-  monthlyBill: number;
+export type {
+  ProjectStatus,
+  PropertyStatus,
+  PropertyType,
+  PricingBreakdown,
+  QuoteSnapshot,
+  PaymentMilestone,
+};
+
+export interface CustomerProperty
+  extends Omit<SharedCustomerProperty, 'project' | 'quotes'> {
+  propertyName?: string;
+  propertyType: PropertyType;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  project?: Project;
+  quotes?: Quote[];
+  customerName?: string;
 }
 
-export interface QuoteVersion {
+export interface Quote extends Omit<SharedQuote, 'versions'> {
+  versions?: QuoteVersion[];
+}
+
+export interface QuoteVersion extends SharedQuoteVersion {
   systemType: string;
   systemSizeKw: number;
   totalWattageWp: number;
   projectCompletionWeeks: number;
+  pricingBreakdown?: PricingBreakdown;
+  quoteSnapshot?: QuoteSnapshot;
+  paymentMilestones?: PaymentMilestone[];
 }
 
 export interface Project {
+  // Legacy & custom fields
   id: string;
-  label: string;
-  status: ProjectStatus;
+  label?: string;
+  status: any;
   totalValue: number;
   subsidy: number;
   amountPaid: number;
@@ -44,5 +67,18 @@ export interface Project {
   nextStep?: string;
   projectNumber?: string;
   property?: CustomerProperty;
-  quoteVersion?: QuoteVersion;
+  quoteVersion?: QuoteVersion | null;
+  metadata?: any;
+
+  // Backend fields
+  propertyId?: string;
+  quoteId?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  name?: string;
+  priority?: any;
+  progressPercentage?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
 }

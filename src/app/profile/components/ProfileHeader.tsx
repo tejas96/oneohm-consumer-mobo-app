@@ -18,15 +18,23 @@ interface ProfileHeaderProps {
     phone?: string;
     email?: string;
   } | null;
+  customerName?: string;
   totalProjects: number;
   t: (key: TranslationKey) => string;
 }
 
-export function ProfileHeader({ user, totalProjects, t }: ProfileHeaderProps) {
+export function ProfileHeader({
+  user,
+  customerName,
+  totalProjects,
+  t,
+}: ProfileHeaderProps) {
   const theme = useAppTheme();
 
   const displayName =
-    [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'User';
+    customerName ||
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+    'User';
   const userPhone = user?.phone || '';
   const userEmail = user?.email || '';
 

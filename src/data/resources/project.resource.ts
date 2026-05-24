@@ -7,34 +7,41 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/core/auth';
-import { projectKeys } from '../query-keys';
+import { propertyKeys } from '../query-keys';
 import { ProjectService } from '../services';
 import type { QueryOptions } from '../types';
 
 /**
- * Hook to get the list of user's projects.
+ * Hook to get the list of user's customer properties (which contain quotes & projects).
  */
-export function useProjects(options?: QueryOptions) {
+export function useProperties(options?: QueryOptions) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   return useQuery({
-    queryKey: projectKeys.lists(),
-    queryFn: () => ProjectService.getProjects(),
+    queryKey: propertyKeys.lists(),
+    queryFn: () => ProjectService.getProperties(),
     enabled: (options?.enabled ?? true) && isAuthenticated,
     meta: options?.meta,
+    staleTime: 0, // Disable caching - consider data immediately stale
+    gcTime: 0, // Banish from garbage collection cache immediately
   });
 }
 
 /**
- * Hook to get a single project by ID.
+ * Hook to get a single customer property by ID.
  */
-export function useProject(id: string, options?: QueryOptions) {
+export function useProperty(id: string, options?: QueryOptions) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   return useQuery({
-    queryKey: projectKeys.detail(id),
-    queryFn: () => ProjectService.getProjectById(id),
+    queryKey: propertyKeys.detail(id),
+    queryFn: () => ProjectService.getPropertyById(id),
     enabled: (options?.enabled ?? true) && isAuthenticated && !!id,
     meta: options?.meta,
+    staleTime: 0, // Disable caching - consider data immediately stale
+    gcTime: 0, // Banish from garbage collection cache immediately
   });
 }
+
+// Retain compatibility exports for now to prevent immediate breakages until screens are updated
+export { useProperties as useProjects, useProperty as useProject };

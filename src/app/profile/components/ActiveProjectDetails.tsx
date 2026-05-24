@@ -3,11 +3,10 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Divider } from 'react-native-paper';
 import { CTCard, CTChip } from '@/shared/components';
 import { useAppTheme, spacing, fontSize, fontWeight } from '@/shared/theme';
-import type { Project } from '@/data/types/project.types';
 import type { TranslationKey } from '@/core/i18n/i18n.types';
 
 interface ActiveProjectDetailsProps {
-  activeProject: Project | null;
+  activeProject: any;
   t: (key: TranslationKey) => string;
 }
 
@@ -65,9 +64,9 @@ export function ActiveProjectDetails({
           </Text>
           <CTChip
             status={
-              activeProject.status === 'COMPLETED'
+              String(activeProject.status).toUpperCase() === 'COMPLETED'
                 ? 'success'
-                : activeProject.status === 'IN_PROGRESS'
+                : String(activeProject.status).toUpperCase() === 'IN_PROGRESS'
                 ? 'warning'
                 : 'info'
             }

@@ -108,260 +108,298 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
 
   return (
     <View style={styles.specsListContainer}>
-      {/* 1. Solar Panels Collapsible Card */}
-      <CTCard
-        variant="glass"
-        style={styles.specCollapseCard}
-        onPress={() => toggleSection('panels')}
-      >
-        <View style={styles.specCollapseHeader}>
-          <View
-            style={[
-              styles.specIconContainer,
-              { backgroundColor: theme.colors.primaryContainer },
-            ]}
-          >
-            <Icon source="solar-panel" color={theme.colors.primary} size={20} />
-          </View>
-          <View style={styles.specTextContainer}>
-            <Text
-              style={[styles.specTitleText, { color: theme.colors.onSurface }]}
-            >
-              {t('project.specs.solarPanels')}
-            </Text>
-            <Text
+      {/* 1. Solar Panels Collapsible Card — only when panel data exists */}
+      {(specs.dcrPanels || specs.nonDcrPanels) && (
+        <CTCard
+          variant="glass"
+          style={styles.specCollapseCard}
+          onPress={() => toggleSection('panels')}
+        >
+          <View style={styles.specCollapseHeader}>
+            <View
               style={[
-                styles.specSubtitleText,
-                { color: theme.colors.onSurfaceVariant },
+                styles.specIconContainer,
+                { backgroundColor: theme.colors.primaryContainer },
               ]}
-              numberOfLines={1}
             >
-              {panelsSubtitle}
-            </Text>
-          </View>
-          <IconButton
-            icon={expandedSections.panels ? 'chevron-up' : 'chevron-down'}
-            iconColor={theme.colors.iconMuted}
-            size={20}
-            style={styles.chevronIcon}
-            onPress={() => toggleSection('panels')}
-          />
-        </View>
-
-        {expandedSections.panels && (
-          <View
-            style={[
-              styles.specDetailsContainer,
-              { borderTopColor: theme.colors.outlineVariant },
-            ]}
-          >
-            {specs.dcrPanels &&
-              renderPanelCompartment(
-                t('project.specs.dcrTitle'),
-                specs.dcrPanels,
-              )}
-            {specs.dcrPanels && specs.nonDcrPanels && (
-              <View
-                style={[
-                  styles.divider,
-                  { backgroundColor: theme.colors.outlineVariant },
-                ]}
+              <Icon
+                source="solar-panel"
+                color={theme.colors.primary}
+                size={20}
               />
-            )}
-            {specs.nonDcrPanels &&
-              renderPanelCompartment(
-                t('project.specs.nonDcrTitle'),
-                specs.nonDcrPanels,
-              )}
+            </View>
+            <View style={styles.specTextContainer}>
+              <Text
+                style={[
+                  styles.specTitleText,
+                  { color: theme.colors.onSurface },
+                ]}
+              >
+                {t('project.specs.solarPanels')}
+              </Text>
+              <Text
+                style={[
+                  styles.specSubtitleText,
+                  { color: theme.colors.onSurfaceVariant },
+                ]}
+                numberOfLines={1}
+              >
+                {panelsSubtitle}
+              </Text>
+            </View>
+            <IconButton
+              icon={expandedSections.panels ? 'chevron-up' : 'chevron-down'}
+              iconColor={theme.colors.iconMuted}
+              size={20}
+              style={styles.chevronIcon}
+              onPress={() => toggleSection('panels')}
+            />
           </View>
-        )}
-      </CTCard>
 
-      {/* 2. Inverter Details Collapsible Card */}
-      <CTCard
-        variant="glass"
-        style={styles.specCollapseCard}
-        onPress={() => toggleSection('inverter')}
-      >
-        <View style={styles.specCollapseHeader}>
-          <View
-            style={[
-              styles.specIconContainer,
-              { backgroundColor: theme.colors.primaryContainer },
-            ]}
-          >
-            <Icon source="power-plug" color={theme.colors.primary} size={20} />
-          </View>
-          <View style={styles.specTextContainer}>
-            <Text
-              style={[styles.specTitleText, { color: theme.colors.onSurface }]}
-            >
-              {t('project.specs.inverterDetails')}
-            </Text>
-            <Text
+          {expandedSections.panels && (
+            <View
               style={[
-                styles.specSubtitleText,
-                { color: theme.colors.onSurfaceVariant },
+                styles.specDetailsContainer,
+                { borderTopColor: theme.colors.outlineVariant },
               ]}
-              numberOfLines={1}
             >
-              {t('project.specs.inverterSubtitle')
-                .replace('{brand}', specs.inverter.brand)
-                .replace('{capacity}', specs.inverter.capacity)}
-            </Text>
-          </View>
-          <IconButton
-            icon={expandedSections.inverter ? 'chevron-up' : 'chevron-down'}
-            iconColor={theme.colors.iconMuted}
-            size={20}
-            style={styles.chevronIcon}
-            onPress={() => toggleSection('inverter')}
-          />
-        </View>
+              {specs.dcrPanels &&
+                renderPanelCompartment(
+                  t('project.specs.dcrTitle'),
+                  specs.dcrPanels,
+                )}
+              {specs.dcrPanels && specs.nonDcrPanels && (
+                <View
+                  style={[
+                    styles.divider,
+                    { backgroundColor: theme.colors.outlineVariant },
+                  ]}
+                />
+              )}
+              {specs.nonDcrPanels &&
+                renderPanelCompartment(
+                  t('project.specs.nonDcrTitle'),
+                  specs.nonDcrPanels,
+                )}
+            </View>
+          )}
+        </CTCard>
+      )}
 
-        {expandedSections.inverter && (
-          <View
-            style={[
-              styles.specDetailsContainer,
-              { borderTopColor: theme.colors.outlineVariant },
-            ]}
-          >
-            <View style={styles.specGrid}>
-              <View style={styles.specRow}>
-                <Text
-                  style={[
-                    styles.specLabel,
-                    { color: theme.colors.onSurfaceVariant },
-                  ]}
-                >
-                  {t('project.specs.brand')}
-                </Text>
-                <Text
-                  style={[styles.specValue, { color: theme.colors.onSurface }]}
-                >
-                  {specs.inverter.brand}
-                </Text>
-              </View>
-              <View style={styles.specRow}>
-                <Text
-                  style={[
-                    styles.specLabel,
-                    { color: theme.colors.onSurfaceVariant },
-                  ]}
-                >
-                  {t('project.specs.capacity')}
-                </Text>
-                <Text
-                  style={[styles.specValue, { color: theme.colors.onSurface }]}
-                >
-                  {specs.inverter.capacity}
-                </Text>
-              </View>
-              <View style={styles.specRow}>
-                <Text
-                  style={[
-                    styles.specLabel,
-                    { color: theme.colors.onSurfaceVariant },
-                  ]}
-                >
-                  {t('project.specs.quantity')}
-                </Text>
-                <Text
-                  style={[styles.specValue, { color: theme.colors.onSurface }]}
-                >
-                  {specs.inverter.quantity}
-                </Text>
-              </View>
-              <View style={styles.specRow}>
-                <Text
-                  style={[
-                    styles.specLabel,
-                    { color: theme.colors.onSurfaceVariant },
-                  ]}
-                >
-                  {t('project.specs.phaseType')}
-                </Text>
-                <Text
-                  style={[styles.specValue, { color: theme.colors.onSurface }]}
-                >
-                  {specs.inverter.phaseType}
-                </Text>
+      {/* 2. Inverter Details Collapsible Card — only when inverter data exists */}
+      {specs.inverter && (
+        <CTCard
+          variant="glass"
+          style={styles.specCollapseCard}
+          onPress={() => toggleSection('inverter')}
+        >
+          <View style={styles.specCollapseHeader}>
+            <View
+              style={[
+                styles.specIconContainer,
+                { backgroundColor: theme.colors.primaryContainer },
+              ]}
+            >
+              <Icon
+                source="power-plug"
+                color={theme.colors.primary}
+                size={20}
+              />
+            </View>
+            <View style={styles.specTextContainer}>
+              <Text
+                style={[
+                  styles.specTitleText,
+                  { color: theme.colors.onSurface },
+                ]}
+              >
+                {t('project.specs.inverterDetails')}
+              </Text>
+              <Text
+                style={[
+                  styles.specSubtitleText,
+                  { color: theme.colors.onSurfaceVariant },
+                ]}
+                numberOfLines={1}
+              >
+                {t('project.specs.inverterSubtitle')
+                  .replace('{brand}', specs.inverter.brand)
+                  .replace('{capacity}', specs.inverter.capacity)}
+              </Text>
+            </View>
+            <IconButton
+              icon={expandedSections.inverter ? 'chevron-up' : 'chevron-down'}
+              iconColor={theme.colors.iconMuted}
+              size={20}
+              style={styles.chevronIcon}
+              onPress={() => toggleSection('inverter')}
+            />
+          </View>
+
+          {expandedSections.inverter && (
+            <View
+              style={[
+                styles.specDetailsContainer,
+                { borderTopColor: theme.colors.outlineVariant },
+              ]}
+            >
+              <View style={styles.specGrid}>
+                <View style={styles.specRow}>
+                  <Text
+                    style={[
+                      styles.specLabel,
+                      { color: theme.colors.onSurfaceVariant },
+                    ]}
+                  >
+                    {t('project.specs.brand')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.specValue,
+                      { color: theme.colors.onSurface },
+                    ]}
+                  >
+                    {specs.inverter.brand}
+                  </Text>
+                </View>
+                <View style={styles.specRow}>
+                  <Text
+                    style={[
+                      styles.specLabel,
+                      { color: theme.colors.onSurfaceVariant },
+                    ]}
+                  >
+                    {t('project.specs.capacity')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.specValue,
+                      { color: theme.colors.onSurface },
+                    ]}
+                  >
+                    {specs.inverter.capacity}
+                  </Text>
+                </View>
+                <View style={styles.specRow}>
+                  <Text
+                    style={[
+                      styles.specLabel,
+                      { color: theme.colors.onSurfaceVariant },
+                    ]}
+                  >
+                    {t('project.specs.quantity')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.specValue,
+                      { color: theme.colors.onSurface },
+                    ]}
+                  >
+                    {specs.inverter.quantity}
+                  </Text>
+                </View>
+                <View style={styles.specRow}>
+                  <Text
+                    style={[
+                      styles.specLabel,
+                      { color: theme.colors.onSurfaceVariant },
+                    ]}
+                  >
+                    {t('project.specs.phaseType')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.specValue,
+                      { color: theme.colors.onSurface },
+                    ]}
+                  >
+                    {specs.inverter.phaseType}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-        )}
-      </CTCard>
+          )}
+        </CTCard>
+      )}
 
-      {/* 3. Mounting Structure Collapsible Card */}
-      <CTCard
-        variant="glass"
-        style={styles.specCollapseCard}
-        onPress={() => toggleSection('structure')}
-      >
-        <View style={styles.specCollapseHeader}>
-          <View
-            style={[
-              styles.specIconContainer,
-              { backgroundColor: theme.colors.primaryContainer },
-            ]}
-          >
-            <Icon source="triangle" color={theme.colors.primary} size={20} />
-          </View>
-          <View style={styles.specTextContainer}>
-            <Text
-              style={[styles.specTitleText, { color: theme.colors.onSurface }]}
-            >
-              {t('project.specs.mountingStructure')}
-            </Text>
-            <Text
+      {/* 3. Mounting Structure Collapsible Card — only when structure data exists */}
+      {specs.structure && (
+        <CTCard
+          variant="glass"
+          style={styles.specCollapseCard}
+          onPress={() => toggleSection('structure')}
+        >
+          <View style={styles.specCollapseHeader}>
+            <View
               style={[
-                styles.specSubtitleText,
-                { color: theme.colors.onSurfaceVariant },
+                styles.specIconContainer,
+                { backgroundColor: theme.colors.primaryContainer },
               ]}
-              numberOfLines={1}
             >
-              {t('project.specs.structureSubtitle').replace(
-                '{type}',
-                specs.structure.structureType,
-              )}
-            </Text>
+              <Icon source="triangle" color={theme.colors.primary} size={20} />
+            </View>
+            <View style={styles.specTextContainer}>
+              <Text
+                style={[
+                  styles.specTitleText,
+                  { color: theme.colors.onSurface },
+                ]}
+              >
+                {t('project.specs.mountingStructure')}
+              </Text>
+              <Text
+                style={[
+                  styles.specSubtitleText,
+                  { color: theme.colors.onSurfaceVariant },
+                ]}
+                numberOfLines={1}
+              >
+                {t('project.specs.structureSubtitle').replace(
+                  '{type}',
+                  specs.structure.structureType,
+                )}
+              </Text>
+            </View>
+            <IconButton
+              icon={expandedSections.structure ? 'chevron-up' : 'chevron-down'}
+              iconColor={theme.colors.iconMuted}
+              size={20}
+              style={styles.chevronIcon}
+              onPress={() => toggleSection('structure')}
+            />
           </View>
-          <IconButton
-            icon={expandedSections.structure ? 'chevron-up' : 'chevron-down'}
-            iconColor={theme.colors.iconMuted}
-            size={20}
-            style={styles.chevronIcon}
-            onPress={() => toggleSection('structure')}
-          />
-        </View>
 
-        {expandedSections.structure && (
-          <View
-            style={[
-              styles.specDetailsContainer,
-              { borderTopColor: theme.colors.outlineVariant },
-            ]}
-          >
-            <View style={styles.specGrid}>
-              <View style={styles.specRow}>
-                <Text
-                  style={[
-                    styles.specLabel,
-                    { color: theme.colors.onSurfaceVariant },
-                  ]}
-                >
-                  {t('project.specs.structureType')}
-                </Text>
-                <Text
-                  style={[styles.specValue, { color: theme.colors.onSurface }]}
-                >
-                  {specs.structure.structureType}
-                </Text>
+          {expandedSections.structure && (
+            <View
+              style={[
+                styles.specDetailsContainer,
+                { borderTopColor: theme.colors.outlineVariant },
+              ]}
+            >
+              <View style={styles.specGrid}>
+                <View style={styles.specRow}>
+                  <Text
+                    style={[
+                      styles.specLabel,
+                      { color: theme.colors.onSurfaceVariant },
+                    ]}
+                  >
+                    {t('project.specs.structureType')}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.specValue,
+                      { color: theme.colors.onSurface },
+                    ]}
+                  >
+                    {specs.structure.structureType}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-        )}
-      </CTCard>
+          )}
+        </CTCard>
+      )}
     </View>
   );
 }

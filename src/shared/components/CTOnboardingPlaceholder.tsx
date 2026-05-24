@@ -70,8 +70,6 @@ export function CTOnboardingPlaceholder({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing['3xl'],
     alignItems: 'center',
     justifyContent: 'center',
   },

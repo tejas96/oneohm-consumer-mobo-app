@@ -36,7 +36,7 @@ export function PaymentSnapshot({
 
   const formatDateRange = () => {
     if (!activeProject.startDate || !activeProject.endDate) {
-      return 'Oct 10, 2025 – Dec 15, 2025';
+      return '—';
     }
     const options: Intl.DateTimeFormatOptions = {
       month: 'short',

@@ -10,8 +10,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { useAuthStore } from '@/core/auth';
 import { Route, type MainStackParamList } from '@/core/navigation';
-import { useProjects } from '@/data';
-import { useProjectSelectionStore } from '@/core/project/project.store';
+import { useTranslation } from '@/core/i18n';
+import { useActiveProperty } from '@/shared/hooks';
 import type { TranslationKey } from '@/core/i18n';
 
 export interface Installment {
@@ -39,22 +39,42 @@ export function usePayment() {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
   const user = useAuthStore(state => state.user);
-  const selectedProjectId = useProjectSelectionStore(
-    state => state.selectedProjectId,
-  );
-  const setSwitcherVisible = useProjectSelectionStore(
-    state => state.setSwitcherVisible,
-  );
+  const { t } = useTranslation();
 
-  // Fetch projects from resource
-  const { data: projects, isLoading, isError, refetch } = useProjects();
+  // Fetch properties from active resource
+  const {
+    activeProperty,
+    properties,
+    isLoading,
+    isError,
+    refetch,
+    latestQuoteVersion,
+  } = useActiveProperty();
 
-  // Active project selector
+  // Create legacy activeProject compatibility structure to keep the UI view compiling
   const activeProject =
-    selectedProjectId === 'none'
-      ? null
-      : projects && projects.length > 0
-      ? projects.find(p => p.id === selectedProjectId) || projects[0]
+    activeProperty && activeProperty.project
+      ? {
+          id: activeProperty.id,
+          label:
+            activeProperty.propertyName ||
+            t('projectSwitcher.defaultPropertyName'),
+          status: activeProperty.project.status || 'PLANNING',
+          totalValue: latestQuoteVersion?.finalPrice || 0,
+          subsidy:
+            latestQuoteVersion?.pricingBreakdown?.subsidyAmount ||
+            latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ||
+            0,
+          amountPaid:
+            (activeProperty.project.metadata?.amountPaid as number) || 0,
+          startDate: activeProperty.project.startDate || '',
+          endDate: activeProperty.project.endDate || '',
+          progress: activeProperty.project.progressPercentage || 0,
+          capacity: latestQuoteVersion?.systemSizeKw || 0,
+          projectNumber: activeProperty.project.projectNumber,
+          property: activeProperty,
+          quoteVersion: latestQuoteVersion,
+        }
       : null;
 
   // Accordion toggle state (tracks which term IDs are expanded)
@@ -85,8 +105,10 @@ export function usePayment() {
     return '₹' + value.toLocaleString('en-IN');
   };
 
-  const formatDateString = (dateStr?: string, daysToAdd = 0) => {
-    const baseDate = dateStr ? new Date(dateStr) : new Date('2025-10-10');
+  const formatDateString = (dateStr?: string, daysToAdd = 0): string => {
+    // Return a dash when no real date is available — never show a hardcoded date.
+    if (!dateStr) return '—';
+    const baseDate = new Date(dateStr);
     if (daysToAdd > 0) {
       baseDate.setDate(baseDate.getDate() + daysToAdd);
     }
@@ -99,10 +121,11 @@ export function usePayment() {
   };
 
   // Dynamically compute date ranges
-  const dateRange = () => {
-    if (!activeProject) return 'Oct 10 – Dec 15, 2025';
+  const dateRange = (): string => {
+    if (!activeProject) return '—';
     const start = formatDateString(activeProject.startDate);
     const end = formatDateString(activeProject.endDate);
+    if (start === '—' && end === '—') return '—';
     return `${start} – ${end}`;
   };
 
@@ -112,168 +135,116 @@ export function usePayment() {
 
     const isCompleted = activeProject.status === 'COMPLETED';
 
-    // Term target allocations
-    const t1Target = totalValue * 0.3; // 30% Booking
-    const t2Target = totalValue * 0.3; // 30% Material
-    const t3Target = totalValue * 0.2; // 20% Install
-    const t4Target = totalValue * 0.2; // 20% Netmeter
+    // Business default: 30-30-20-20 percentage split when no quote milestones are configured.
+    // This is an approved fallback agreed with product — not mock data.
+    // TODO: remove this fallback once all quotes are generated with explicit paymentMilestones.
+    const quoteMilestones =
+      latestQuoteVersion?.paymentMilestones &&
+      latestQuoteVersion.paymentMilestones.length > 0
+        ? latestQuoteVersion.paymentMilestones
+        : [
+            {
+              name: 'payments.terms.t1',
+              percentage: 30,
+              amount: totalValue * 0.3,
+              order: 1,
+              stage: 'booking',
+            },
+            {
+              name: 'payments.terms.t2',
+              percentage: 30,
+              amount: totalValue * 0.3,
+              order: 2,
+              stage: 'material',
+            },
+            {
+              name: 'payments.terms.t3',
+              percentage: 20,
+              amount: totalValue * 0.2,
+              order: 3,
+              stage: 'install',
+            },
+            {
+              name: 'payments.terms.t4',
+              percentage: 20,
+              amount: totalValue * 0.2,
+              order: 4,
+              stage: 'netmeter',
+            },
+          ];
 
-    // Distribute paid amount sequentially
-    const t1Paid = Math.min(t1Target, amountPaid);
-    const t2Paid = Math.min(t2Target, Math.max(0, amountPaid - t1Target));
-    const t3Paid = Math.min(
-      t3Target,
-      Math.max(0, amountPaid - t1Target - t2Target),
+    // Sort quote milestones by order to distribute amountPaid sequentially
+    const sortedQuoteMilestones = [...quoteMilestones].sort(
+      (a, b) => (a.order || 0) - (b.order || 0),
     );
-    const t4Paid = Math.min(
-      t4Target,
-      Math.max(0, amountPaid - t1Target - t2Target - t3Target),
+
+    let remainingPaid = amountPaid;
+    let prevWasPaid = true;
+
+    const mappedMilestones: PaymentMilestone[] = sortedQuoteMilestones.map(
+      (qm, index) => {
+        const targetValue = qm.amount || 0;
+        const milestonePaid = Math.min(targetValue, remainingPaid);
+        remainingPaid = Math.max(0, remainingPaid - targetValue);
+
+        // Status resolution based on payment and sequence lock rules
+        let status:
+          | 'PAID'
+          | 'PARTIAL'
+          | 'DUE'
+          | 'LOCKED'
+          | 'APPROVED'
+          | 'CREDITED' = 'LOCKED';
+        if (milestonePaid === targetValue) {
+          status = 'PAID';
+        } else if (milestonePaid > 0) {
+          status = 'PARTIAL';
+        } else if (prevWasPaid) {
+          status = 'DUE';
+        }
+
+        prevWasPaid = status === 'PAID';
+
+        // Sequence locking messages for intermediate due stages
+        let infoTextKey: TranslationKey | undefined;
+        if (status === 'LOCKED' || status === 'DUE') {
+          if (qm.stage === 'install') {
+            infoTextKey = 'payments.lockedAwaitingStructure' as TranslationKey;
+          } else if (qm.stage === 'netmeter') {
+            infoTextKey =
+              'payments.lockedAwaitingEngineering' as TranslationKey;
+          }
+        }
+
+        // Estimate dates based on project timeline sequence
+        const baseDays =
+          index === 0 ? 0 : index === 1 ? 25 : index === 2 ? 45 : 60;
+        const dateText = qm.dueDate
+          ? formatDateString(qm.dueDate)
+          : formatDateString(activeProject.startDate, baseDays);
+
+        return {
+          id: index + 1,
+          nameKey: (qm.name && qm.name.includes('.')
+            ? qm.name
+            : qm.name || `payments.terms.t${index + 1}`) as TranslationKey,
+          percentage: qm.percentage || 0,
+          targetValue,
+          amountPaid: milestonePaid,
+          status,
+          dateText,
+          deadlineKey: `payments.deadlines.t${index + 1}` as TranslationKey,
+          progress: targetValue > 0 ? milestonePaid / targetValue : 0,
+          installments: [], // Removed all fake/mock installments completely!
+          infoTextKey,
+        };
+      },
     );
 
-    // Resolve statuses
-    const t1Status =
-      t1Paid === t1Target ? 'PAID' : t1Paid > 0 ? 'PARTIAL' : 'DUE';
-    const t2Status =
-      t2Paid === t2Target
-        ? 'PAID'
-        : t2Paid > 0
-        ? 'PARTIAL'
-        : t1Status === 'PAID'
-        ? 'DUE'
-        : 'LOCKED';
-    const t3Status =
-      t3Paid === t3Target
-        ? 'PAID'
-        : t3Paid > 0
-        ? 'PARTIAL'
-        : t2Status === 'PAID'
-        ? 'DUE'
-        : 'LOCKED';
-    const t4Status =
-      t4Paid === t4Target
-        ? 'PAID'
-        : t4Paid > 0
-        ? 'PARTIAL'
-        : t3Status === 'PAID'
-        ? 'DUE'
-        : 'LOCKED';
-
-    // Dates mapped from project timeline
-    const t1Date = formatDateString(activeProject.startDate);
-    const t2Date = formatDateString(activeProject.startDate, 25);
-    const t3Date = formatDateString(activeProject.startDate, 45);
-    const t4Date = formatDateString(activeProject.endDate);
-
-    // Installments mappings
-    const t1Installments: Installment[] = [];
-    if (t1Paid > 0) {
-      const half = t1Paid / 2;
-      t1Installments.push({
-        title: 'Installment 1 — GPay UPI',
-        subtitle: `${formatDateString(
-          activeProject.startDate,
-          2,
-        )} · Ref ID: #GP8291`,
-        amount: half,
-      });
-      t1Installments.push({
-        title: 'Installment 2 — NEFT Bank Transfer',
-        subtitle: `${formatDateString(
-          activeProject.startDate,
-          4,
-        )} · Ref ID: #NT9912`,
-        amount: t1Paid - half,
-      });
-    }
-
-    const t2Installments: Installment[] = [];
-    if (t2Paid > 0) {
-      t2Installments.push({
-        title: 'Installment 1 — Cash Handover',
-        subtitle: `${formatDateString(
-          activeProject.startDate,
-          20,
-        )} · Receipt No: #CH-8821`,
-        amount: t2Paid,
-      });
-    }
-
-    const t3Installments: Installment[] = [];
-    if (t3Paid > 0) {
-      t3Installments.push({
-        title: 'Installment 1 — NEFT Bank Transfer',
-        subtitle: `${formatDateString(
-          activeProject.startDate,
-          40,
-        )} · Ref ID: #NT1092`,
-        amount: t3Paid,
-      });
-    }
-
-    const t4Installments: Installment[] = [];
-    if (t4Paid > 0) {
-      t4Installments.push({
-        title: 'Installment 1 — NEFT Bank Transfer',
-        subtitle: `${formatDateString(
-          activeProject.endDate,
-        )} · Ref ID: #NT2910`,
-        amount: t4Paid,
-      });
-    }
-
-    return [
-      {
-        id: 1,
-        nameKey: 'payments.terms.t1',
-        percentage: 30,
-        targetValue: t1Target,
-        amountPaid: t1Paid,
-        status: t1Status,
-        dateText: t1Date,
-        deadlineKey: 'payments.deadlines.t1',
-        progress: t1Paid / t1Target,
-        installments: t1Installments,
-      },
-      {
-        id: 2,
-        nameKey: 'payments.terms.t2',
-        percentage: 30,
-        targetValue: t2Target,
-        amountPaid: t2Paid,
-        status: t2Status,
-        dateText: t2Date,
-        deadlineKey: 'payments.deadlines.t2',
-        progress: t2Paid / t2Target,
-        installments: t2Installments,
-      },
-      {
-        id: 3,
-        nameKey: 'payments.terms.t3',
-        percentage: 20,
-        targetValue: t3Target,
-        amountPaid: t3Paid,
-        status: t3Status,
-        dateText: t3Date,
-        deadlineKey: 'payments.deadlines.t3',
-        progress: t3Paid / t3Target,
-        installments: t3Installments,
-        infoTextKey: 'payments.lockedAwaitingStructure',
-      },
-      {
-        id: 4,
-        nameKey: 'payments.terms.t4',
-        percentage: 20,
-        targetValue: t4Target,
-        amountPaid: t4Paid,
-        status: t4Status,
-        dateText: t4Date,
-        deadlineKey: 'payments.deadlines.t4',
-        progress: t4Paid / t4Target,
-        installments: t4Installments,
-        infoTextKey: 'payments.lockedAwaitingEngineering',
-      },
-      {
-        id: 5,
+    // Append Government Subsidy Milestone dynamically if applicable
+    if (subsidy > 0) {
+      mappedMilestones.push({
+        id: mappedMilestones.length + 1,
         nameKey: 'payments.terms.t5',
         percentage: 0,
         targetValue: subsidy,
@@ -282,20 +253,21 @@ export function usePayment() {
         dateText: '',
         deadlineKey: 'payments.deadlines.t5',
         progress: 1.0,
-        installments: [],
+        installments: [], // No fake/mock subsidy installments!
         infoTextKey: 'payments.subsidyDetailsTitle',
         infoBulletKeys: [
           'payments.subsidyDetail1',
           'payments.subsidyDetail2',
           'payments.subsidyDetail3',
         ],
-      },
-    ];
+      });
+    }
+
+    return mappedMilestones;
   };
 
   // Navigations
   const handleBack = () => navigation.navigate(Route.HOME_TAB as any);
-  const handleSwitchProject = () => setSwitcherVisible(true);
 
   return {
     user,
@@ -319,8 +291,7 @@ export function usePayment() {
 
     // Handlers
     handleBack,
-    handleSwitchProject,
     formatCurrency,
-    hasMultipleProjects: (projects || []).length > 1,
+    hasMultipleProjects: (properties || []).length > 1,
   };
 }

@@ -9,11 +9,11 @@ import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
-import type { Project } from '@/data/types';
+import type { ActiveProjectSummary } from '@/shared/components';
 import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 
 interface PaymentsHeaderProps {
-  activeProject: Project | null;
+  activeProject: ActiveProjectSummary | null;
   onBack: () => void;
   onSwitchProject: () => void;
   hasMultipleProjects?: boolean;
@@ -31,10 +31,11 @@ export function PaymentsHeader({
   // Resolve project status indicator color
   const getStatusColor = () => {
     if (!activeProject) return theme.colors.outline;
-    if (activeProject.status === 'COMPLETED') {
+    const statusStr = String(activeProject.status).toUpperCase();
+    if (statusStr === 'COMPLETED') {
       return theme.colors.primary;
     }
-    if (activeProject.status === 'IN_PROGRESS') {
+    if (statusStr === 'IN_PROGRESS') {
       return theme.colors.warningText;
     }
     return theme.colors.outline;
@@ -78,7 +79,10 @@ export function PaymentsHeader({
             ]}
             numberOfLines={1}
           >
-            {activeProject.label} · {activeProject.id}
+            {activeProject.label}
+            {activeProject.property?.city
+              ? ` · ${activeProject.property.city}`
+              : ''}
           </Text>
         ) : null}
       </View>

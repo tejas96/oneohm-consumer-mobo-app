@@ -13,14 +13,24 @@ import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
-import type { Project } from '@/data/types';
 import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
+
+/**
+ * Minimal project shape needed by CTPremiumHeader.
+ * Avoids importing the full Project type so callers don't need 'as any' casts
+ * when passing a property-derived summary object.
+ */
+export interface ActiveProjectSummary {
+  label: string;
+  status: string;
+  property?: { city?: string };
+}
 
 export interface CTPremiumHeaderProps {
   /** Page title string */
   title: string;
   /** Active project details */
-  activeProject: Project | null;
+  activeProject: ActiveProjectSummary | null;
   /** Left back action handler */
   onBack?: () => void;
   /** Project switcher badge press handler */
@@ -41,10 +51,11 @@ export function CTPremiumHeader({
   // Resolve project status indicator color dynamically from theme
   const getStatusColor = () => {
     if (!activeProject) return theme.colors.outline;
-    if (activeProject.status === 'COMPLETED') {
+    const statusStr = String(activeProject.status).toUpperCase();
+    if (statusStr === 'COMPLETED') {
       return theme.colors.primary;
     }
-    if (activeProject.status === 'IN_PROGRESS') {
+    if (statusStr === 'IN_PROGRESS') {
       return theme.colors.warningText;
     }
     return theme.colors.outline;
@@ -87,7 +98,10 @@ export function CTPremiumHeader({
             style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
             numberOfLines={1}
           >
-            {activeProject.label} · {activeProject.id}
+            {activeProject.label}
+            {activeProject.property?.city
+              ? ` · ${activeProject.property.city}`
+              : ''}
           </Text>
         ) : null}
       </View>

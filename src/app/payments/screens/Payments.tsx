@@ -4,19 +4,25 @@
  * Layer: app/payments/screens
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 
 import { ScreenWrapper, CTOnboardingPlaceholder } from '@/shared/components';
 import { spacing, useAppTheme } from '@/shared/theme';
-import { useTranslation } from '@/core/i18n';
+import { useTranslation, type TranslationKey } from '@/core/i18n';
 
 import { usePayment } from '../hooks/usePayment';
 import { PaymentsHeader } from '../components/PaymentsHeader';
 import { FinancialSummary } from '../components/FinancialSummary';
 import { TimelineTracker } from '../components/TimelineTracker';
+import {
+  PropertySwitcherBottomSheet,
+  type PropertySwitcherBottomSheetRef,
+} from '@/shared/components/PropertySwitcherBottomSheet';
 
 export function Payments() {
+  const switcherRef = useRef<PropertySwitcherBottomSheetRef>(null);
+
   const theme = useAppTheme();
   const { t } = useTranslation();
   const {
@@ -30,7 +36,6 @@ export function Payments() {
     milestones,
     dateRange,
     handleBack,
-    handleSwitchProject,
     formatCurrency,
     hasMultipleProjects,
   } = usePayment();
@@ -40,10 +45,10 @@ export function Payments() {
     if (!activeProject) {
       return (
         <CTOnboardingPlaceholder
-          title="Payment Milestones"
-          description="Your customized solar installation payment milestone schedule will generate here. Complete onboarding to view payment stages."
-          lottieSource={require('@/assets/animations/lottie/slide4_payments.json')}
-          statusText="Stage: Setup & Verification"
+          title={t('payments.onboardingTitle' as TranslationKey)}
+          description={t('payments.onboardingDesc' as TranslationKey)}
+          lottieSource={require('@/assets/animations/lottie/Finance App.json')}
+          statusText={t('payments.onboardingStage' as TranslationKey)}
           status="warning"
         />
       );
@@ -100,10 +105,11 @@ export function Payments() {
       <PaymentsHeader
         activeProject={activeProject}
         onBack={handleBack}
-        onSwitchProject={handleSwitchProject}
+        onSwitchProject={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
       <View style={styles.content}>{renderContent()}</View>
+      <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );
 }

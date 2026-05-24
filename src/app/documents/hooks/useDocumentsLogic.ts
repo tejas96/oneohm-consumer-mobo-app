@@ -4,6 +4,9 @@
  * Encapsulates document data, category filtering, search, and download actions.
  * Follows "Fat Hooks, Skinny Components" (§4).
  *
+ * NOTE: Documents are served by the backend API. There is no mock/fallback data.
+ * The list will be empty until the documents API endpoint is integrated.
+ *
  * Layer: app/documents/hooks
  */
 
@@ -13,8 +16,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Route, type MainStackParamList } from '@/core/navigation';
-import { useActiveProject } from '@/shared/hooks';
-import { useProjectSelectionStore } from '@/core/project/project.store';
+import { useTranslation } from '@/core/i18n';
+import { useActiveProperty } from '@/shared/hooks';
 
 export interface DocumentItem {
   id: string;
@@ -22,63 +25,54 @@ export interface DocumentItem {
   category: string;
   date: string;
   size: string;
-  status: string;
-  statusType: 'success' | 'info' | 'warning' | 'error';
 }
 
-const CATEGORIES = ['All', 'Agreements', 'Technical', 'Approvals'] as const;
-
-const ALL_DOCUMENTS: DocumentItem[] = [
-  {
-    id: 'doc-1',
-    title: 'Solar Installation Agreement',
-    category: 'Agreements',
-    date: 'May 10, 2026',
-    size: '2.4 MB',
-    status: 'Signed',
-    statusType: 'success',
-  },
-  {
-    id: 'doc-2',
-    title: 'Engineering Design & Schematics',
-    category: 'Technical',
-    date: 'May 14, 2026',
-    size: '8.1 MB',
-    status: 'Approved',
-    statusType: 'success',
-  },
-  {
-    id: 'doc-3',
-    title: 'DISCOM Grid Connection NOC',
-    category: 'Approvals',
-    date: 'May 18, 2026',
-    size: '1.2 MB',
-    status: 'Received',
-    statusType: 'info',
-  },
-  {
-    id: 'doc-4',
-    title: 'Site Assessment & Shadow Report',
-    category: 'Technical',
-    date: 'May 08, 2026',
-    size: '4.7 MB',
-    status: 'Completed',
-    statusType: 'success',
-  },
-];
+// No mock data — documents will be fetched from the backend API.
+// Until the API is integrated, the list is empty by design.
+const EMPTY_DOCUMENTS: DocumentItem[] = [];
 
 export function useDocumentsLogic() {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+  const { t } = useTranslation();
 
-  const { activeProject, projects, isOnboarding, isLoading, isError, refetch } =
-    useActiveProject();
+  const {
+    activeProperty,
+    properties,
+    isOnboarding: activePropOnboarding,
+    isLoading,
+    isError,
+    refetch,
+  } = useActiveProperty();
+
+  // Show onboarding state if no property is selected OR the property has no
+  // active project yet — mirrors the same logic used in useProjectLogic.
+  const isOnboarding = activePropOnboarding || !activeProperty?.project;
+
+  // Expose a minimal activeProject-compatible shape for CTPremiumHeader
+  const activeProject = activeProperty
+    ? {
+        id: activeProperty.id,
+        label: activeProperty.propertyName || '',
+        status: activeProperty.project?.status || 'PLANNING',
+        property: activeProperty,
+      }
+    : null;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  // Derive categories dynamically from actual documents.
+  // Until the API is live this will only ever contain 'All'.
+  const categories = useMemo(() => {
+    const unique = Array.from(
+      new Set(EMPTY_DOCUMENTS.map(doc => doc.category)),
+    );
+    return ['All', ...unique];
+  }, []);
+
   const filteredDocs = useMemo(() => {
-    return ALL_DOCUMENTS.filter(doc => {
+    return EMPTY_DOCUMENTS.filter(doc => {
       const matchesCategory =
         selectedCategory === 'All' || doc.category === selectedCategory;
       const matchesSearch = doc.title
@@ -89,17 +83,14 @@ export function useDocumentsLogic() {
   }, [searchQuery, selectedCategory]);
 
   const handleDownload = (title: string) => {
-    Alert.alert('Download Started', `Downloading "${title}" to your device.`, [
-      { text: 'OK' },
-    ]);
+    Alert.alert(
+      t('documents.downloadStartedTitle'),
+      t('documents.downloadStartedDesc').replace('{title}', title),
+      [{ text: 'OK' }],
+    );
   };
 
-  const setSwitcherVisible = useProjectSelectionStore(
-    state => state.setSwitcherVisible,
-  );
-
   const handleBack = () => navigation.navigate(Route.HOME_TAB as any);
-  const handleSwitchProject = () => setSwitcherVisible(true);
 
   return {
     activeProject,
@@ -107,7 +98,7 @@ export function useDocumentsLogic() {
     isLoading,
     isError,
     refetch,
-    categories: CATEGORIES,
+    categories,
     searchQuery,
     setSearchQuery,
     selectedCategory,
@@ -115,7 +106,6 @@ export function useDocumentsLogic() {
     filteredDocs,
     handleDownload,
     handleBack,
-    handleSwitchProject,
-    hasMultipleProjects: projects.length > 1,
+    hasMultipleProjects: properties.length > 1,
   };
 }

@@ -9,8 +9,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { useAuthStore } from '@/core/auth';
 import { Route, type MainStackParamList } from '@/core/navigation';
-import { useActiveProject } from '@/shared/hooks';
-import { useProjectSelectionStore } from '@/core/project/project.store';
+import { useTranslation } from '@/core/i18n';
+import { useActiveProperty } from '@/shared/hooks';
 
 export type DashboardState = 'onboarding' | 'in_progress' | 'completed';
 
@@ -18,17 +18,26 @@ export function useHomeDashboard() {
   const navigation =
     useNavigation<NativeStackNavigationProp<MainStackParamList>>();
   const user = useAuthStore(state => state.user);
-  const setSwitcherVisible = useProjectSelectionStore(
-    state => state.setSwitcherVisible,
-  );
+  const refreshUser = useAuthStore(state => state.refreshUser);
+  const { t } = useTranslation();
+  const {
+    activeProperty,
+    properties,
+    isLoading,
+    isError,
+    refetch,
+    propertyStage,
+    latestQuoteVersion,
+  } = useActiveProperty();
 
-  const { activeProject, projects, isLoading, isError, refetch } =
-    useActiveProject();
+  const handleRefetch = async () => {
+    await Promise.all([refetch(), refreshUser()]);
+  };
 
   // Resolve overall dashboard state
   let dashboardState: DashboardState = 'onboarding';
-  if (activeProject) {
-    if (activeProject.status === 'COMPLETED') {
+  if (activeProperty && propertyStage === 'project_active') {
+    if (activeProperty.project?.status === 'COMPLETED') {
       dashboardState = 'completed';
     } else {
       dashboardState = 'in_progress';
@@ -36,11 +45,36 @@ export function useHomeDashboard() {
   }
 
   // Financial calculations
-  const totalValue = activeProject?.totalValue || 0;
-  const amountPaid = activeProject?.amountPaid || 0;
-  const subsidy = activeProject?.subsidy || 0;
+  const totalValue = latestQuoteVersion?.finalPrice || 0;
+  const amountPaid =
+    (activeProperty?.project?.metadata?.amountPaid as number) || 0;
+  const subsidy =
+    latestQuoteVersion?.pricingBreakdown?.subsidyAmount ||
+    latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ||
+    0;
   const outstanding = Math.max(0, totalValue - amountPaid);
   const netCost = totalValue - subsidy;
+
+  // Map CustomerProperty to compatibility object for the presentational widgets
+  const activeProjectMapped = activeProperty
+    ? {
+        id: activeProperty.id,
+        label:
+          activeProperty.propertyName ||
+          t('projectSwitcher.defaultPropertyName'),
+        status: activeProperty.project?.status || 'PLANNING',
+        totalValue,
+        subsidy,
+        amountPaid,
+        startDate: activeProperty.project?.startDate || '',
+        endDate: activeProperty.project?.endDate || '',
+        progress: activeProperty.project?.progressPercentage || 0,
+        capacity: latestQuoteVersion?.systemSizeKw || 0,
+        projectNumber: activeProperty.project?.projectNumber,
+        property: activeProperty,
+        quoteVersion: latestQuoteVersion,
+      }
+    : null;
 
   // Navigation handlers
   const navigateToPayments = () =>
@@ -50,11 +84,10 @@ export function useHomeDashboard() {
   const navigateToSupport = () => navigation.navigate(Route.SUPPORT);
   const navigateToWarranty = () => navigation.navigate(Route.WARRANTY);
   const navigateToProjectTeam = () => {
-    if (activeProject) {
-      navigation.navigate(Route.PROJECT_TEAM, { projectId: activeProject.id });
+    if (activeProperty) {
+      navigation.navigate(Route.PROJECT_TEAM, { projectId: activeProperty.id });
     }
   };
-  const navigateToProjectSwitcher = () => setSwitcherVisible(true);
   const navigateToNotifications = () =>
     navigation.navigate(Route.NOTIFICATIONS);
   const navigateToProfile = () =>
@@ -62,11 +95,11 @@ export function useHomeDashboard() {
 
   return {
     user,
-    activeProject,
+    activeProject: activeProjectMapped,
     dashboardState,
     isLoading,
     isError,
-    refetch,
+    refetch: handleRefetch,
 
     // Financial Metrics
     financials: {
@@ -78,13 +111,12 @@ export function useHomeDashboard() {
     },
 
     // Handlers
-    hasMultipleProjects: projects.length > 1,
+    hasMultipleProjects: properties.length > 1,
     navigateToPayments,
     navigateToDocuments,
     navigateToSupport,
     navigateToWarranty,
     navigateToProjectTeam,
-    navigateToProjectSwitcher,
     navigateToNotifications,
     navigateToProfile,
   };

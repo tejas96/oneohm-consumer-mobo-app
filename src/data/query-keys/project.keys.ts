@@ -1,12 +1,9 @@
-/**
- * Project Keys — Query key factory for project endpoints
- *
- * Layer: data/query-keys
- */
-
-export const projectKeys = {
-  all: ['projects'] as const,
-  lists: () => [...projectKeys.all, 'list'] as const,
-  details: () => [...projectKeys.all, 'detail'] as const,
-  detail: (id: string) => [...projectKeys.details(), id] as const,
+export const propertyKeys = {
+  all: ['properties'] as const,
+  lists: () => [...propertyKeys.all, 'list'] as const,
+  details: () => [...propertyKeys.all, 'detail'] as const,
+  detail: (id: string) => [...propertyKeys.details(), id] as const,
 };
+
+// Maintain compatibility alias if needed, or we can just update all references
+export const projectKeys = propertyKeys;

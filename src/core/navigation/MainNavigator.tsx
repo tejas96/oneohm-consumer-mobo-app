@@ -15,7 +15,6 @@ import { MainTabNavigator } from './MainTabNavigator';
 import { SupportScreen } from '@/app/support/screens/SupportScreen';
 import { WarrantyScreen } from '@/app/warranty/screens/WarrantyScreen';
 import { TeamScreen } from '@/app/project/screens/TeamScreen';
-import { ProjectSwitcherBottomSheet } from '@/shared/components';
 
 import type { MainStackParamList } from './navigation.types';
 import { Route } from './routes';
@@ -25,17 +24,14 @@ const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export function MainNavigator() {
   return (
-    <>
-      <Stack.Navigator screenOptions={defaultScreenOptions}>
-        {/* Tab root — hosts all 5 bottom-nav tabs */}
-        <Stack.Screen name={Route.MAIN_TABS} component={MainTabNavigator} />
+    <Stack.Navigator screenOptions={defaultScreenOptions}>
+      {/* Tab root — hosts all 5 bottom-nav tabs */}
+      <Stack.Screen name={Route.MAIN_TABS} component={MainTabNavigator} />
 
-        {/* Stack overlays — pushed on top of any active tab */}
-        <Stack.Screen name={Route.SUPPORT} component={SupportScreen} />
-        <Stack.Screen name={Route.WARRANTY} component={WarrantyScreen} />
-        <Stack.Screen name={Route.PROJECT_TEAM} component={TeamScreen} />
-      </Stack.Navigator>
-      <ProjectSwitcherBottomSheet />
-    </>
+      {/* Stack overlays — pushed on top of any active tab */}
+      <Stack.Screen name={Route.SUPPORT} component={SupportScreen} />
+      <Stack.Screen name={Route.WARRANTY} component={WarrantyScreen} />
+      <Stack.Screen name={Route.PROJECT_TEAM} component={TeamScreen} />
+    </Stack.Navigator>
   );
 }

@@ -6,25 +6,27 @@
  */
 
 import { api, API_ENDPOINTS } from '@/core/api';
-import type { Project } from '../types/project.types';
+import type { CustomerProperty } from '../types/project.types';
 
 /**
- * Fetch list of user's active solar installation projects.
+ * Fetch list of user's active properties, quotes, and projects.
  */
-async function getProjects(): Promise<Project[]> {
-  return api.get<Project[]>(API_ENDPOINTS.PROJECTS.LIST);
+async function getProperties(): Promise<CustomerProperty[]> {
+  return api.get<CustomerProperty[]>(
+    API_ENDPOINTS.CUSTOMER_PROPERTIES.MY_PROPERTIES,
+  );
 }
 
 /**
- * Fetch a single project detail by ID.
+ * Fetch a single property detail by ID.
  *
- * @param id Project identifier
+ * @param id Property identifier
  */
-async function getProjectById(id: string): Promise<Project> {
-  return api.get<Project>(API_ENDPOINTS.PROJECTS.GET(id));
+async function getPropertyById(id: string): Promise<CustomerProperty> {
+  return api.get<CustomerProperty>(API_ENDPOINTS.CUSTOMER_PROPERTIES.GET(id));
 }
 
 export const ProjectService = {
-  getProjects,
-  getProjectById,
+  getProperties,
+  getPropertyById,
 };

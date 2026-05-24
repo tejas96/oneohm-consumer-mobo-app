@@ -11,7 +11,6 @@ import { Text } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
 import { useAppTheme } from '@/shared/theme';
-import { fontSize, fontWeight } from '@/shared/theme';
 
 export interface ProgressRingProps {
   progress: number;
@@ -41,7 +40,7 @@ export function ProgressRing({ progress, color }: ProgressRingProps) {
           cy={CENTER_COORD}
           r={RADIUS}
           fill="transparent"
-          stroke={theme.colors.circularProgressBg}
+          stroke={theme.colors.outlineVariant}
           strokeWidth={STROKE_WIDTH}
         />
         {/* Active Progress */}
@@ -63,7 +62,7 @@ export function ProgressRing({ progress, color }: ProgressRingProps) {
           {clampedProgress}%
         </Text>
         <Text
-          style={[styles.ringSub, { color: theme.colors.onSurfaceVariant }]}
+          style={[styles.ringSub, { color: theme.colors.onSurface }]}
           numberOfLines={1}
         >
           {t('projectSwitcher.done')}
@@ -90,13 +89,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   ringPercent: {
-    fontSize: fontSize.caption,
-    fontWeight: fontWeight.bold,
+    fontSize: 13,
+    fontWeight: '800',
     lineHeight: 14,
   },
   ringSub: {
-    fontSize: fontSize.micro,
+    fontSize: 8,
     lineHeight: 10,
-    opacity: 0.6,
+    opacity: 0.25,
   },
 });

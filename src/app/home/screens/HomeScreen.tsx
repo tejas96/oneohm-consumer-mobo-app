@@ -4,12 +4,16 @@
  * Layer: app/home/screens
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 
 import { ScreenWrapper } from '@/shared/components';
 import { spacing, useAppTheme } from '@/shared/theme';
 import { useTranslation } from '@/core/i18n';
+import {
+  PropertySwitcherBottomSheet,
+  type PropertySwitcherBottomSheetRef,
+} from '@/shared/components/PropertySwitcherBottomSheet';
 
 import { useHomeDashboard } from '../hooks/useHomeDashboard';
 import { HomeHeader } from '../components/HomeHeader';
@@ -20,6 +24,8 @@ import { QuickActions } from '../components/QuickActions';
 import { BannerAlert } from '../components/BannerAlert';
 
 export function HomeScreen() {
+  const switcherRef = useRef<PropertySwitcherBottomSheetRef>(null);
+
   const theme = useAppTheme();
   const { t } = useTranslation();
   const {
@@ -35,7 +41,6 @@ export function HomeScreen() {
     navigateToSupport,
     navigateToWarranty,
     navigateToProjectTeam,
-    navigateToProjectSwitcher,
     navigateToNotifications,
     hasMultipleProjects,
   } = useHomeDashboard();
@@ -103,13 +108,16 @@ export function HomeScreen() {
       }}
     >
       <HomeHeader
-        userName={user?.firstName || ''}
+        userName={
+          activeProject?.property?.customerName || user?.firstName || ''
+        }
         activeProject={activeProject}
         onNotificationsPress={navigateToNotifications}
-        onProjectSwitcherPress={navigateToProjectSwitcher}
+        onProjectSwitcherPress={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
       <View style={styles.content}>{renderContent()}</View>
+      <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );
 }

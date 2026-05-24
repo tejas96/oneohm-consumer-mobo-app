@@ -1,2 +1,2 @@
 export { useDebounce } from './useDebounce';
-export { useActiveProject } from './useActiveProject';
+export { useActiveProperty, useActiveProject } from './useActiveProperty';

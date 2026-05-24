@@ -76,10 +76,10 @@ export const en = {
     greetingMorning: 'Good Morning',
     greetingAfternoon: 'Good Afternoon',
     greetingEvening: 'Good Evening',
-    onboardingTitle: 'Profile Onboarding',
+    onboardingTitle: 'Your Solar Journey is Beginning!',
     onboardingDesc:
-      'We are currently setting up your customer profile and validating your solar quote details. Once the onboarding process is 100% complete and converted into an active project, your tracking dashboard will launch here.',
-    onboardingStage: 'Stage: Onboarding & Verification',
+      'We are currently validating your electricity documents and securing the necessary government DISCOM solar approvals. Your custom real-time installation timeline, payments ledger, and live team support will light up right here the moment engineering verification is complete!',
+    onboardingStage: 'Onboarding & Document Verification',
     inProgress: 'In Progress',
     gridActive: 'Grid Active',
     paymentSnapshot: 'Payment Snapshot',
@@ -110,6 +110,10 @@ export const en = {
   },
   payments: {
     title: 'Payment Journey',
+    onboardingTitle: 'Your Solar Financial Ledger',
+    onboardingDesc:
+      'Track your entire payment journey, verified transactions, and government subsidy approvals in one place. Your sequential milestone ledger (Booking, Material Delivery, Installation, and Net-metering) will be activated once onboarding is complete.',
+    onboardingStage: 'Onboarding & Escrow Setup',
     targetLabel: 'Target: {amount} ({percent}%)',
     expectedRecovery: 'Expected Recovery',
     installmentsBadge: '{count} Inst.',
@@ -225,6 +229,12 @@ export const en = {
     assistanceDesc:
       'Reach out to your dedicated project team for priority installation support.',
     contactBtn: 'Contact Project Team',
+    onboardingTitle: 'Engineering & Design in Progress',
+    onboardingDesc:
+      'Our structural engineers and electrical designers are finalizing your optimal solar rooftop layout, shadow analysis, and single line diagram (SLD). Once the layout designs are verified, your detailed technical panel specifications and step-by-step engineering timeline will be activated here.',
+    onboardingStage: 'System Design & Engineering',
+    noActiveProjectTitle: 'No Active Project',
+    noActiveProjectDesc: 'Please select a project first.',
   },
   team: {
     title: 'Project Team',
@@ -259,6 +269,12 @@ export const en = {
     title: 'Project Documents',
     searchPlaceholder: 'Search documents...',
     emptyState: 'No documents found matching criteria.',
+    onboardingTitle: 'Your Document Vault',
+    onboardingDesc:
+      'Securely view and download all your solar agreements, electrical schematics, utility NOC approvals, and system warranties in one place. These files will be uploaded automatically as onboarding progresses.',
+    onboardingStage: 'Onboarding & Document Setup',
+    downloadStartedTitle: 'Download Started',
+    downloadStartedDesc: 'Downloading "{title}" to your device.',
   },
   projectSwitcher: {
     title: 'My Projects',
@@ -273,5 +289,19 @@ export const en = {
     statusInProgress: 'In Progress',
     statusCompleted: 'Completed',
     statusOnHold: 'On Hold',
+    defaultPropertyName: 'My Property',
+    stageNotQuoted: 'NOT QUOTED',
+    stageQuoted: 'QUOTED',
+    stageQuoteAccepted: 'QUOTE ACCEPTED',
+    stageAllRejected: 'ALL REJECTED',
+    stageOnboarding: 'ONBOARDING',
+    subtitleNotQuoted: 'Quotation design in progress',
+    subtitleQuoted: 'Quotations under review',
+    subtitleAccepted: 'Preparing project plan',
+    subtitleRejected: 'All quotations rejected',
+    subtitlePlanning: 'Project planning phase',
+    subtitleInProgress: 'Installation project is active',
+    subtitleCompleted: 'Project successfully completed',
+    subtitleOnHold: 'Project is on hold',
   },
 };

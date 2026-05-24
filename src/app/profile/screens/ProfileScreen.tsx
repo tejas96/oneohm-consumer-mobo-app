@@ -4,7 +4,7 @@
  * Layer: app/profile/screens
  */
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { Text, Portal, Snackbar, IconButton } from 'react-native-paper';
 
@@ -18,16 +18,22 @@ import {
   lineHeight,
 } from '@/shared/theme';
 import { useProfileLogic } from '../hooks/useProfileLogic';
+import {
+  PropertySwitcherBottomSheet,
+  type PropertySwitcherBottomSheetRef,
+} from '@/shared/components/PropertySwitcherBottomSheet';
 
 // Subcomponents
 import { ProfileHeader } from '../components/ProfileHeader';
 import { LanguageToggle } from '../components/LanguageToggle';
 import { PortfolioOverview } from '../components/PortfolioOverview';
-import { MyProjects } from '../components/MyProjects';
+import { MyProperties } from '../components/MyProperties';
 import { ActiveProjectDetails } from '../components/ActiveProjectDetails';
 import { AccountSettings } from '../components/AccountSettings';
 
 export function ProfileScreen() {
+  const switcherRef = useRef<PropertySwitcherBottomSheetRef>(null);
+
   const theme = useAppTheme();
   const {
     user,
@@ -45,7 +51,6 @@ export function ProfileScreen() {
     navigateToSupport,
     navigateToWarranty,
     handleSwitchProject,
-    openProjectSwitcher,
   } = useProfileLogic();
 
   const [snackbarVisible, setSnackbarVisible] = React.useState(false);
@@ -58,9 +63,11 @@ export function ProfileScreen() {
       }
     : undefined;
 
-  const onSwitch = (projId: string, projName: string) => {
-    handleSwitchProject(projId);
-    setToastMessage(t('profile.switchSuccess').replace('{name}', projName));
+  const onSwitch = (propertyId: string, propertyName: string) => {
+    handleSwitchProject(propertyId);
+    setToastMessage(
+      t('profile.switchSuccess' as any).replace('{name}', propertyName),
+    );
     setSnackbarVisible(true);
   };
 
@@ -78,6 +85,7 @@ export function ProfileScreen() {
         {/* Profile Header (Avatar, identity details, properties badge) */}
         <ProfileHeader
           user={user}
+          customerName={activeProject?.property?.customerName}
           totalProjects={aggregates.totalProjects}
           t={t}
         />
@@ -92,12 +100,12 @@ export function ProfileScreen() {
         {/* Portfolio Overview (Aggregate stats cards) */}
         <PortfolioOverview aggregates={aggregates} t={t} />
 
-        {/* My Projects (Switchable project list cards) */}
-        <MyProjects
-          projects={projects}
-          selectedProjectId={selectedProjectId}
+        {/* My Properties (Switchable property list cards) */}
+        <MyProperties
+          properties={projects}
+          selectedPropertyId={selectedProjectId}
           onSwitch={onSwitch}
-          onViewAll={openProjectSwitcher}
+          onViewAll={() => switcherRef.current?.open()}
           t={t}
         />
 
@@ -128,7 +136,7 @@ export function ProfileScreen() {
             </Text>
           </CTCard>
         ) : (
-          <ActiveProjectDetails activeProject={activeProject} t={t} />
+          <ActiveProjectDetails activeProject={activeProject as any} t={t} />
         )}
 
         {/* Settings options list (Notifications, Support, Warranty, Logout) */}
@@ -172,6 +180,7 @@ export function ProfileScreen() {
           </Text>
         </Snackbar>
       </Portal>
+      <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );
 }

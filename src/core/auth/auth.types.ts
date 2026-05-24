@@ -72,4 +72,5 @@ export interface AuthActions {
   setAuthenticated: (tokens: AuthTokens, user: AuthUser) => Promise<void>;
   logout: () => Promise<void>;
   hydrate: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }

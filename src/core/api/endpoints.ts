@@ -64,6 +64,16 @@ export const API_ENDPOINTS = {
     /** POST — Submit feedback for a team member */
     FEEDBACK: (id: string) => `/projects/${id}/team/feedback`,
   },
+
+  // ============================================
+  // CUSTOMER PROPERTIES
+  // ============================================
+  CUSTOMER_PROPERTIES: {
+    /** GET — Get properties for logged in customer */
+    MY_PROPERTIES: '/customer-properties/my-properties',
+    /** GET — Get property by ID */
+    GET: (id: string) => `/customer-properties/${id}`,
+  },
 } as const;
 
 export type ApiEndpointModule = keyof typeof API_ENDPOINTS;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
@@ -21,10 +21,16 @@ import {
 
 import { useTranslation } from '@/core/i18n';
 import { useProjectLogic } from '@/app/project/hooks/useProjectLogic';
+import {
+  PropertySwitcherBottomSheet,
+  type PropertySwitcherBottomSheetRef,
+} from '@/shared/components/PropertySwitcherBottomSheet';
 import { ProjectTimeline } from '../components/ProjectTimeline';
 import { ProjectSpecs } from '../components/ProjectSpecs';
 
 export function ProjectScreen() {
+  const switcherRef = useRef<PropertySwitcherBottomSheetRef>(null);
+
   const theme = useAppTheme();
   const { t } = useTranslation();
   const {
@@ -36,19 +42,25 @@ export function ProjectScreen() {
     timelineSteps,
     specsData,
     handleBack,
-    handleSwitchProject,
     handleContactTeam,
     hasMultipleProjects,
   } = useProjectLogic();
+
+  const hasTimeline = timelineSteps.length > 0;
+  const hasSpecs =
+    specsData.dcrPanels !== null ||
+    specsData.nonDcrPanels !== null ||
+    specsData.inverter !== null ||
+    specsData.structure !== null;
 
   const renderContent = () => {
     if (isOnboarding) {
       return (
         <CTOnboardingPlaceholder
-          title="Project Layout & Design"
-          description="Your system design, solar panel orientation, and inverter electrical layout are being reviewed by our engineers. These technical specs will go live once verification is complete."
+          title={t('project.onboardingTitle')}
+          description={t('project.onboardingDesc')}
           lottieSource={require('@/assets/animations/lottie/Tracking my package.json')}
-          statusText="Stage: System Design & Engineering"
+          statusText={t('project.onboardingStage')}
           status="warning"
         />
       );
@@ -56,7 +68,7 @@ export function ProjectScreen() {
 
     const isCompleted = activeProject?.status === 'COMPLETED';
     const progress = isCompleted ? 100 : activeProject?.progress ?? 0;
-    const capacity = activeProject?.capacity ?? 5.4;
+    const capacity = activeProject?.capacity ?? 0;
     const statusLabel = isCompleted
       ? t('dashboard.gridActive')
       : t('dashboard.inProgress');
@@ -101,21 +113,35 @@ export function ProjectScreen() {
           </CTProgressCircle>
         </View>
 
-        {/* Visual Timeline Tracker */}
-        <Text
-          style={[styles.sectionTitle, { color: theme.colors.onBackground }]}
-        >
-          {t('project.timelineTitle')}
-        </Text>
-        <ProjectTimeline steps={timelineSteps} />
+        {/* Visual Timeline Tracker — only rendered when real steps are available */}
+        {hasTimeline && (
+          <>
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: theme.colors.onBackground },
+              ]}
+            >
+              {t('project.timelineTitle')}
+            </Text>
+            <ProjectTimeline steps={timelineSteps} />
+          </>
+        )}
 
-        {/* Collapsible System Specifications */}
-        <Text
-          style={[styles.sectionTitle, { color: theme.colors.onBackground }]}
-        >
-          {t('project.specsTitle')}
-        </Text>
-        <ProjectSpecs specs={specsData} />
+        {/* Collapsible System Specifications — only rendered when quote data exists */}
+        {hasSpecs && (
+          <>
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: theme.colors.onBackground },
+              ]}
+            >
+              {t('project.specsTitle')}
+            </Text>
+            <ProjectSpecs specs={specsData} />
+          </>
+        )}
 
         {/* Contact Installation Team CTA Card */}
         <CTCard
@@ -188,10 +214,11 @@ export function ProjectScreen() {
         title={t('project.title')}
         activeProject={activeProject}
         onBack={handleBack}
-        onSwitchProject={handleSwitchProject}
+        onSwitchProject={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
       <View style={styles.container}>{renderContent()}</View>
+      <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );
 }
@@ -234,9 +261,6 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.black,
     marginTop: spacing.xl,
     marginBottom: spacing.sm,
-  },
-  card: {
-    marginBottom: spacing.xs,
   },
   contactTeamCard: {
     marginTop: spacing.xl,

@@ -39,6 +39,7 @@ export const STORAGE_KEYS = {
   THEME_PREFERENCE: '@oneohm:theme_preference',
   LAST_SYNC_TIMESTAMP: '@oneohm:last_sync',
   APP_LANGUAGE: '@oneohm:app_language',
+  SELECTED_PROPERTY_ID: '@oneohm:selected_property_id',
 } as const;
 
 /** Token refresh configuration */
