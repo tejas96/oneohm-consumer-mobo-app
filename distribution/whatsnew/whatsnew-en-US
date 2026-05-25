@@ -1,3 +1,8 @@
-What's new in v0.0.1:
+What's new in v0.1.0:
 
-• Bug fixes and improvements
+• Integrate Firebase, update app icons, and add milestone tracking infrastructure
+• Implement property switching system with dedicated components and hooks
+• Implement payment detail components, add new shared UI elements, and internationalize team interaction strings
+• Add project selection system, global state management, and native intent configurations
+• Implement profile screen components and update project configuration
+• ...and more improvements
