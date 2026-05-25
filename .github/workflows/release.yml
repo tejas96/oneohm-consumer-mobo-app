@@ -1,0 +1,192 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump-type:
+        description: "Version bump type (leave empty for auto-detect)"
+        required: false
+        default: ""
+        type: choice
+        options: ["", "patch", "minor", "major"]
+      skip-bump:
+        description: "Skip version bump (for retrying a failed build/deploy)"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  packages: read
+
+env:
+  NODE_VERSION: "22"
+  JAVA_VERSION: "17"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: "!contains(github.event.head_commit.message, '[skip release]')"
+
+    steps:
+      # 1. Checkout with full history (for git log / tag detection)
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Setup toolchain
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: "gradle"
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        env:
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+
+      # 4. Version bump (local only -- files modified but NOT committed yet)
+      - name: Bump version
+        id: bump
+        run: |
+          if [ "${{ inputs.skip-bump }}" = "true" ]; then
+            node scripts/bump-version.js --skip
+          elif [ -n "${{ inputs.bump-type }}" ]; then
+            node scripts/bump-version.js --type ${{ inputs.bump-type }}
+          else
+            node scripts/bump-version.js --auto
+          fi
+
+      # 5. Generate changelog (writes whatsnew + RELEASE_NOTES.md locally)
+      - name: Generate changelog
+        run: node scripts/generate-changelog.js --version ${{ steps.bump.outputs.version }}
+
+      # 6. Validate signing secrets
+      - name: Validate secrets
+        env:
+          HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+          HAS_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD != '' }}
+          HAS_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD != '' }}
+          HAS_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS != '' }}
+          HAS_API_URL: ${{ secrets.PRODUCTION_API_URL != '' }}
+          HAS_PLAY_CREDS: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        run: |
+          MISSING=0
+          for VAR_NAME in KEYSTORE STORE_PASS KEY_PASS KEY_ALIAS API_URL PLAY_CREDS; do
+            VAR="HAS_$VAR_NAME"
+            if [ "${!VAR}" != "true" ]; then
+              echo "Missing secret: $VAR_NAME" && MISSING=1
+            fi
+          done
+          [ "$MISSING" -eq 1 ] && exit 1
+          echo "All required secrets are configured"
+
+      # 7. Create production .env
+      - name: Create production .env
+        run: |
+          {
+            echo "API_URL=${{ secrets.PRODUCTION_API_URL }}"
+            echo "API_TIMEOUT=30000"
+            echo "APP_NAME=OneOhm"
+            echo "APP_ENV=production"
+            echo "ENABLE_ANALYTICS=true"
+            echo "ENABLE_CRASH_REPORTING=true"
+          } > .env
+
+      # 8. Decode keystore
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | \
+            base64 --decode > android/app/oneohm-release.keystore
+
+      # 9. Build AAB (working dir has bumped version in build.gradle)
+      - name: Build Android AAB (Release)
+        run: |
+          cd android && chmod +x gradlew
+          ./gradlew bundleRelease --no-daemon --build-cache \
+            -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
+        env:
+          ONEOHM_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ONEOHM_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ONEOHM_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ONEOHM_RELEASE_STORE_FILE: oneohm-release.keystore
+
+      # 10. Verify AAB
+      - name: Verify AAB was created
+        run: |
+          [ -f android/app/build/outputs/bundle/release/app-release.aab ] || \
+            { echo "AAB file not found!" && exit 1; }
+
+      # === BUILD SUCCEEDED -- now commit, tag, and deploy ===
+
+      # 11. Commit version bump + changelog (only after successful build)
+      - name: Commit release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json android/app/build.gradle distribution/whatsnew/
+          if git diff --cached --quiet; then
+            echo "No changes to commit -- skipping push"
+          else
+            git commit -m "chore(release): v${{ steps.bump.outputs.version }} [skip release]"
+            git push
+          fi
+
+      # 12. Create and push tag (skip if already exists for retries)
+      - name: Create tag
+        run: |
+          TAG="v${{ steps.bump.outputs.version }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists, skipping"
+          else
+            git tag -a "$TAG" -m "Release $TAG"
+            git push origin "$TAG"
+          fi
+
+      # 13. Upload to Play Store
+      - name: Upload to Google Play (Production)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.oneohm.consumer
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: production
+          status: completed
+          whatsNewDirectory: distribution/whatsnew
+
+      # 14. Create GitHub Release with full changelog
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.version }}
+          name: v${{ steps.bump.outputs.version }}
+          body_path: RELEASE_NOTES.md
+          files: android/app/build/outputs/bundle/release/app-release.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 15. Summary
+      - name: Release Summary
+        if: always()
+        run: |
+          echo "## Release v${{ steps.bump.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed to Google Play Store (production)" >> $GITHUB_STEP_SUMMARY

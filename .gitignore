@@ -76,6 +76,7 @@ yarn-error.log
 
 .env
 .env.local
+.env.*
 
 # IDEs
 .vscode/
@@ -85,3 +86,19 @@ yarn-error.log
 
 # NPM
 .npmrc
+
+# Release keystore (NEVER commit this!)
+android/app/oneohm-release.keystore
+*.keystore
+!android/app/debug.keystore
+
+# Keystore properties (contains sensitive passwords)
+android/keystore.properties
+keystore.properties
+keystore-base64.txt
+
+# Release assets (contains sensitive keystore info)
+release-assets/
+
+# Temporary release notes generated during CI
+RELEASE_NOTES.md
