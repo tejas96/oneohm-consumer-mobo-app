@@ -53,7 +53,7 @@ export const PropertySwitcherBottomSheet = forwardRef<
   const sheetRef = useRef<BottomSheet>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  const snapPoints = useMemo(() => ['50%', '85%'], []);
+  const snapPoints = useMemo(() => ['70%', '85%'], []);
 
   useImperativeHandle(ref, () => ({
     open: () => {

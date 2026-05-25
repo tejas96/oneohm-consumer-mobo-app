@@ -59,8 +59,10 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `/projects/${id}`,
     /** GET — Get project timeline */
     TIMELINE: (id: string) => `/projects/${id}/timeline`,
+    /** GET — Get project milestones and task-progress aggregates */
+    MILESTONES: (id: string) => `/projects/${id}/milestones`,
     /** GET — Get project team members */
-    TEAM: (id: string) => `/projects/${id}/team`,
+    TEAM: (id: string) => `/projects/${id}/customer-team`,
     /** POST — Submit feedback for a team member */
     FEEDBACK: (id: string) => `/projects/${id}/team/feedback`,
   },

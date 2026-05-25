@@ -45,6 +45,7 @@ export interface Quote extends Omit<SharedQuote, 'versions'> {
 export interface QuoteVersion extends SharedQuoteVersion {
   systemType: string;
   systemSizeKw: number;
+  actualSystemSizeKw?: number;
   totalWattageWp: number;
   projectCompletionWeeks: number;
   pricingBreakdown?: PricingBreakdown;
@@ -81,4 +82,22 @@ export interface Project {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
+}
+
+export type MilestoneDisplayStatus =
+  | 'pending'
+  | 'in_progress'
+  | 'completed'
+  | 'blocked'
+  | 'no_tasks';
+
+export interface MilestoneAggregateItem {
+  name: string;
+  order: number;
+  totalTasks: number;
+  completedTasks: number;
+  inProgressTasks: number;
+  blockedTasks: number;
+  percent: number;
+  status: MilestoneDisplayStatus;
 }

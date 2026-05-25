@@ -147,7 +147,13 @@ export function useActiveProject(): any {
         startDate: activeProp.activeProperty.project?.startDate || '',
         endDate: activeProp.activeProperty.project?.endDate || '',
         progress: activeProp.activeProperty.project?.progressPercentage || 0,
-        capacity: activeProp.latestQuoteVersion?.systemSizeKw || 0,
+        capacity:
+          activeProp.latestQuoteVersion?.quoteSnapshot?.calculation
+            ?.actualSystemSizeKw ??
+          activeProp.latestQuoteVersion?.quoteSnapshot?.inputs
+            ?.actualSystemSizeKw ??
+          activeProp.latestQuoteVersion?.actualSystemSizeKw ??
+          0,
         projectNumber: activeProp.activeProperty.project?.projectNumber,
         property: activeProp.activeProperty,
         quoteVersion: activeProp.latestQuoteVersion,
@@ -171,7 +177,11 @@ export function useActiveProject(): any {
         label: p.propertyName || 'My Property',
         status: p.project?.status || 'PLANNING',
         progress: p.project?.progressPercentage || 0,
-        capacity: newestV?.systemSizeKw || p.project?.progressPercentage || 0,
+        capacity:
+          newestV?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+          newestV?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+          newestV?.actualSystemSizeKw ??
+          0,
         property: p,
       };
     }),

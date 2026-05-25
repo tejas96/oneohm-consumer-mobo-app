@@ -146,7 +146,7 @@ export function ActiveProjectDetails({
           <Text
             style={[styles.detailsValue, { color: theme.colors.onSurface }]}
           >
-            {activeProject.capacity.toFixed(1)} kW ·{' '}
+            {activeProject.capacity.toFixed(2)} kW ·{' '}
             {activeProject.quoteVersion?.systemType || 'On-Grid'}
           </Text>
         </View>

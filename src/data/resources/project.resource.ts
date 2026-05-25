@@ -43,5 +43,24 @@ export function useProperty(id: string, options?: QueryOptions) {
   });
 }
 
+/**
+ * Hook to fetch live project milestones and task-progress aggregates.
+ */
+export function useProjectMilestones(
+  projectId: string,
+  options?: QueryOptions,
+) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
+  return useQuery({
+    queryKey: propertyKeys.milestones(projectId),
+    queryFn: () => ProjectService.getProjectMilestones(projectId),
+    enabled: (options?.enabled ?? true) && isAuthenticated && !!projectId,
+    meta: options?.meta,
+    staleTime: 0, // Disable caching - consider data immediately stale
+    gcTime: 0, // Banish from cache immediately to bring latest data
+  });
+}
+
 // Retain compatibility exports for now to prevent immediate breakages until screens are updated
 export { useProperties as useProjects, useProperty as useProject };

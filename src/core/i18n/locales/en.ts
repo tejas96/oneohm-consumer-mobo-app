@@ -203,6 +203,23 @@ export const en = {
     timelineTitle: 'Project Timeline',
     specsTitle: 'System Specifications',
     tasksCount: '{completed}/{total} tasks',
+    milestoneStatus: {
+      pending: 'Pending',
+      inProgress: 'In progress',
+      blocked: 'Blocked',
+      completed: 'Completed',
+      noTasks: 'No tasks',
+    },
+    milestoneNames: {
+      design: 'Design',
+      planning: 'Planning',
+      permitsApprovals: 'Permits & Approvals',
+      materialProcurement: 'Material Procurement',
+      installation: 'Installation',
+      inspection: 'Inspection',
+      commissioning: 'Commissioning',
+      handover: 'Handover',
+    },
     specs: {
       solarPanels: 'Solar Panels',
       inverterDetails: 'Inverter Details',

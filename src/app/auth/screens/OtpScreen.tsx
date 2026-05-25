@@ -10,8 +10,6 @@ import {
   View,
   TextInput as RNTextInput,
   Pressable,
-  Platform,
-  KeyboardAvoidingView,
 } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
@@ -75,144 +73,132 @@ export function OtpScreen() {
   };
 
   return (
-    <ScreenWrapper ambientGlow padded={false} showThemeToggle={false}>
-      <KeyboardAvoidingView
-        style={styles.keyboardView}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <View style={styles.content}>
-          {/* Back Button */}
-          <IconButton
-            icon="chevron-left"
-            size={20}
-            iconColor={theme.colors.onBackground}
-            rippleColor="transparent"
-            onPress={handleGoBack}
-            style={[
-              styles.backButton,
-              {
-                backgroundColor: theme.colors.surfaceVariant,
-                borderColor: theme.colors.outlineVariant,
-              },
-            ]}
+    <ScreenWrapper
+      ambientGlow
+      padded={false}
+      showThemeToggle={false}
+      keyboardAvoiding={true}
+    >
+      <View style={styles.content}>
+        {/* Back Button */}
+        <IconButton
+          icon="chevron-left"
+          size={20}
+          iconColor={theme.colors.onBackground}
+          rippleColor="transparent"
+          onPress={handleGoBack}
+          style={[
+            styles.backButton,
+            {
+              backgroundColor: theme.colors.surfaceVariant,
+              borderColor: theme.colors.outlineVariant,
+            },
+          ]}
+        />
+
+        {/* Heading */}
+        <View style={styles.headingContainer}>
+          <Text style={[styles.title, { color: theme.colors.onBackground }]}>
+            {t('auth.verifyOtpTitle')}
+          </Text>
+          <Text
+            style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
+          >
+            {t('auth.verifyOtpSubtitle')}{' '}
+            <Text
+              style={[
+                styles.phoneHighlight,
+                { color: theme.colors.onBackground },
+              ]}
+            >
+              {phone.replace(/(\d{5})(\d{5})/, '$1 $2')}
+            </Text>
+          </Text>
+        </View>
+
+        {/* OTP Input Grid */}
+        <View style={styles.otpContainer}>
+          <View style={styles.otpRow}>{renderOtpBoxes()}</View>
+          <RNTextInput
+            ref={inputRef}
+            value={otp}
+            onChangeText={text => setOtp(text.replace(/\D/g, ''))}
+            keyboardType="number-pad"
+            maxLength={6}
+            style={styles.hiddenInput}
+            caretHidden
+            autoFocus
           />
+        </View>
 
-          {/* Heading */}
-          <View style={styles.headingContainer}>
-            <Text style={[styles.title, { color: theme.colors.onBackground }]}>
-              {t('auth.verifyOtpTitle')}
-            </Text>
-            <Text
-              style={[
-                styles.subtitle,
-                { color: theme.colors.onSurfaceVariant },
-              ]}
-            >
-              {t('auth.verifyOtpSubtitle')}{' '}
-              <Text
-                style={[
-                  styles.phoneHighlight,
-                  { color: theme.colors.onBackground },
-                ]}
-              >
-                +91 {phone.replace(/(\d{5})(\d{5})/, '$1 $2')}
-              </Text>
-            </Text>
-          </View>
-
-          {/* OTP Input Grid */}
-          <View style={styles.otpContainer}>
-            <View style={styles.otpRow}>{renderOtpBoxes()}</View>
-            <RNTextInput
-              ref={inputRef}
-              value={otp}
-              onChangeText={text => setOtp(text.replace(/\D/g, ''))}
-              keyboardType="number-pad"
-              maxLength={6}
-              style={styles.hiddenInput}
-              caretHidden
-              autoFocus
-            />
-          </View>
-
-          {/* Resend */}
-          <View style={styles.resendContainer}>
-            <Text
-              style={[
-                styles.resendText,
-                { color: theme.colors.onSurfaceVariant },
-              ]}
-            >
-              {t('auth.didNotReceive')}{' '}
-              {timer > 0 ? (
-                <Text
-                  style={[styles.resendTimer, { color: theme.colors.primary }]}
-                >
-                  {t('auth.resendIn').replace('{time}', formatTimer(timer))}
-                </Text>
-              ) : (
-                <Text
-                  onPress={handleResendOtp}
-                  style={[styles.resendLink, { color: theme.colors.primary }]}
-                >
-                  {t('auth.resendCode')}
-                </Text>
-              )}
-            </Text>
-          </View>
-
-          {/* Auto-detect badge */}
-          <View
+        {/* Resend */}
+        <View style={styles.resendContainer}>
+          <Text
             style={[
-              styles.badge,
-              {
-                backgroundColor: theme.colors.surfaceVariant,
-                borderColor: theme.colors.outlineVariant,
-              },
+              styles.resendText,
+              { color: theme.colors.onSurfaceVariant },
             ]}
           >
-            <View
-              style={[
-                styles.badgeDot,
-                { backgroundColor: theme.colors.primary },
-              ]}
-            />
-            <Text
-              style={[
-                styles.badgeText,
-                { color: theme.colors.onSurfaceVariant },
-              ]}
-            >
-              {t('auth.autoDetecting')}
-            </Text>
-          </View>
-
-          {/* Spacer */}
-          <View style={styles.spacer} />
-
-          {/* CTA Button */}
-          <View style={styles.ctaContainer}>
-            <CTButton
-              variant="primary"
-              size="lg"
-              onPress={handleVerifyOtp}
-              disabled={isPending}
-              loading={isPending}
-              style={[styles.button, { shadowColor: theme.colors.primary }]}
-            >
-              {t('auth.verifyAndContinue')}
-            </CTButton>
-          </View>
+            {t('auth.didNotReceive')}{' '}
+            {timer > 0 ? (
+              <Text
+                style={[styles.resendTimer, { color: theme.colors.primary }]}
+              >
+                {t('auth.resendIn').replace('{time}', formatTimer(timer))}
+              </Text>
+            ) : (
+              <Text
+                onPress={handleResendOtp}
+                style={[styles.resendLink, { color: theme.colors.primary }]}
+              >
+                {t('auth.resendCode')}
+              </Text>
+            )}
+          </Text>
         </View>
-      </KeyboardAvoidingView>
+
+        {/* Auto-detect badge */}
+        <View
+          style={[
+            styles.badge,
+            {
+              backgroundColor: theme.colors.surfaceVariant,
+              borderColor: theme.colors.outlineVariant,
+            },
+          ]}
+        >
+          <View
+            style={[styles.badgeDot, { backgroundColor: theme.colors.primary }]}
+          />
+          <Text
+            style={[styles.badgeText, { color: theme.colors.onSurfaceVariant }]}
+          >
+            {t('auth.autoDetecting')}
+          </Text>
+        </View>
+
+        {/* Spacer */}
+        <View style={styles.spacer} />
+
+        {/* CTA Button */}
+        <View style={styles.ctaContainer}>
+          <CTButton
+            variant="primary"
+            size="lg"
+            onPress={handleVerifyOtp}
+            disabled={isPending}
+            loading={isPending}
+            style={[styles.button, { shadowColor: theme.colors.primary }]}
+          >
+            {t('auth.verifyAndContinue')}
+          </CTButton>
+        </View>
+      </View>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  keyboardView: {
-    flex: 1,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 32,

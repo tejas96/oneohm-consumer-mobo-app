@@ -55,7 +55,12 @@ function resolvePropertyUI(
 
   // Capacity text
   const capacityText = latestVersion
-    ? `${latestVersion.systemSizeKw}k`
+    ? `${(
+        latestVersion.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+        latestVersion.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+        latestVersion.actualSystemSizeKw ??
+        0
+      ).toFixed(2)}kW`
     : prop.propertyType.substring(0, 3).toUpperCase();
 
   if (project) {

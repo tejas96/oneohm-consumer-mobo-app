@@ -15,6 +15,7 @@ import type { ViewStyle } from 'react-native';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { spacing } from '@/shared/theme';
 import { useAppTheme } from '@/shared/theme';
@@ -35,6 +36,16 @@ interface ScreenWrapperProps {
   edges?: Edge[];
   /** Optional state configuration for loading, error, and empty states */
   stateConfig?: Omit<CTStateWrapperProps, 'children'>;
+  /** Whether to enable keyboard avoiding via scroll view (default: false) */
+  keyboardAvoiding?: boolean;
+  /** Custom keyboard persist tap behavior (default: 'handled') */
+  keyboardShouldPersistTaps?: 'always' | 'never' | 'handled';
+  /** Extra height offset when keyboard opens (default: 30) */
+  extraScrollHeight?: number;
+  /** Whether to enable keyboard avoidance on Android (default: true) */
+  enableOnAndroid?: boolean;
+  /** Style for the content container inside the scroll view */
+  contentContainerStyle?: ViewStyle;
 }
 
 export function ScreenWrapper({
@@ -45,6 +56,11 @@ export function ScreenWrapper({
   showThemeToggle = true,
   edges,
   stateConfig,
+  keyboardAvoiding = false,
+  keyboardShouldPersistTaps = 'handled',
+  extraScrollHeight = 30,
+  enableOnAndroid = true,
+  contentContainerStyle,
 }: ScreenWrapperProps) {
   const theme = useAppTheme();
 
@@ -107,13 +123,36 @@ export function ScreenWrapper({
             <ThemeToggleButton />
           </View>
         )}
-        <View style={[styles.content, padded && styles.padded, style]}>
-          {stateConfig ? (
-            <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
-          ) : (
-            children
-          )}
-        </View>
+        {keyboardAvoiding ? (
+          <KeyboardAwareScrollView
+            style={styles.keyboardScrollView}
+            contentContainerStyle={[
+              styles.scrollContainer,
+              padded && styles.padded,
+              contentContainerStyle,
+              style,
+            ]}
+            keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+            extraScrollHeight={extraScrollHeight}
+            enableOnAndroid={enableOnAndroid}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            {stateConfig ? (
+              <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
+            ) : (
+              children
+            )}
+          </KeyboardAwareScrollView>
+        ) : (
+          <View style={[styles.content, padded && styles.padded, style]}>
+            {stateConfig ? (
+              <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
+            ) : (
+              children
+            )}
+          </View>
+        )}
       </SafeAreaView>
     </View>
   );
@@ -132,6 +171,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
+  },
+  keyboardScrollView: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
   content: {
     flex: 1,

@@ -16,6 +16,7 @@ import { DcrPreference } from '@tejas96/shared';
 import { Route, type MainStackParamList } from '@/core/navigation';
 import { useTranslation } from '@/core/i18n';
 import { useActiveProperty } from '@/shared/hooks';
+import { useProjectMilestones } from '@/data';
 
 export interface TimelineStep {
   title: string;
@@ -59,13 +60,37 @@ export function useProjectLogic() {
     activeProperty,
     properties,
     isOnboarding: activePropOnboarding,
-    isLoading,
-    isError,
-    refetch,
+    isLoading: isActivePropertyLoading,
+    isError: isActivePropertyError,
+    refetch: refetchActiveProperty,
     latestQuoteVersion,
   } = useActiveProperty();
 
   const isOnboarding = activePropOnboarding || !activeProperty?.project;
+  const projectId = activeProperty?.project?.id || '';
+
+  const {
+    data: milestonesRaw,
+    isLoading: isMilestonesLoading,
+    isError: isMilestonesError,
+    refetch: refetchMilestones,
+  } = useProjectMilestones(projectId, {
+    enabled: !isOnboarding && !!projectId,
+  });
+
+  const isLoading =
+    isActivePropertyLoading ||
+    (!isOnboarding && !!projectId && isMilestonesLoading);
+  const isError =
+    isActivePropertyError ||
+    (!isOnboarding && !!projectId && isMilestonesError);
+
+  const refetch = async () => {
+    await refetchActiveProperty();
+    if (projectId) {
+      await refetchMilestones();
+    }
+  };
 
   // Build activeProject from real property/quote data only — no fallbacks.
   const activeProject = activeProperty
@@ -83,16 +108,78 @@ export function useProjectLogic() {
         startDate: activeProperty.project?.startDate || '',
         endDate: activeProperty.project?.endDate || '',
         progress: activeProperty.project?.progressPercentage || 0,
-        capacity: latestQuoteVersion?.systemSizeKw || 0,
+        capacity:
+          latestQuoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+          latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+          latestQuoteVersion?.actualSystemSizeKw ??
+          0,
         projectNumber: activeProperty.project?.projectNumber,
         property: activeProperty,
         quoteVersion: latestQuoteVersion,
       }
     : null;
 
-  // Timeline steps come from the backend API.
-  // No mock data — return empty until the project timeline API is integrated.
-  const timelineSteps: TimelineStep[] = [];
+  // Mapping from MilestoneAggregateItem to TimelineStep
+  const getMilestoneTitle = (name: string) => {
+    switch (name.toLowerCase()) {
+      case 'design':
+        return t('project.milestoneNames.design');
+      case 'planning':
+        return t('project.milestoneNames.planning');
+      case 'permits & approvals':
+      case 'permits approvals':
+        return t('project.milestoneNames.permitsApprovals');
+      case 'material procurement':
+        return t('project.milestoneNames.materialProcurement');
+      case 'installation':
+        return t('project.milestoneNames.installation');
+      case 'inspection':
+        return t('project.milestoneNames.inspection');
+      case 'commissioning':
+        return t('project.milestoneNames.commissioning');
+      case 'handover':
+        return t('project.milestoneNames.handover');
+      default:
+        return name;
+    }
+  };
+
+  const getStatusSubtitle = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return t('project.milestoneStatus.completed');
+      case 'in_progress':
+        return t('project.milestoneStatus.inProgress');
+      case 'blocked':
+        return t('project.milestoneStatus.blocked');
+      case 'no_tasks':
+        return t('project.milestoneStatus.noTasks');
+      default:
+        return t('project.milestoneStatus.pending');
+    }
+  };
+
+  const timelineSteps: TimelineStep[] = milestonesRaw
+    ? [...milestonesRaw]
+        .filter(m => m.totalTasks > 0)
+        .sort((a, b) => a.order - b.order)
+        .map(m => {
+          const mappedStatus: 'completed' | 'current' | 'pending' =
+            m.status === 'completed'
+              ? 'completed'
+              : m.status === 'in_progress' || m.status === 'blocked'
+              ? 'current'
+              : 'pending';
+
+          return {
+            title: getMilestoneTitle(m.name),
+            subtitle: getStatusSubtitle(m.status),
+            status: mappedStatus,
+            completedTasks: m.completedTasks,
+            totalTasks: m.totalTasks,
+          };
+        })
+    : [];
 
   // Derive specs from the accepted quote snapshot inputs.
   // Returns null for each section when no quote data is present.
@@ -104,7 +191,11 @@ export function useProjectLogic() {
   let structure: StructureSpecs | null = null;
 
   if (inputs) {
-    const capacity = latestQuoteVersion?.systemSizeKw ?? 0;
+    const capacity =
+      latestQuoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+      latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+      latestQuoteVersion?.actualSystemSizeKw ??
+      0;
     const dcrPref = inputs.dcrPreference;
 
     // DCR panels — only when the quote includes a DCR component
@@ -130,7 +221,7 @@ export function useProjectLogic() {
     // Inverter — derived from quote inputs
     if (capacity > 0) {
       inverter = {
-        capacity: `${capacity.toFixed(1)} kW`,
+        capacity: `${capacity.toFixed(2)} kW`,
         quantity: inputs.manualInverterCount
           ? `${inputs.manualInverterCount} Unit${
               inputs.manualInverterCount > 1 ? 's' : ''
@@ -158,8 +249,10 @@ export function useProjectLogic() {
 
   const handleBack = () => navigation.navigate(Route.HOME_TAB as any);
   const handleContactTeam = () => {
-    if (activeProject) {
-      navigation.navigate(Route.PROJECT_TEAM, { projectId: activeProject.id });
+    if (activeProperty?.project?.id) {
+      navigation.navigate(Route.PROJECT_TEAM, {
+        projectId: activeProperty.project.id,
+      });
     } else {
       Alert.alert(
         t('project.noActiveProjectTitle'),

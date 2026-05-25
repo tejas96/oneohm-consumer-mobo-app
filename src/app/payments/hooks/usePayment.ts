@@ -70,7 +70,12 @@ export function usePayment() {
           startDate: activeProperty.project.startDate || '',
           endDate: activeProperty.project.endDate || '',
           progress: activeProperty.project.progressPercentage || 0,
-          capacity: latestQuoteVersion?.systemSizeKw || 0,
+          capacity:
+            latestQuoteVersion?.quoteSnapshot?.calculation
+              ?.actualSystemSizeKw ??
+            latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+            latestQuoteVersion?.actualSystemSizeKw ??
+            0,
           projectNumber: activeProperty.project.projectNumber,
           property: activeProperty,
           quoteVersion: latestQuoteVersion,

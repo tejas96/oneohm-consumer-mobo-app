@@ -205,6 +205,23 @@ export const mr: Dictionary = {
     timelineTitle: 'प्रकल्प टाइमलाइन',
     specsTitle: 'तांत्रिक तपशील',
     tasksCount: '{completed}/{total} कामे',
+    milestoneStatus: {
+      pending: 'प्रलंबित',
+      inProgress: 'प्रगतीपथावर',
+      blocked: 'अवरोधित',
+      completed: 'पूर्ण झाले',
+      noTasks: 'कामे नाहीत',
+    },
+    milestoneNames: {
+      design: 'डिझाईन आणि अभियांत्रिकी',
+      planning: 'नियोजन',
+      permitsApprovals: 'परवानग्या आणि मंजुरी',
+      materialProcurement: 'साहित्य खरेदी',
+      installation: 'सौर इन्स्टॉलेशन',
+      inspection: 'तपासणी',
+      commissioning: 'कार्यान्वित करणे',
+      handover: 'हस्तांतरण',
+    },
     specs: {
       solarPanels: 'सौर पॅनेल्स',
       inverterDetails: 'इन्व्हर्टर तपशील',

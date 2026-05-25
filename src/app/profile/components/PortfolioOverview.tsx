@@ -28,7 +28,7 @@ export function PortfolioOverview({ aggregates, t }: PortfolioOverviewProps) {
       <View style={styles.statsGrid}>
         <CTCard variant="glass" style={styles.statsCard}>
           <Text style={[styles.statsValue, { color: theme.colors.primary }]}>
-            {aggregates.totalCapacity.toFixed(1)} kW
+            {aggregates.totalCapacity.toFixed(2)} kW
           </Text>
           <Text
             style={[

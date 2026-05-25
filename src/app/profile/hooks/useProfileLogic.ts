@@ -49,7 +49,13 @@ export function useProfileLogic() {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     )[0];
     const newestV = newestQ?.versions?.[0];
-    return sum + (newestV?.systemSizeKw || 0);
+    return (
+      sum +
+      (newestV?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+        newestV?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+        newestV?.actualSystemSizeKw ??
+        0)
+    );
   }, 0);
 
   const totalPaid = properties.reduce((sum, p) => {
@@ -98,7 +104,11 @@ export function useProfileLogic() {
         startDate: activeProperty.project?.startDate || '',
         endDate: activeProperty.project?.endDate || '',
         progress: activeProperty.project?.progressPercentage || 0,
-        capacity: latestQuoteVersion?.systemSizeKw || 0,
+        capacity:
+          latestQuoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+          latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+          latestQuoteVersion?.actualSystemSizeKw ??
+          0,
         projectNumber: activeProperty.project?.projectNumber,
         property: activeProperty,
         quoteVersion: latestQuoteVersion,

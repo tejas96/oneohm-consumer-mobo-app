@@ -63,7 +63,12 @@ export function PropertyCard({
     const latestVersion = sorted[0]?.versions?.[0];
 
     if (latestVersion) {
-      return `${latestVersion.systemSizeKw} kW · ${
+      const size =
+        latestVersion.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+        latestVersion.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+        latestVersion.actualSystemSizeKw ??
+        0;
+      return `${size} kW · ${
         latestVersion.projectType || property?.propertyType
       }`;
     }

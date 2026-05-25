@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { Dialog, Portal, Text } from 'react-native-paper';
 
 import {
@@ -45,6 +45,8 @@ export interface CTDialogProps {
   actions?: CTDialogAction[];
   /** Dismiss on backdrop tap (default: true) */
   dismissable?: boolean;
+  /** Whether the dialog should shift when keyboard opens (default: true) */
+  keyboardAvoiding?: boolean;
 }
 
 export function CTDialog({
@@ -55,59 +57,70 @@ export function CTDialog({
   children,
   actions = [],
   dismissable = true,
+  keyboardAvoiding = true,
 }: CTDialogProps) {
   const theme = useAppTheme();
 
+  const dialogContent = (
+    <Dialog
+      visible={visible}
+      onDismiss={onDismiss}
+      dismissable={dismissable}
+      style={[
+        styles.dialog,
+        {
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
+        },
+      ]}
+    >
+      <Dialog.Title style={[styles.title, { color: theme.colors.onSurface }]}>
+        {title}
+      </Dialog.Title>
+
+      {message || children ? (
+        <Dialog.Content style={styles.content}>
+          {message ? (
+            <Text
+              style={[styles.message, { color: theme.colors.onSurfaceVariant }]}
+            >
+              {message}
+            </Text>
+          ) : null}
+          {children}
+        </Dialog.Content>
+      ) : null}
+
+      {actions.length > 0 ? (
+        <Dialog.Actions style={styles.actions}>
+          {actions.map((action, i) => (
+            <CTButton
+              key={i}
+              variant={action.variant ?? (i === 0 ? 'ghost' : 'primary')}
+              size="sm"
+              onPress={action.onPress}
+              {...action.buttonProps}
+            >
+              {action.label}
+            </CTButton>
+          ))}
+        </Dialog.Actions>
+      ) : null}
+    </Dialog>
+  );
+
   return (
     <Portal>
-      <Dialog
-        visible={visible}
-        onDismiss={onDismiss}
-        dismissable={dismissable}
-        style={[
-          styles.dialog,
-          {
-            backgroundColor: theme.colors.surface,
-            borderColor: theme.colors.outlineVariant,
-          },
-        ]}
-      >
-        <Dialog.Title style={[styles.title, { color: theme.colors.onSurface }]}>
-          {title}
-        </Dialog.Title>
-
-        {message || children ? (
-          <Dialog.Content style={styles.content}>
-            {message ? (
-              <Text
-                style={[
-                  styles.message,
-                  { color: theme.colors.onSurfaceVariant },
-                ]}
-              >
-                {message}
-              </Text>
-            ) : null}
-            {children}
-          </Dialog.Content>
-        ) : null}
-
-        {actions.length > 0 ? (
-          <Dialog.Actions style={styles.actions}>
-            {actions.map((action, i) => (
-              <CTButton
-                key={i}
-                variant={action.variant ?? (i === 0 ? 'ghost' : 'primary')}
-                size="sm"
-                onPress={action.onPress}
-                {...action.buttonProps}
-              >
-                {action.label}
-              </CTButton>
-            ))}
-          </Dialog.Actions>
-        ) : null}
-      </Dialog>
+      {keyboardAvoiding ? (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.keyboardAvoidingView}
+        >
+          {dialogContent}
+        </KeyboardAvoidingView>
+      ) : (
+        dialogContent
+      )}
     </Portal>
   );
 }
@@ -133,5 +146,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
     gap: spacing.xs,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });
