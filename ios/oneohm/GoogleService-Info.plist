@@ -3,28 +3,28 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyBsf8Nm0Z0nbwgWVHtMkIc5oa1H4Hqez3c</string>
+	<string>AIzaSyBxYbdVevVra3wR7WfDdYE54lTcSaIE8_Q</string>
 	<key>GCM_SENDER_ID</key>
-	<string>173689119399</string>
+	<string>179839852522</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.oneohm.consumer</string>
 	<key>PROJECT_ID</key>
-	<string>oneohm-fa774</string>
+	<string>oneohm-prod</string>
 	<key>STORAGE_BUCKET</key>
-	<string>oneohm-fa774.firebasestorage.app</string>
+	<string>oneohm-prod.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:173689119399:ios:1371b3e2f88573b9927182</string>
+	<string>1:179839852522:ios:709157ebd9a12273251c93</string>
 </dict>
 </plist>

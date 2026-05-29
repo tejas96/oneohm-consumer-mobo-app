@@ -155,19 +155,23 @@ jobs:
         env:
           GITHUB_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
 
-      - name: Create staging .env
+      - name: Create CI .env
         env:
-          API_URL: ${{ secrets.STAGING_API_URL }}
+          API_URL: ${{ secrets.PRODUCTION_API_URL }}
         run: |
+          if [ -z "$API_URL" ]; then
+            echo "Missing secret: PRODUCTION_API_URL"
+            exit 1
+          fi
           {
-            echo "API_URL=${API_URL:-https://api.example.com}"
+            echo "API_URL=${API_URL}"
             echo "API_TIMEOUT=30000"
             echo "APP_NAME=OneOhm"
-            echo "APP_ENV=staging"
+            echo "APP_ENV=production"
             echo "ENABLE_ANALYTICS=false"
             echo "ENABLE_CRASH_REPORTING=true"
           } > .env
-          echo "✅ Staging .env created ($(wc -l < .env) vars)"
+          echo "CI .env created ($(wc -l < .env) vars)"
 
       - name: Build Android APK (Debug)
         run: |
@@ -253,5 +257,4 @@ jobs:
               repo: context.repo.repo,
               body: `📦 **Bundle Size**: ${size}\n\n_This is the JavaScript bundle size for Android._`
             });
-
 

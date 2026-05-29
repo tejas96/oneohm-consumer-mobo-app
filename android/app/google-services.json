@@ -1,32 +1,13 @@
 {
   "project_info": {
-    "project_number": "173689119399",
-    "project_id": "oneohm-fa774",
-    "storage_bucket": "oneohm-fa774.firebasestorage.app"
+    "project_number": "179839852522",
+    "project_id": "oneohm-prod",
+    "storage_bucket": "oneohm-prod.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:173689119399:android:464c14ade3f596fe927182",
-        "android_client_info": {
-          "package_name": "com.oneohm.app"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyABsBl9-hk8UqHHTUrG4FK94achV5n4EXo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:173689119399:android:0024d9786f53841a927182",
+        "mobilesdk_app_id": "1:179839852522:android:5d25509200601317251c93",
         "android_client_info": {
           "package_name": "com.oneohm.consumer"
         }
@@ -34,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyABsBl9-hk8UqHHTUrG4FK94achV5n4EXo"
+          "current_key": "AIzaSyCDcyoz9kT_lmWFnCDT83kS6OhPg_yi598"
         }
       ],
       "services": {
