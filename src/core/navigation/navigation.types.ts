@@ -74,11 +74,51 @@ export type MainStackParamList = {
   [Route.SUPPORT]: undefined;
   [Route.WARRANTY]: undefined;
   [Route.PROJECT_TEAM]: { projectId: string };
+
+  // ── Customer Flow ────────────────────────────────────────────────────
+  // CustomerFlowResolver (T6) mounts as the first screen in MainNavigator,
+  // replacing the direct MAIN_TABS mount. All journey screens are siblings
+  // here so the resolver can navigate.replace() without re-parenting later.
+  [Route.FLOW_RESOLVER]: undefined;
+  [Route.PROPERTY_PENDING]: undefined;
+  [Route.PROPERTY_SELECTION]: undefined;
+  [Route.QUOTATION_PENDING]: QuotationPendingParams;
+  [Route.QUOTATION_DETAIL]: QuotationDetailParams;
+  [Route.QUOTATION_LIST]: QuotationListParams;
+  [Route.QUOTATION_REJECTED]: QuotationRejectedParams;
+  [Route.PROJECT_PENDING]: ProjectPendingParams;
 };
 
 /** Params for viewing a project's details */
 export interface ProjectDetailParams {
   projectId: string;
+}
+
+/** Params for the quotation-pending screen (property is known at this point) */
+export interface QuotationPendingParams {
+  propertyId: string;
+}
+
+/** Params for viewing a single quotation's details */
+export interface QuotationDetailParams {
+  quotationId: string;
+  propertyId: string;
+}
+
+/** Params for the quotation list (all quotes for a property) */
+export interface QuotationListParams {
+  propertyId: string;
+}
+
+/** Params for the all-rejected screen (leads to Call OneOhm CTA) */
+export interface QuotationRejectedParams {
+  propertyId: string;
+}
+
+/** Params for the project-pending screen (accepted quote exists, project not yet created) */
+export interface ProjectPendingParams {
+  propertyId: string;
+  quotationId: string;
 }
 
 // ============================================

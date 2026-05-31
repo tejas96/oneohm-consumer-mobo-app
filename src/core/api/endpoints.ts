@@ -68,6 +68,14 @@ export const API_ENDPOINTS = {
   },
 
   // ============================================
+  // CONSUMER (customer-safe API — T3 backend)
+  // ============================================
+  CONSUMER: {
+    /** GET — Logged-in customer's properties (quotes + project eager-loaded) */
+    PROPERTIES: '/consumer/properties',
+  },
+
+  // ============================================
   // CUSTOMER PROPERTIES
   // ============================================
   CUSTOMER_PROPERTIES: {
