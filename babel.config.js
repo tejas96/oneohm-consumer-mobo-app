@@ -1,3 +1,5 @@
+const isTest = process.env.NODE_ENV === 'test';
+
 module.exports = {
   presets: ['module:@react-native/babel-preset'],
   plugins: [
@@ -19,7 +21,7 @@ module.exports = {
         },
       },
     ],
-    [
+    !isTest && [
       'module:react-native-dotenv',
       {
         envName: 'APP_ENV',
@@ -30,5 +32,5 @@ module.exports = {
       },
     ],
     'react-native-reanimated/plugin',
-  ],
+  ].filter(Boolean),
 };

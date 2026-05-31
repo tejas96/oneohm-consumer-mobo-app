@@ -75,17 +75,3 @@ jest.mock('@react-native-firebase/messaging', () => {
     getMessaging: jest.fn(() => mockMessagingInstance),
   };
 });
-
-// Mock @env environment variables for testing context
-jest.mock(
-  '@env',
-  () => ({
-    API_URL: 'https://staging.api.oneohm.com',
-    API_TIMEOUT: '30000',
-    APP_NAME: 'OneOhmTest',
-    APP_ENV: 'development',
-    ENABLE_ANALYTICS: 'false',
-    ENABLE_CRASH_REPORTING: 'false',
-  }),
-  { virtual: true },
-);
