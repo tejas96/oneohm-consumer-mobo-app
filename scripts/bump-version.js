@@ -141,6 +141,28 @@ function updateBuildGradle(newVersion, newVersionCode) {
   fs.writeFileSync(GRADLE_PATH, gradle, 'utf8');
 }
 
+function updateAppVersionTs(newVersion) {
+  const appVersionPath = path.join(
+    ROOT,
+    'src',
+    'core',
+    'config',
+    'app-version.ts',
+  );
+  if (fs.existsSync(appVersionPath)) {
+    let content = fs.readFileSync(appVersionPath, 'utf8');
+    content = content.replace(
+      /APP_VERSION\s*=\s*'[^']+'/,
+      `APP_VERSION = '${newVersion}'`,
+    );
+    content = content.replace(
+      /APP_VERSION\s*=\s*"[^"]+"/,
+      `APP_VERSION = "${newVersion}"`,
+    );
+    fs.writeFileSync(appVersionPath, content, 'utf8');
+  }
+}
+
 function setOutput(key, value) {
   const outputFile = process.env.GITHUB_OUTPUT;
   if (outputFile) {
@@ -183,6 +205,7 @@ function main() {
 
   updatePackageJson(newVersion);
   updateBuildGradle(newVersion, newVersionCode);
+  updateAppVersionTs(newVersion);
 
   setOutput('version', newVersion);
   setOutput('bump-type', bumpType);

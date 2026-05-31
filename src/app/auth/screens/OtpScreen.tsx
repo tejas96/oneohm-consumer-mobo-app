@@ -5,12 +5,7 @@
  */
 
 import React, { useRef } from 'react';
-import {
-  StyleSheet,
-  View,
-  TextInput as RNTextInput,
-  Pressable,
-} from 'react-native';
+import { StyleSheet, View, TextInput as RNTextInput } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 
 import { ScreenWrapper, CTButton } from '@/shared/components';
@@ -28,29 +23,23 @@ export function OtpScreen() {
     handleResendOtp,
     handleGoBack,
     formatTimer,
+    isInputFocused,
+    setIsInputFocused,
     t,
   } = useOtpScreenLogic();
   const theme = useAppTheme();
   const inputRef = useRef<RNTextInput>(null);
 
-  const handleBoxPress = () => {
-    inputRef.current?.blur();
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 50);
-  };
-
   const renderOtpBoxes = () => {
     const boxes = [];
     for (let i = 0; i < 6; i++) {
       const char = otp[i] || '';
-      const isFocused = otp.length === i;
+      const isFocused = isInputFocused && otp.length === i;
       const isFilled = otp.length > i;
 
       boxes.push(
-        <Pressable
+        <View
           key={i}
-          onPress={handleBoxPress}
           style={[
             styles.otpBox,
             {
@@ -66,7 +55,7 @@ export function OtpScreen() {
           <Text style={[styles.otpText, { color: theme.colors.onBackground }]}>
             {char || (isFocused ? '' : '·')}
           </Text>
-        </Pressable>,
+        </View>,
       );
     }
     return boxes;
@@ -128,6 +117,16 @@ export function OtpScreen() {
             style={styles.hiddenInput}
             caretHidden
             autoFocus
+            textContentType="oneTimeCode"
+            autoComplete="sms-otp"
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            underlineColorAndroid="transparent"
+            importantForAutofill="yes"
+            selectionColor="transparent"
           />
         </View>
 
@@ -250,10 +249,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   hiddenInput: {
-    position: 'absolute',
-    width: 1,
-    height: 1,
-    opacity: 0,
+    ...StyleSheet.absoluteFill,
+    opacity: 1,
+    color: 'transparent',
+    backgroundColor: 'transparent',
   },
   resendContainer: {
     alignItems: 'center',

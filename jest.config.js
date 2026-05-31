@@ -12,4 +12,7 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!((jest-)?react-native|react-native-[\\w.-]+|@react-native(-community)?|@react-native-firebase|@react-native-async-storage|@react-navigation|@tanstack|zustand)/)',
   ],
+  moduleNameMapper: {
+    '^@env$': '<rootDir>/jest.env.js',
+  },
 };

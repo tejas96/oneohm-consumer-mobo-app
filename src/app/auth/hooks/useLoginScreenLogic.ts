@@ -13,6 +13,7 @@ import { Route, useAppNavigation } from '@/core/navigation';
 import { useRequestOtp } from '@/data/resources/auth.resource';
 import { useTranslation } from '@/core/i18n';
 import { normalizePhoneToE164 } from '@/shared/utils/format';
+import { mapToUserFriendlyError } from '@/core/api/error-mapper';
 
 export function useLoginScreenLogic() {
   const [phone, setPhone] = useState('');
@@ -41,10 +42,11 @@ export function useLoginScreenLogic() {
           navigation.navigate(Route.OTP, { phone: formattedPhone });
         },
         onError: error => {
+          const userFriendly = mapToUserFriendlyError(error);
           Toast.show({
             type: 'error',
-            text1: t('common.error'),
-            text2: error.message || 'Failed to send OTP. Please try again.',
+            text1: userFriendly.title,
+            text2: userFriendly.description,
           });
         },
       },

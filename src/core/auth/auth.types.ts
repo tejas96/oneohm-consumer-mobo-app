@@ -19,7 +19,8 @@ export interface OtpRequestPayload {
 /** OTP request response */
 export interface OtpRequestResponse {
   message: string;
-  expiresIn: number;
+  expiresIn?: number;
+  retryAfter?: number;
 }
 
 /** OTP verification payload */
