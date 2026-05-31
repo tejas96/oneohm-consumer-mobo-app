@@ -143,7 +143,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json android/app/build.gradle distribution/whatsnew/
+          git add package.json android/app/build.gradle src/core/config/app-version.ts distribution/whatsnew/
           if git diff --cached --quiet; then
             echo "No changes to commit -- skipping push"
           else

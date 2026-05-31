@@ -16,11 +16,13 @@ import type { AuthStackParamList } from '@/core/navigation';
 import { Route } from '@/core/navigation';
 import { useVerifyOtp, useRequestOtp } from '@/data/resources/auth.resource';
 import { useTranslation } from '@/core/i18n';
+import { mapToUserFriendlyError } from '@/core/api/error-mapper';
 
 export function useOtpScreenLogic() {
   const { params } = useRoutes<Route.OTP>();
   const phone = (params as AuthStackParamList[Route.OTP])?.phone ?? '';
   const [otp, setOtp] = useState('');
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [timer, setTimer] = useState(30);
   const navigation = useAppNavigation();
   const verifyOtp = useVerifyOtp();
@@ -76,10 +78,11 @@ export function useOtpScreenLogic() {
       },
       {
         onError: error => {
+          const userFriendly = mapToUserFriendlyError(error);
           Toast.show({
             type: 'error',
-            text1: t('common.error'),
-            text2: error.message || 'OTP verification failed',
+            text1: userFriendly.title,
+            text2: userFriendly.description,
           });
         },
       },
@@ -119,10 +122,11 @@ export function useOtpScreenLogic() {
           startTimer();
         },
         onError: error => {
+          const userFriendly = mapToUserFriendlyError(error);
           Toast.show({
             type: 'error',
-            text1: t('common.error'),
-            text2: error.message || 'Failed to resend OTP',
+            text1: userFriendly.title,
+            text2: userFriendly.description,
           });
         },
       },
@@ -149,6 +153,8 @@ export function useOtpScreenLogic() {
     handleResendOtp,
     handleGoBack,
     formatTimer,
+    isInputFocused,
+    setIsInputFocused,
     t,
   };
 }

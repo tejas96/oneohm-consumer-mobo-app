@@ -47,13 +47,13 @@ export function useOnboardingScreenLogic() {
       title: t('onboarding.slide3.title'),
       subtitle: t('onboarding.slide3.subtitle'),
       accentColor: theme.colors.brandPurple, // Brand Purple
-      lottieFile: require('@/assets/animations/lottie/slide3_team.json'),
+      lottieFile: require('@/assets/animations/lottie/Office worker team work hello office waves.json'),
     },
     {
       title: t('onboarding.slide4.title'),
       subtitle: t('onboarding.slide4.subtitle'),
       accentColor: theme.colors.warningText, // Amber (warning state)
-      lottieFile: require('@/assets/animations/lottie/slide4_payments.json'),
+      lottieFile: require('@/assets/animations/lottie/Scanning Document.json'),
     },
     {
       title: t('onboarding.slide5.title'),

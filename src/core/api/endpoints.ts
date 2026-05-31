@@ -76,6 +76,14 @@ export const API_ENDPOINTS = {
     /** GET — Get property by ID */
     GET: (id: string) => `/customer-properties/${id}`,
   },
+
+  // ============================================
+  // APP CONFIG (Public)
+  // ============================================
+  APP_CONFIG: {
+    /** GET — Check mobile app version */
+    VERSION_CHECK: '/app-config/version-check',
+  },
 } as const;
 
 export type ApiEndpointModule = keyof typeof API_ENDPOINTS;

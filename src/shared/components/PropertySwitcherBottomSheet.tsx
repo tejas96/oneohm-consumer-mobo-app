@@ -51,14 +51,15 @@ export const PropertySwitcherBottomSheet = forwardRef<
   const theme = useAppTheme();
 
   const sheetRef = useRef<BottomSheet>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   const snapPoints = useMemo(() => ['70%', '85%'], []);
 
   useImperativeHandle(ref, () => ({
     open: () => {
+      setIsMounted(true);
       setIsVisible(true);
-      sheetRef.current?.snapToIndex(1);
       refetch().catch(err => {
         if (__DEV__) console.warn('Failed to refetch properties:', err);
       });
@@ -70,6 +71,7 @@ export const PropertySwitcherBottomSheet = forwardRef<
 
   const handleSheetChange = useCallback((index: number) => {
     if (index === -1) {
+      setIsMounted(false);
       setIsVisible(false);
     } else {
       setIsVisible(true);
@@ -108,6 +110,7 @@ export const PropertySwitcherBottomSheet = forwardRef<
 
   if (!isFocused) return null;
   if (!isFetching && properties.length <= 1) return null;
+  if (!isMounted) return null;
 
   return (
     <Portal>
@@ -117,7 +120,7 @@ export const PropertySwitcherBottomSheet = forwardRef<
       >
         <BottomSheet
           ref={sheetRef}
-          index={-1}
+          index={isVisible ? 1 : -1}
           snapPoints={snapPoints}
           onChange={handleSheetChange}
           backdropComponent={renderBackdrop}
