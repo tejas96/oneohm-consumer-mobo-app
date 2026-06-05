@@ -12,7 +12,10 @@
  */
 
 import React from 'react';
-import { createBottomTabNavigator, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+  type BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 
 import { HomeScreen } from '@/app/home/screens/HomeScreen';
 import { ProjectScreen } from '@/app/project/screens/ProjectScreen';
@@ -33,10 +36,7 @@ export function MainTabNavigator() {
   const { t } = useTranslation();
 
   return (
-    <Tab.Navigator
-      tabBar={renderTabBar}
-      screenOptions={{ headerShown: false }}
-    >
+    <Tab.Navigator tabBar={renderTabBar} screenOptions={{ headerShown: false }}>
       <Tab.Screen
         name={Route.HOME_TAB}
         component={HomeScreen}
