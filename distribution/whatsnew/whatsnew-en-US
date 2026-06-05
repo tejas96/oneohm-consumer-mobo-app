@@ -1,3 +1,4 @@
-What's new in v0.2.0:
+What's new in v0.3.0:
 
-• Implement force update, maintenance mode, and app versioning system with improved auth error handling
+• Implement new consumer quotation flow, project selection, and status management modules
+• Add consumer property selection and customer flow management with new API endpoints and state management
