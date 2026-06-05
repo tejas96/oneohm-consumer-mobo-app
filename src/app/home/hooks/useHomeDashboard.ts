@@ -125,12 +125,12 @@ export function useHomeDashboard() {
   const totalValue = Number(latestQuoteVersion?.finalPrice ?? 0);
   const amountPaid = Number(
     financialSummary?.totalReceived ??
-    readMetadataAmountPaid(activeProperty?.project?.metadata)
+      readMetadataAmountPaid(activeProperty?.project?.metadata),
   );
   const subsidy = Number(
     latestQuoteVersion?.pricingBreakdown?.subsidyAmount ??
-    latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ??
-    0
+      latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ??
+      0,
   );
   const outstanding = Math.max(0, totalValue - amountPaid);
   const netCost = totalValue - subsidy;

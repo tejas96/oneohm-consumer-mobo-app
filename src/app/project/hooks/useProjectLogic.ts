@@ -248,7 +248,9 @@ export function useProjectLogic() {
       inverter = {
         inverters: items,
         phaseType: inputs.phaseType || '',
-        totalCapacity: `${Number(calculation.inverters.totalCapacityKw || 0).toFixed(2)} kW`,
+        totalCapacity: `${Number(
+          calculation.inverters.totalCapacityKw || 0,
+        ).toFixed(2)} kW`,
       };
     } else if (capacity > 0) {
       // Fallback to inputs-based inverter specs
