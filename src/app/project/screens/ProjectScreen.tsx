@@ -4,12 +4,12 @@ import { Text, IconButton } from 'react-native-paper';
 
 import {
   ScreenWrapper,
-  CTOnboardingPlaceholder,
   CTCard,
   CTButton,
   CTPremiumHeader,
   CTProgressCircle,
   CTChip,
+  CTStateWrapper,
 } from '@/shared/components';
 import {
   spacing,
@@ -17,6 +17,7 @@ import {
   fontWeight,
   borderRadius,
   useAppTheme,
+  lineHeight,
 } from '@/shared/theme';
 
 import { useTranslation } from '@/core/i18n';
@@ -35,7 +36,6 @@ export function ProjectScreen() {
   const { t } = useTranslation();
   const {
     activeProject,
-    isOnboarding,
     isLoading,
     isError,
     refetch,
@@ -54,18 +54,6 @@ export function ProjectScreen() {
     specsData.structure !== null;
 
   const renderContent = () => {
-    if (isOnboarding) {
-      return (
-        <CTOnboardingPlaceholder
-          title={t('project.onboardingTitle')}
-          description={t('project.onboardingDesc')}
-          lottieSource={require('@/assets/animations/lottie/Tracking my package.json')}
-          statusText={t('project.onboardingStage')}
-          status="warning"
-        />
-      );
-    }
-
     const isCompleted = activeProject?.status === 'COMPLETED';
     const progress = isCompleted ? 100 : activeProject?.progress ?? 0;
     const capacity = activeProject?.capacity ?? 0;
@@ -86,6 +74,7 @@ export function ProjectScreen() {
             size={192}
             strokeWidth={10}
             trackWidth={6}
+            isWavy={true}
           >
             <Text
               style={[
@@ -197,18 +186,6 @@ export function ProjectScreen() {
       padded={false}
       edges={['top', 'left', 'right']}
       showThemeToggle={false}
-      stateConfig={{
-        state: isLoading ? 'loading' : isError ? 'error' : 'success',
-        loadingConfig: {
-          message: t('common.stateConfig.loadingProject'),
-        },
-        errorConfig: {
-          title: t('common.stateConfig.errorTitleProject'),
-          message: t('common.stateConfig.errorMessage'),
-          retryText: t('common.retry'),
-          onRetry: refetch,
-        },
-      }}
     >
       <CTPremiumHeader
         title={t('project.title')}
@@ -217,7 +194,22 @@ export function ProjectScreen() {
         onSwitchProject={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
-      <View style={styles.container}>{renderContent()}</View>
+      <View style={styles.container}>
+        <CTStateWrapper
+          state={isLoading ? 'loading' : isError ? 'error' : 'success'}
+          loadingConfig={{
+            message: t('common.stateConfig.loadingProject'),
+          }}
+          errorConfig={{
+            title: t('common.stateConfig.errorTitleProject'),
+            message: t('common.stateConfig.errorMessage'),
+            retryText: t('common.retry'),
+            onRetry: refetch,
+          }}
+        >
+          {renderContent()}
+        </CTStateWrapper>
+      </View>
       <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );
@@ -240,17 +232,17 @@ const styles = StyleSheet.create({
     marginVertical: spacing.lg,
   },
   progressSystemSize: {
-    fontSize: 10,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
     opacity: 0.7,
   },
   progressPercentage: {
-    fontSize: 36,
+    fontSize: fontSize.display,
     fontWeight: fontWeight.black,
-    lineHeight: 40,
-    marginVertical: 4,
+    lineHeight: lineHeight.display,
+    marginVertical: spacing['2xs'],
     letterSpacing: -1,
   },
   chipMargin: {

@@ -4,7 +4,13 @@ import { Text, IconButton } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
 import type { Project } from '@/data/types';
-import { spacing, fontWeight, useAppTheme } from '@/shared/theme';
+import {
+  spacing,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  useAppTheme,
+} from '@/shared/theme';
 
 interface BannerAlertProps {
   activeProject: Project;
@@ -160,7 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
-    marginTop: 2,
+    marginTop: spacing.micro,
   },
   icon: {
     margin: 0,
@@ -170,21 +176,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   successTitle: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   warningTitle: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   messageText: {
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: 2,
+    fontSize: fontSize.body,
+    lineHeight: lineHeight.body,
+    marginTop: spacing.micro,
     fontWeight: fontWeight.medium,
   },
   pingRow: {
@@ -199,7 +205,7 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   pingText: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
     opacity: 0.7,
   },
@@ -209,7 +215,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   reviewLinkText: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
   },
   arrow: {

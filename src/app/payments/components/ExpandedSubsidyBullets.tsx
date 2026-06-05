@@ -9,8 +9,13 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import { useTranslation, type TranslationKey } from '@/core/i18n';
-import { useAppTheme } from '@/shared/theme';
-import { spacing, fontWeight } from '@/shared/theme';
+import {
+  spacing,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  useAppTheme,
+} from '@/shared/theme';
 
 export interface ExpandedSubsidyBulletsProps {
   infoTextKey?: TranslationKey;
@@ -65,7 +70,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   detailsHeading: {
-    fontSize: 9.5,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -80,13 +85,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   bulletDot: {
-    fontSize: 12,
-    marginRight: 6,
-    lineHeight: 14,
+    fontSize: fontSize.caption,
+    marginRight: spacing['2xs'] + 2,
+    lineHeight: lineHeight.caption,
   },
   bulletText: {
-    fontSize: 9.5,
+    fontSize: fontSize.xs,
     flex: 1,
-    lineHeight: 14,
+    lineHeight: lineHeight.caption,
   },
 });

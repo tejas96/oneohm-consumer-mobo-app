@@ -23,7 +23,13 @@ import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 export interface ActiveProjectSummary {
   label: string;
   status: string;
-  property?: { city?: string };
+  property?: {
+    city?: string;
+    address?: string;
+    discomName?: string;
+    consumerNumber?: string;
+    consumerName?: string;
+  };
 }
 
 export interface CTPremiumHeaderProps {

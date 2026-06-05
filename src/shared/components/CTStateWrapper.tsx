@@ -12,7 +12,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Icon, Text } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
-import sandyLoadingAnimation from '@/assets/animations/lottie/Sandy Loading.json';
+const sandyLoadingAnimation = require('@/assets/animations/lottie/Sandy Loading.json');
 
 import {
   spacing,

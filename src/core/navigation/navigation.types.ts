@@ -68,18 +68,32 @@ export type MainTabParamList = {
 
 export type MainStackParamList = {
   [Route.MAIN_TABS]: NavigatorScreenParams<MainTabParamList> | undefined;
-  [Route.NOTIFICATIONS]: undefined;
-  [Route.SETTINGS]: undefined;
-  [Route.PROJECT_DETAIL]: ProjectDetailParams;
   [Route.SUPPORT]: undefined;
-  [Route.WARRANTY]: undefined;
   [Route.PROJECT_TEAM]: { projectId: string };
+  [Route.PROJECT_CHAT]: { projectId: string };
+  [Route.QUOTATION_DETAIL]: QuotationDetailParams;
+  [Route.QUOTATION_LIST]: QuotationListParams;
 };
 
-/** Params for viewing a project's details */
-export interface ProjectDetailParams {
-  projectId: string;
+/** Params for viewing a single quotation's details */
+export interface QuotationDetailParams {
+  quotationId: string;
+  propertyId: string;
 }
+
+/** Params for the quotation list (all quotes for a property) */
+export interface QuotationListParams {
+  propertyId: string;
+}
+
+// ============================================
+// Quotation Stack (quotation_active nested navigator)
+// ============================================
+
+export type QuotationStackParamList = {
+  [Route.QUOTATION_DETAIL]: QuotationDetailParams;
+  [Route.QUOTATION_LIST]: QuotationListParams;
+};
 
 // ============================================
 // Composite Root Param List

@@ -19,6 +19,7 @@ export interface ProjectSpecsProps {
 }
 
 export function ProjectSpecs({ specs }: ProjectSpecsProps) {
+  const { dcrPanels, nonDcrPanels, inverter, structure } = specs;
   const theme = useAppTheme();
   const { t } = useTranslation();
   const [expandedSections, setExpandedSections] = useState<
@@ -34,16 +35,16 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
 
   // Derive Solar Panels Subtitle
   let panelsSubtitle = '';
-  if (specs.dcrPanels && !specs.nonDcrPanels) {
-    panelsSubtitle = `${specs.dcrPanels.brand} · ${t(
+  if (dcrPanels && !nonDcrPanels) {
+    panelsSubtitle = `${dcrPanels.brand} · ${t(
       'project.specs.panelUnit',
-    ).replace('{count}', String(specs.dcrPanels.count))}`;
-  } else if (!specs.dcrPanels && specs.nonDcrPanels) {
-    panelsSubtitle = `${specs.nonDcrPanels.brand} · ${t(
+    ).replace('{count}', String(dcrPanels.count))}`;
+  } else if (!dcrPanels && nonDcrPanels) {
+    panelsSubtitle = `${nonDcrPanels.brand} · ${t(
       'project.specs.panelUnit',
-    ).replace('{count}', String(specs.nonDcrPanels.count))}`;
-  } else if (specs.dcrPanels && specs.nonDcrPanels) {
-    const totalCount = specs.dcrPanels.count + specs.nonDcrPanels.count;
+    ).replace('{count}', String(nonDcrPanels.count))}`;
+  } else if (dcrPanels && nonDcrPanels) {
+    const totalCount = dcrPanels.count + nonDcrPanels.count;
     panelsSubtitle = `${t('project.specs.dcrTitle')} + ${t(
       'project.specs.nonDcrTitle',
     )} (${totalCount})`;
@@ -109,7 +110,7 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
   return (
     <View style={styles.specsListContainer}>
       {/* 1. Solar Panels Collapsible Card — only when panel data exists */}
-      {(specs.dcrPanels || specs.nonDcrPanels) && (
+      {(dcrPanels || nonDcrPanels) && (
         <CTCard
           variant="glass"
           style={styles.specCollapseCard}
@@ -163,12 +164,9 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
                 { borderTopColor: theme.colors.outlineVariant },
               ]}
             >
-              {specs.dcrPanels &&
-                renderPanelCompartment(
-                  t('project.specs.dcrTitle'),
-                  specs.dcrPanels,
-                )}
-              {specs.dcrPanels && specs.nonDcrPanels && (
+              {dcrPanels &&
+                renderPanelCompartment(t('project.specs.dcrTitle'), dcrPanels)}
+              {dcrPanels && nonDcrPanels && (
                 <View
                   style={[
                     styles.divider,
@@ -176,10 +174,10 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
                   ]}
                 />
               )}
-              {specs.nonDcrPanels &&
+              {nonDcrPanels &&
                 renderPanelCompartment(
                   t('project.specs.nonDcrTitle'),
-                  specs.nonDcrPanels,
+                  nonDcrPanels,
                 )}
             </View>
           )}
@@ -187,7 +185,7 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
       )}
 
       {/* 2. Inverter Details Collapsible Card — only when inverter data exists */}
-      {specs.inverter && (
+      {inverter && (
         <CTCard
           variant="glass"
           style={styles.specCollapseCard}
@@ -223,8 +221,14 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
                 numberOfLines={1}
               >
                 {t('project.specs.inverterSubtitle')
-                  .replace('{brand}', specs.inverter.brand)
-                  .replace('{capacity}', specs.inverter.capacity)}
+                  .replace(
+                    '{brand}',
+                    inverter.inverters
+                      .map(i => i.brand)
+                      .filter(Boolean)
+                      .join(', ') || 'Inverter',
+                  )
+                  .replace('{capacity}', inverter.totalCapacity)}
               </Text>
             </View>
             <IconButton
@@ -243,79 +247,129 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
                 { borderTopColor: theme.colors.outlineVariant },
               ]}
             >
-              <View style={styles.specGrid}>
-                <View style={styles.specRow}>
-                  <Text
-                    style={[
-                      styles.specLabel,
-                      { color: theme.colors.onSurfaceVariant },
-                    ]}
-                  >
-                    {t('project.specs.brand')}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.specValue,
-                      { color: theme.colors.onSurface },
-                    ]}
-                  >
-                    {specs.inverter.brand}
-                  </Text>
-                </View>
-                <View style={styles.specRow}>
-                  <Text
-                    style={[
-                      styles.specLabel,
-                      { color: theme.colors.onSurfaceVariant },
-                    ]}
-                  >
-                    {t('project.specs.capacity')}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.specValue,
-                      { color: theme.colors.onSurface },
-                    ]}
-                  >
-                    {specs.inverter.capacity}
-                  </Text>
-                </View>
-                <View style={styles.specRow}>
-                  <Text
-                    style={[
-                      styles.specLabel,
-                      { color: theme.colors.onSurfaceVariant },
-                    ]}
-                  >
-                    {t('project.specs.quantity')}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.specValue,
-                      { color: theme.colors.onSurface },
-                    ]}
-                  >
-                    {specs.inverter.quantity}
-                  </Text>
-                </View>
-                <View style={styles.specRow}>
-                  <Text
-                    style={[
-                      styles.specLabel,
-                      { color: theme.colors.onSurfaceVariant },
-                    ]}
-                  >
-                    {t('project.specs.phaseType')}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.specValue,
-                      { color: theme.colors.onSurface },
-                    ]}
-                  >
-                    {specs.inverter.phaseType}
-                  </Text>
-                </View>
+              {/* If there are multiple inverters, render them as compartments */}
+              {inverter.inverters.map((inv, idx) => (
+                <React.Fragment key={idx}>
+                  {idx > 0 && (
+                    <View
+                      style={[
+                        styles.divider,
+                        { backgroundColor: theme.colors.outlineVariant },
+                      ]}
+                    />
+                  )}
+                  <View style={styles.compartmentContainer}>
+                    {inverter.inverters.length > 1 && (
+                      <Text
+                        style={[
+                          styles.compartmentTitle,
+                          { color: theme.colors.primary },
+                        ]}
+                      >
+                        {inv.name}
+                      </Text>
+                    )}
+                    <View style={styles.specGrid}>
+                      <View style={styles.specRow}>
+                        <Text
+                          style={[
+                            styles.specLabel,
+                            { color: theme.colors.onSurfaceVariant },
+                          ]}
+                        >
+                          {t('project.specs.brand')}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.specValue,
+                            { color: theme.colors.onSurface },
+                          ]}
+                        >
+                          {inv.brand}
+                        </Text>
+                      </View>
+                      <View style={styles.specRow}>
+                        <Text
+                          style={[
+                            styles.specLabel,
+                            { color: theme.colors.onSurfaceVariant },
+                          ]}
+                        >
+                          {t('project.specs.capacity')}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.specValue,
+                            { color: theme.colors.onSurface },
+                          ]}
+                        >
+                          {inv.capacity}
+                        </Text>
+                      </View>
+                      <View style={styles.specRow}>
+                        <Text
+                          style={[
+                            styles.specLabel,
+                            { color: theme.colors.onSurfaceVariant },
+                          ]}
+                        >
+                          {t('project.specs.quantity')}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.specValue,
+                            { color: theme.colors.onSurface },
+                          ]}
+                        >
+                          {inv.quantity}
+                        </Text>
+                      </View>
+                      {!!inv.warranty && (
+                        <View style={styles.specRow}>
+                          <Text
+                            style={[
+                              styles.specLabel,
+                              { color: theme.colors.onSurfaceVariant },
+                            ]}
+                          >
+                            {t('project.specs.warranty')}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.specValue,
+                              { color: theme.colors.onSurface },
+                            ]}
+                          >
+                            {inv.warranty}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                </React.Fragment>
+              ))}
+
+              {/* Render Phase Type at the bottom */}
+              <View
+                style={[
+                  styles.divider,
+                  { backgroundColor: theme.colors.outlineVariant },
+                ]}
+              />
+              <View style={styles.specRow}>
+                <Text
+                  style={[
+                    styles.specLabel,
+                    { color: theme.colors.onSurfaceVariant },
+                  ]}
+                >
+                  {t('project.specs.phaseType')}
+                </Text>
+                <Text
+                  style={[styles.specValue, { color: theme.colors.onSurface }]}
+                >
+                  {inverter.phaseType}
+                </Text>
               </View>
             </View>
           )}
@@ -323,7 +377,7 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
       )}
 
       {/* 3. Mounting Structure Collapsible Card — only when structure data exists */}
-      {specs.structure && (
+      {structure && (
         <CTCard
           variant="glass"
           style={styles.specCollapseCard}
@@ -356,7 +410,7 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
               >
                 {t('project.specs.structureSubtitle').replace(
                   '{type}',
-                  specs.structure.structureType,
+                  structure.structureType,
                 )}
               </Text>
             </View>
@@ -392,7 +446,7 @@ export function ProjectSpecs({ specs }: ProjectSpecsProps) {
                       { color: theme.colors.onSurface },
                     ]}
                   >
-                    {specs.structure.structureType}
+                    {structure.structureType}
                   </Text>
                 </View>
               </View>
@@ -433,7 +487,7 @@ const styles = StyleSheet.create({
   },
   specSubtitleText: {
     fontSize: fontSize.caption,
-    marginTop: 2,
+    marginTop: spacing.micro,
   },
   chevronIcon: {
     margin: 0,

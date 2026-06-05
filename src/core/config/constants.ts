@@ -46,3 +46,9 @@ export const STORAGE_KEYS = {
 export const TOKEN_REFRESH = {
   TIMEOUT_MS: 10_000,
 } as const;
+
+/** Customer-facing contact details */
+export const CONTACT = {
+  /** OneOhm customer support line (E.164) — same as oneohm-mobile LoginScreen */
+  SUPPORT_PHONE: '+919850808484',
+} as const;

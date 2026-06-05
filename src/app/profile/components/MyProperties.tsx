@@ -53,13 +53,12 @@ function resolvePropertyUI(
   );
   const latestVersion = sorted[0]?.versions?.[0];
 
-  // Capacity text
   const capacityText = latestVersion
-    ? `${(
+    ? `${Number(
         latestVersion.quoteSnapshot?.calculation?.actualSystemSizeKw ??
-        latestVersion.quoteSnapshot?.inputs?.actualSystemSizeKw ??
-        latestVersion.actualSystemSizeKw ??
-        0
+          latestVersion.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+          latestVersion.actualSystemSizeKw ??
+          0,
       ).toFixed(2)}kW`
     : prop.propertyType.substring(0, 3).toUpperCase();
 
@@ -165,6 +164,22 @@ export function MyProperties({
           const isActive = prop.id === selectedPropertyId;
           const ui = resolvePropertyUI(prop, theme);
 
+          const quotes = prop.quotes || [];
+          const sortedQuotes = [...quotes].sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          );
+          const latestQuote = sortedQuotes[0];
+          const latestVersion = latestQuote?.versions?.[0];
+
+          const systemSizeKw =
+            latestVersion?.actualSystemSizeKw ??
+            latestVersion?.systemSizeKw ??
+            latestQuote?.systemSizeKw ??
+            prop.project?.capacity;
+
+          const sizeMeta = systemSizeKw != null ? ` · ${systemSizeKw} kW` : '';
+
           return (
             <CTCard
               key={prop.id}
@@ -255,7 +270,7 @@ export function MyProperties({
                   ]}
                   numberOfLines={1}
                 >
-                  {prop.address || prop.city || ''}
+                  {(prop.address || prop.city || '') + sizeMeta}
                 </Text>
               </View>
 

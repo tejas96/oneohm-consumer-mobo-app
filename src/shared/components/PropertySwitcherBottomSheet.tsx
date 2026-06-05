@@ -1,5 +1,5 @@
 /**
- * PropertySwitcherBottomSheet — Premium Centralized Property & Quote Switcher Sheet
+ * PropertySwitcherBottomSheet — Multi-property switcher for tab screens
  *
  * Layer: shared/components (Composed UI Element)
  */
@@ -19,25 +19,46 @@ import BottomSheet, {
   BottomSheetBackdrop,
   type BottomSheetBackdropProps,
 } from '@gorhom/bottom-sheet';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { useActiveProperty } from '@/shared/hooks';
+import { PropertySelectionCard } from '@/app/flow/components/PropertySelectionCard';
+import { formatPropertyLocation } from '@/app/flow/utils/property-selection-display';
 import { usePropertySelectionStore } from '@/core/project/project.store';
 import { useTranslation, type TranslationKey } from '@/core/i18n';
 import { useIsFocused } from '@react-navigation/native';
-import { useAppTheme } from '@/shared/theme';
-import { spacing, fontSize } from '@/shared/theme';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { PropertyCard } from './PropertyCard';
+import type { CustomerProperty } from '@/data/types/project.types';
+import {
+  resolvePropertyStageBadge,
+  type PropertyStageBadge,
+} from '@/data/utils';
+import { useCustomerFlow } from '@/shared/hooks';
+import { spacing, fontSize, useAppTheme } from '@/shared/theme';
+
+const STAGE_I18N_KEYS: Record<PropertyStageBadge, TranslationKey> = {
+  no_quotation: 'propertySelection.stage.no_quotation',
+  quotation_ready: 'propertySelection.stage.quotation_ready',
+  quote_accepted: 'propertySelection.stage.quote_accepted',
+  in_progress: 'propertySelection.stage.in_progress',
+  completed: 'propertySelection.stage.completed',
+  quotations_closed: 'propertySelection.stage.quotations_closed',
+};
 
 export interface PropertySwitcherBottomSheetRef {
   open: () => void;
   close: () => void;
 }
 
+function getPropertyDisplayName(
+  property: CustomerProperty,
+  defaultName: string,
+): string {
+  return property.propertyName?.trim() || defaultName;
+}
+
 export const PropertySwitcherBottomSheet = forwardRef<
   PropertySwitcherBottomSheetRef,
-  {}
->((_, ref) => {
+  object
+>(function PropertySwitcherBottomSheet(_, ref) {
   const isFocused = useIsFocused();
   const setSelectedPropertyId = usePropertySelectionStore(
     state => state.setSelectedPropertyId,
@@ -46,7 +67,7 @@ export const PropertySwitcherBottomSheet = forwardRef<
     state => state.selectedPropertyId,
   );
 
-  const { properties, refetch, isFetching } = useActiveProperty();
+  const { properties, refetch, isFetching } = useCustomerFlow();
   const { t } = useTranslation();
   const theme = useAppTheme();
 
@@ -54,15 +75,17 @@ export const PropertySwitcherBottomSheet = forwardRef<
   const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
-  const snapPoints = useMemo(() => ['70%', '85%'], []);
+  const snapPoints = useMemo(() => ['60%', '75%'], []);
+
+  const defaultPropertyName = t('propertySelection.defaultPropertyName');
+  const selectedLabel = t('propertySelection.selected');
+  const selectedA11yLabel = t('propertySelection.selectedA11y');
 
   useImperativeHandle(ref, () => ({
     open: () => {
       setIsMounted(true);
       setIsVisible(true);
-      refetch().catch(err => {
-        if (__DEV__) console.warn('Failed to refetch properties:', err);
-      });
+      void refetch();
     },
     close: () => {
       sheetRef.current?.close();
@@ -82,7 +105,7 @@ export const PropertySwitcherBottomSheet = forwardRef<
     sheetRef.current?.close();
   };
 
-  const handleSelect = (id: string | null) => {
+  const handleSelect = (id: string) => {
     setSelectedPropertyId(id);
     handleClose();
   };
@@ -102,15 +125,21 @@ export const PropertySwitcherBottomSheet = forwardRef<
   const totalCount = properties.length;
   const countText =
     totalCount === 1
-      ? t('projectSwitcher.propertyCount' as TranslationKey)
-      : t('projectSwitcher.propertiesCount' as TranslationKey).replace(
+      ? t('projectSwitcher.propertyCount').replace('{count}', '1')
+      : t('projectSwitcher.propertiesCount').replace(
           '{count}',
           String(totalCount),
         );
 
-  if (!isFocused) return null;
-  if (!isFetching && properties.length <= 1) return null;
-  if (!isMounted) return null;
+  if (!isFocused) {
+    return null;
+  }
+  if (!isFetching && properties.length <= 1) {
+    return null;
+  }
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <Portal>
@@ -126,14 +155,14 @@ export const PropertySwitcherBottomSheet = forwardRef<
           backdropComponent={renderBackdrop}
           enablePanDownToClose={true}
           backgroundStyle={{
-            backgroundColor: theme.colors.surface, // Matches Dark Obsidian surface #061810
+            backgroundColor: theme.colors.surface,
             borderTopLeftRadius: 28,
             borderTopRightRadius: 28,
             borderTopWidth: 1,
-            borderColor: theme.colors.outlineVariant, // 8% white border sheen
+            borderColor: theme.colors.outlineVariant,
           }}
           handleIndicatorStyle={{
-            backgroundColor: theme.colors.outline, // 15% white handle indicator
+            backgroundColor: theme.colors.outline,
             width: 40,
             height: 4,
           }}
@@ -144,11 +173,10 @@ export const PropertySwitcherBottomSheet = forwardRef<
             },
           ]}
         >
-          {/* Header Block */}
           <View style={styles.header}>
             <View style={styles.headerTitles}>
               <Text style={[styles.title, { color: theme.colors.onSurface }]}>
-                {t('projectSwitcher.title' as TranslationKey)}
+                {t('projectSwitcher.title')}
               </Text>
               <Text
                 style={[
@@ -160,7 +188,6 @@ export const PropertySwitcherBottomSheet = forwardRef<
               </Text>
             </View>
 
-            {/* Premium Close Circular Button */}
             <TouchableOpacity
               style={[
                 styles.closeButton,
@@ -180,6 +207,14 @@ export const PropertySwitcherBottomSheet = forwardRef<
             </TouchableOpacity>
           </View>
 
+          {/* Hairline divider between header and list */}
+          <View
+            style={[
+              styles.divider,
+              { backgroundColor: theme.colors.outlineVariant },
+            ]}
+          />
+
           {isFetching ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="small" color={theme.colors.primary} />
@@ -189,7 +224,7 @@ export const PropertySwitcherBottomSheet = forwardRef<
                   { color: theme.colors.onSurfaceVariant },
                 ]}
               >
-                {t('common.loading' as TranslationKey) || 'Loading...'}
+                {t('common.loading')}
               </Text>
             </View>
           ) : (
@@ -199,14 +234,28 @@ export const PropertySwitcherBottomSheet = forwardRef<
               showsVerticalScrollIndicator={false}
               bounces={true}
             >
-              {properties.map(property => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  isActive={selectedPropertyId === property.id}
-                  onPress={() => handleSelect(property.id)}
-                />
-              ))}
+              {properties.map(property => {
+                const { stage, chipStatus } =
+                  resolvePropertyStageBadge(property);
+                const isSelected = selectedPropertyId === property.id;
+
+                return (
+                  <PropertySelectionCard
+                    key={property.id}
+                    displayName={getPropertyDisplayName(
+                      property,
+                      defaultPropertyName,
+                    )}
+                    locationLine={formatPropertyLocation(property)}
+                    stageLabel={t(STAGE_I18N_KEYS[stage])}
+                    chipStatus={chipStatus}
+                    selectedLabel={selectedLabel}
+                    isSelected={isSelected}
+                    selectedA11yLabel={selectedA11yLabel}
+                    onPress={() => handleSelect(property.id)}
+                  />
+                );
+              })}
             </BottomSheetScrollView>
           )}
         </BottomSheet>
@@ -233,25 +282,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.xl,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
+    paddingTop: spacing.xs, // tighter — handle indicator already gives visual gap
+    paddingBottom: spacing.sm,
   },
   headerTitles: {
     flex: 1,
   },
   title: {
-    fontSize: fontSize.xl, // 20px
+    fontSize: fontSize.headline, // 18px — was fontSize.xl (20px)
     fontWeight: '800',
   },
   subtitle: {
-    fontSize: fontSize.caption, // 12px
-    marginTop: 2,
-    opacity: 0.35,
+    fontSize: fontSize.caption,
+    marginTop: spacing.micro,
+    opacity: 0.45,
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.xs,
   },
   closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -260,8 +314,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['2xl'] + spacing.xl,
+    paddingHorizontal: spacing.md, // 16px — was 24px, gives cards more horizontal room
+    paddingBottom: spacing['2xl'],
   },
   loadingContainer: {
     flex: 1,

@@ -36,9 +36,9 @@ const SIZE_CONFIG: Record<
   ButtonSize,
   { paddingVertical: number; fontSize: number }
 > = {
-  sm: { paddingVertical: spacing['2xs'], fontSize: fontSize.caption },
-  md: { paddingVertical: spacing.sm, fontSize: fontSize.body },
-  lg: { paddingVertical: spacing.md, fontSize: fontSize.subhead },
+  sm: { paddingVertical: spacing.micro, fontSize: fontSize.caption },
+  md: { paddingVertical: spacing.xs, fontSize: fontSize.body },
+  lg: { paddingVertical: spacing.sm, fontSize: fontSize.subhead },
 };
 
 export function CTButton({
@@ -121,7 +121,10 @@ export function CTButton({
         { paddingVertical: sizeConfig.paddingVertical },
         contentStyle,
       ]}
-      labelStyle={[{ fontSize: sizeConfig.fontSize }, labelStyle]}
+      labelStyle={[
+        { fontSize: sizeConfig.fontSize, fontWeight: '700' },
+        labelStyle,
+      ]}
       disabled={disabled}
       {...rest}
     />
@@ -130,7 +133,7 @@ export function CTButton({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: borderRadius.card,
+    borderRadius: borderRadius.md,
   },
   fullWidth: {
     width: '100%',

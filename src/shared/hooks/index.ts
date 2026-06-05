@@ -1,2 +1,3 @@
 export { useDebounce } from './useDebounce';
-export { useActiveProperty, useActiveProject } from './useActiveProperty';
+export { useCustomerFlow } from './useCustomerFlow';
+export type { UseCustomerFlowResult } from './useCustomerFlow';

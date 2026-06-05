@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
   },
   subtitle: {
-    fontSize: 10,
-    marginTop: 2,
+    fontSize: fontSize.micro,
+    marginTop: spacing.micro,
     fontWeight: fontWeight.medium,
   },
   switcherBadge: {

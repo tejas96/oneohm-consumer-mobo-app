@@ -34,6 +34,19 @@ export enum Route {
   DOCUMENTS = 'Documents',
   PAYMENTS = 'Payments',
   SUPPORT = 'Support',
-  WARRANTY = 'Warranty',
   PROJECT_TEAM = 'ProjectTeam',
+  PROJECT_CHAT = 'ProjectChat',
+
+  // ── Customer Flow (resolver + journey screens) ──
+  // Mount point: CustomerFlowResolver replaces MAIN_TABS as the first
+  // screen in MainNavigator (T6). All journey screens are siblings in
+  // MainStackParamList so the resolver can navigate.replace() to them.
+  FLOW_RESOLVER = 'FlowResolver',
+  PROPERTY_PENDING = 'PropertyPending',
+  PROPERTY_SELECTION = 'PropertySelection',
+  QUOTATION_PENDING = 'QuotationPending',
+  QUOTATION_DETAIL = 'QuotationDetail',
+  QUOTATION_LIST = 'QuotationList',
+  QUOTATION_REJECTED = 'QuotationRejected',
+  PROJECT_PENDING = 'ProjectPending',
 }

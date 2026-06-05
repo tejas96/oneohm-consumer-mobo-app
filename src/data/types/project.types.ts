@@ -36,9 +36,35 @@ export interface CustomerProperty
   project?: Project;
   quotes?: Quote[];
   customerName?: string;
+  discomName?: string;
+  consumerNumber?: string;
 }
 
-export interface Quote extends Omit<SharedQuote, 'versions'> {
+/** Flat fields from consumer QuoteResponseDto (latest version) when versions are omitted */
+export interface ConsumerQuoteFlatFields {
+  quoteNumber?: string;
+  validUntil?: string;
+  systemType?: string;
+  systemSizeKw?: number;
+  actualSystemSizeKw?: number;
+  totalWattageWp?: number;
+  projectType?: PropertyType;
+  basePrice?: number;
+  gstAmount?: number;
+  totalPrice?: number;
+  discountAmount?: number;
+  finalPrice?: number;
+  effectivePrice?: number;
+  isSubsidyApplicable?: boolean;
+  subsidyAmount?: number;
+  pricingBreakdown?: PricingBreakdown;
+  propertyName?: string;
+  propertyAddress?: string;
+}
+
+export interface Quote
+  extends Omit<SharedQuote, 'versions' | keyof ConsumerQuoteFlatFields>,
+    ConsumerQuoteFlatFields {
   versions?: QuoteVersion[];
 }
 
@@ -56,7 +82,7 @@ export interface QuoteVersion extends SharedQuoteVersion {
 export interface Project {
   // Legacy & custom fields
   id: string;
-  label?: string;
+  label: string;
   status: any;
   totalValue: number;
   subsidy: number;

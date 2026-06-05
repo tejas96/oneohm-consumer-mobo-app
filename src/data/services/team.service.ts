@@ -44,8 +44,11 @@ async function getTeamMembers(projectId: string): Promise<TeamMember[]> {
       roleKey,
       phone: user?.phone || '',
       avatarInitials,
-      rating: 4.8, // Stable premium display rating
-      reviewCount: item.isProjectManager ? 18 : 8,
+      rating:
+        item.rating !== null && item.rating !== undefined
+          ? Number(item.rating)
+          : 0,
+      reviewCount: item.rating !== null && item.rating !== undefined ? 1 : 0,
     };
   });
 }
@@ -59,13 +62,20 @@ async function getTeamMembers(projectId: string): Promise<TeamMember[]> {
  * @param comment Review comment text
  */
 async function submitTeamMemberFeedback(
-  _projectId: string,
-  _memberId: string,
-  _rating: number,
-  _comment: string,
+  projectId: string,
+  memberId: string,
+  rating: number,
+  comment: string,
 ): Promise<boolean> {
-  // Stub review submission as NestJS doesn't have a team member feedback database entity
-  return new Promise(resolve => setTimeout(() => resolve(true), 800));
+  const response = await api.post<any>(
+    API_ENDPOINTS.PROJECTS.FEEDBACK(projectId),
+    {
+      memberId,
+      rating,
+      comment,
+    },
+  );
+  return !!response;
 }
 
 export const TeamService = {

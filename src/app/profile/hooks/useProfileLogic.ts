@@ -4,6 +4,7 @@
  * Layer: app/profile/hooks
  */
 
+import { useMemo } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -11,7 +12,11 @@ import { useAuthStore } from '@/core/auth';
 import { useTranslation } from '@/core/i18n';
 import { Route, type MainStackParamList } from '@/core/navigation';
 import { usePropertySelectionStore } from '@/core/project/project.store';
-import { useActiveProperty } from '@/shared/hooks';
+import { useCustomerFlow } from '@/shared/hooks';
+import {
+  getLatestQuoteVersion,
+  mapActivePropertyToProject,
+} from '@/shared/utils';
 
 export function useProfileLogic() {
   const navigation =
@@ -26,16 +31,23 @@ export function useProfileLogic() {
     state => state.setSelectedPropertyId,
   );
 
+  const selectedPropertyId = usePropertySelectionStore(
+    state => state.selectedPropertyId,
+  );
+
   const {
-    selectedPropertyId,
     activeProperty,
-    isOnboarding,
     properties,
+    quotationView,
     isLoading,
     isError,
     refetch,
-    latestQuoteVersion,
-  } = useActiveProperty();
+  } = useCustomerFlow();
+
+  const latestQuoteVersion = useMemo(
+    () => getLatestQuoteVersion(quotationView.activeQuote),
+    [quotationView.activeQuote],
+  );
 
   const handleRefetch = async () => {
     await Promise.all([refetch(), refreshUser()]);
@@ -69,51 +81,30 @@ export function useProfileLogic() {
 
   const totalProjects = properties.length;
 
-  // Navigation Handlers
-  const navigateToNotifications = () => {
-    navigation.navigate(Route.NOTIFICATIONS);
-  };
-
   const navigateToSupport = () => {
     navigation.navigate(Route.SUPPORT);
   };
 
-  const navigateToWarranty = () => {
-    navigation.navigate(Route.WARRANTY);
+  const navigateToTeam = () => {
+    if (activeProperty?.project?.id) {
+      navigation.navigate(Route.PROJECT_TEAM, {
+        projectId: activeProperty.project.id,
+      });
+    }
   };
 
   const handleSwitchProject = (propertyId: string) => {
     setSelectedPropertyId(propertyId);
   };
 
-  // Legacy activeProject backward-compatibility map for settings widget
-  const activeProjectMapped = activeProperty
-    ? {
-        id: activeProperty.id,
-        label:
-          activeProperty.propertyName ||
-          t('projectSwitcher.defaultPropertyName'),
-        status: activeProperty.project?.status || 'PLANNING',
-        totalValue: latestQuoteVersion?.finalPrice || 0,
-        subsidy:
-          latestQuoteVersion?.pricingBreakdown?.subsidyAmount ||
-          latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ||
-          0,
-        amountPaid:
-          (activeProperty.project?.metadata?.amountPaid as number) || 0,
-        startDate: activeProperty.project?.startDate || '',
-        endDate: activeProperty.project?.endDate || '',
-        progress: activeProperty.project?.progressPercentage || 0,
-        capacity:
-          latestQuoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
-          latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
-          latestQuoteVersion?.actualSystemSizeKw ??
-          0,
-        projectNumber: activeProperty.project?.projectNumber,
-        property: activeProperty,
-        quoteVersion: latestQuoteVersion,
-      }
-    : null;
+  const activeProjectMapped = useMemo(
+    () =>
+      mapActivePropertyToProject(activeProperty, {
+        defaultPropertyName: t('projectSwitcher.defaultPropertyName'),
+        latestQuoteVersion,
+      }),
+    [activeProperty, latestQuoteVersion, t],
+  );
 
   return {
     user,
@@ -123,7 +114,7 @@ export function useProfileLogic() {
     setLanguage,
     selectedProjectId: selectedPropertyId,
     activeProject: activeProjectMapped,
-    isOnboarding,
+    hasActiveProject: !!activeProperty?.project?.id,
     projects: properties,
     isLoading,
     isError,
@@ -138,9 +129,8 @@ export function useProfileLogic() {
     },
 
     // Handlers
-    navigateToNotifications,
     navigateToSupport,
-    navigateToWarranty,
+    navigateToTeam,
     handleSwitchProject,
   };
 }

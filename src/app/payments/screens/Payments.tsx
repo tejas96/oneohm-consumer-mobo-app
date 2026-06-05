@@ -7,9 +7,9 @@
 import React, { useRef } from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
 
-import { ScreenWrapper, CTOnboardingPlaceholder } from '@/shared/components';
+import { ScreenWrapper, CTStateWrapper } from '@/shared/components';
 import { spacing, useAppTheme } from '@/shared/theme';
-import { useTranslation, type TranslationKey } from '@/core/i18n';
+import { useTranslation } from '@/core/i18n';
 
 import { usePayment } from '../hooks/usePayment';
 import { PaymentsHeader } from '../components/PaymentsHeader';
@@ -29,6 +29,7 @@ export function Payments() {
     activeProject,
     isLoading,
     isError,
+    isRefreshing,
     refetch,
     expandedTerms,
     toggleTerm,
@@ -40,48 +41,32 @@ export function Payments() {
     hasMultipleProjects,
   } = usePayment();
 
-  const renderContent = () => {
-    // Onboarding State fallback if activeProject is absent
-    if (!activeProject) {
-      return (
-        <CTOnboardingPlaceholder
-          title={t('payments.onboardingTitle' as TranslationKey)}
-          description={t('payments.onboardingDesc' as TranslationKey)}
-          lottieSource={require('@/assets/animations/lottie/Finance App.json')}
-          statusText={t('payments.onboardingStage' as TranslationKey)}
-          status="warning"
+  const renderContent = () => (
+    <ScrollView
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={refetch}
+          colors={[theme.colors.primary]}
+          tintColor={theme.colors.primary}
         />
-      );
-    }
-
-    // Main scrollable list of components
-    return (
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={refetch}
-            colors={[theme.colors.primary]}
-            tintColor={theme.colors.primary}
-          />
-        }
-      >
-        <FinancialSummary
-          financials={financials}
-          dateRange={dateRange}
-          formatCurrency={formatCurrency}
-        />
-        <TimelineTracker
-          milestones={milestones}
-          expandedTerms={expandedTerms}
-          onToggleTerm={toggleTerm}
-          formatCurrency={formatCurrency}
-        />
-      </ScrollView>
-    );
-  };
+      }
+    >
+      <FinancialSummary
+        financials={financials}
+        dateRange={dateRange}
+        formatCurrency={formatCurrency}
+      />
+      <TimelineTracker
+        milestones={milestones}
+        expandedTerms={expandedTerms}
+        onToggleTerm={toggleTerm}
+        formatCurrency={formatCurrency}
+      />
+    </ScrollView>
+  );
 
   return (
     <ScreenWrapper
@@ -89,18 +74,6 @@ export function Payments() {
       ambientGlow={false}
       showThemeToggle={false}
       edges={['top', 'left', 'right']}
-      stateConfig={{
-        state: isLoading ? 'loading' : isError ? 'error' : 'success',
-        loadingConfig: {
-          message: t('common.stateConfig.loadingPayments'),
-        },
-        errorConfig: {
-          title: t('common.stateConfig.errorTitlePayments'),
-          message: t('common.stateConfig.errorMessage'),
-          retryText: t('common.retry'),
-          onRetry: refetch,
-        },
-      }}
     >
       <PaymentsHeader
         activeProject={activeProject}
@@ -108,7 +81,22 @@ export function Payments() {
         onSwitchProject={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
-      <View style={styles.content}>{renderContent()}</View>
+      <View style={styles.content}>
+        <CTStateWrapper
+          state={isLoading ? 'loading' : isError ? 'error' : 'success'}
+          loadingConfig={{
+            message: t('common.stateConfig.loadingPayments'),
+          }}
+          errorConfig={{
+            title: t('common.stateConfig.errorTitlePayments'),
+            message: t('common.stateConfig.errorMessage'),
+            retryText: t('common.retry'),
+            onRetry: refetch,
+          }}
+        >
+          {renderContent()}
+        </CTStateWrapper>
+      </View>
       <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );

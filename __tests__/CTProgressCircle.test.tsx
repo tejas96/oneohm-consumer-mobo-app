@@ -58,4 +58,18 @@ describe('CTProgressCircle', () => {
     expect(progressCircle.props.trackWidth).toBe(4);
     expect(progressCircle.props.style).toEqual(customStyle);
   });
+
+  it('renders as wavy progress circle correctly when isWavy is true', async () => {
+    let component;
+    await ReactTestRenderer.act(async () => {
+      component = ReactTestRenderer.create(
+        <PaperProvider theme={darkPaperTheme}>
+          <CTProgressCircle progress={60} isWavy={true} />
+        </PaperProvider>,
+      );
+    });
+    const progressCircle = component.root.findByType(CTProgressCircle);
+    expect(progressCircle).toBeTruthy();
+    expect(progressCircle.props.isWavy).toBe(true);
+  });
 });

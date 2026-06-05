@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import LottieView from 'lottie-react-native';
@@ -23,19 +24,22 @@ export interface CTOnboardingPlaceholderProps {
   statusText?: string;
   /** Status semantic style for the chip badge */
   status?: 'warning' | 'info' | 'success' | 'error';
+  /** Optional container style overrides */
+  style?: StyleProp<ViewStyle>;
 }
 
 export function CTOnboardingPlaceholder({
   title,
   description,
   lottieSource,
-  statusText = 'Stage: Onboarding & Verification',
+  statusText,
   status = 'warning',
+  style,
 }: CTOnboardingPlaceholderProps) {
   const theme = useAppTheme();
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <View style={styles.animationOuter}>
         <View style={styles.lottieWrapper}>
           <LottieView
@@ -56,13 +60,15 @@ export function CTOnboardingPlaceholder({
         {description}
       </Text>
 
-      <CTChip
-        status={status}
-        size="sm"
-        style={{ marginTop: spacing.md, alignSelf: 'center' }}
-      >
-        {statusText}
-      </CTChip>
+      {statusText ? (
+        <CTChip
+          status={status}
+          size="sm"
+          style={{ marginTop: spacing.md, alignSelf: 'center' }}
+        >
+          {statusText}
+        </CTChip>
+      ) : null}
     </View>
   );
 }

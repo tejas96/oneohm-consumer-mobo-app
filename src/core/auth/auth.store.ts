@@ -22,6 +22,9 @@ import { SessionService } from './session.service';
 import { TokenService } from './token.service';
 import { useI18nStore } from '@/core/i18n';
 import { useThemeStore } from '@/core/theme';
+import { STORAGE_KEYS } from '@/core/config/constants';
+import { appQueryClient } from '@/core/query/query-client';
+import { removeItem } from '@/core/storage/app.storage';
 import { usePropertySelectionStore } from '@/core/project/project.store';
 
 type AuthStore = AuthState & AuthActions;
@@ -58,6 +61,11 @@ export const useAuthStore = create<AuthStore>((set, get) => {
 
     logout: async () => {
       await SessionService.endSession();
+      usePropertySelectionStore.getState().setSelectedPropertyId(null);
+      await removeItem(STORAGE_KEYS.SELECTED_PROPERTY_ID).catch(
+        () => undefined,
+      );
+      appQueryClient.clear();
       set({ user: null, isAuthenticated: false, isLoading: false });
     },
 
