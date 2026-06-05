@@ -9,8 +9,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
-import { useAppTheme } from '@/shared/theme';
-import { spacing, fontWeight } from '@/shared/theme';
+import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 import type { Installment } from '../hooks/usePayment';
 
 export interface ExpandedInstallmentsProps {
@@ -18,7 +17,7 @@ export interface ExpandedInstallmentsProps {
   status: 'PAID' | 'PARTIAL' | 'DUE' | 'LOCKED' | 'APPROVED' | 'CREDITED';
   targetValue: number;
   amountPaid: number;
-  formatCurrency: (value: number) => string;
+  formatCurrency: (value?: number | null) => string;
 }
 
 export function ExpandedInstallments({
@@ -114,7 +113,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   detailsHeading: {
-    fontSize: 9.5,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -131,15 +130,15 @@ const styles = StyleSheet.create({
     paddingRight: spacing.sm,
   },
   installmentTitle: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
   },
   installmentSubtitle: {
-    fontSize: 9,
-    marginTop: 1,
+    fontSize: fontSize.xs,
+    marginTop: spacing.micro,
   },
   installmentAmount: {
-    fontSize: 11.5,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.black,
   },
   remainingTermRow: {
@@ -150,11 +149,11 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xs,
   },
   remainingLabel: {
-    fontSize: 10,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.bold,
   },
   remainingValue: {
-    fontSize: 11.5,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.black,
   },
 });

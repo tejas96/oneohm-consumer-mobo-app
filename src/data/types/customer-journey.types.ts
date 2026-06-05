@@ -22,7 +22,8 @@ import type { CustomerProperty, Quote } from './project.types';
  * Each state maps to exactly one screen or navigator branch.
  *
  * Decision order enforced by resolveCustomerFlow():
- *   resolving → error → no_property → select_property →
+ *   resolving (loading) → error → no_property →
+ *   resolving (selection hydrate) → select_property →
  *   no_quotation → project_pending/project_active →
  *   all_rejected → quotation_active
  */
@@ -43,9 +44,11 @@ export type CustomerFlowState =
 
 /**
  * All data the resolver needs to make a routing decision.
- * Assembled by the useCustomerFlow hook (T6) from:
+ * Assembled by the useCustomerFlow hook from:
  *   - useCustomerProperties resource (T4)
  *   - usePropertySelectionStore (T5)
+ *   - useCustomerQuotations resource (T10)
+ *   - resolveQuotationView / resolveCustomerFlow (T2)
  *
  * selectedPropertyId semantics:
  *   null   = store not yet hydrated (treat as resolving)
@@ -59,6 +62,8 @@ export interface CustomerFlowInput {
   /** null = unhydrated; 'none' = explicit deselection; string = id */
   selectedPropertyId: string | null;
   activeProperty: CustomerProperty | null;
+  /** Resolved quote view from live FDAL quotes (T11) */
+  quotationView: QuotationView;
 }
 
 // ============================================

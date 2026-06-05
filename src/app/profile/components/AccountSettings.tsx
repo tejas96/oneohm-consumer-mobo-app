@@ -8,24 +8,21 @@ import {
   fontSize,
   fontWeight,
   borderRadius,
-  hexToRgba,
 } from '@/shared/theme';
 import type { TranslationKey } from '@/core/i18n/i18n.types';
 
 interface AccountSettingsProps {
-  navigateToNotifications: () => void;
-  navigateToSupport: () => void;
-  navigateToWarranty: () => void;
+  navigateToTeam?: () => void;
   logout: () => void;
   t: (key: TranslationKey) => string;
+  hasActiveProject: boolean;
 }
 
 export function AccountSettings({
-  navigateToNotifications,
-  navigateToSupport,
-  navigateToWarranty,
+  navigateToTeam,
   logout,
   t,
+  hasActiveProject,
 }: AccountSettingsProps) {
   const theme = useAppTheme();
 
@@ -38,37 +35,23 @@ export function AccountSettings({
       </Text>
       <CTCard variant="glass" style={styles.menuCard}>
         <CTListItem
-          title={t('profile.notifications')}
-          leftIcon={{
-            name: 'bell-outline',
-            color: theme.colors.primary,
-            bgColor: theme.colors.primaryContainer,
-          }}
-          showChevron={true}
-          showDivider={true}
-          onPress={navigateToNotifications}
-        />
-        <CTListItem
           title={t('profile.support')}
+          description={
+            !hasActiveProject ? t('project.noActiveProjectDesc') : undefined
+          }
           leftIcon={{
             name: 'account-group-outline',
-            color: theme.colors.brandBlue || theme.colors.secondary,
-            bgColor: theme.colors.secondaryContainer,
+            color: !hasActiveProject
+              ? theme.colors.outline
+              : theme.colors.brandBlue || theme.colors.secondary,
+            bgColor: !hasActiveProject
+              ? theme.colors.surfaceVariant
+              : theme.colors.secondaryContainer,
           }}
-          showChevron={true}
+          showChevron={hasActiveProject}
           showDivider={true}
-          onPress={navigateToSupport}
-        />
-        <CTListItem
-          title={t('profile.warranty')}
-          leftIcon={{
-            name: 'shield-check-outline',
-            color: theme.colors.brandPurple,
-            bgColor: hexToRgba(theme.colors.brandPurple, 0.08),
-          }}
-          showChevron={true}
-          showDivider={true}
-          onPress={navigateToWarranty}
+          onPress={hasActiveProject ? navigateToTeam : undefined}
+          style={!hasActiveProject ? styles.disabledItem : undefined}
         />
         <CTListItem
           title={t('profile.signOut')}
@@ -99,5 +82,8 @@ const styles = StyleSheet.create({
   menuCard: {
     borderRadius: borderRadius.card,
     overflow: 'hidden',
+  },
+  disabledItem: {
+    opacity: 0.55,
   },
 });

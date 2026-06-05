@@ -70,7 +70,7 @@ class ConfigService {
       'api.url':
         process.env.APP_ENV === 'development'
           ? 'https://staging.api.oneohm.com'
-          : 'http://192.168.1.3:8085/api/v1',
+          : 'http://10.67.160.98:8085/api/v1',
       'api.timeout': 30000,
       'app.name':
         process.env.APP_ENV === 'development' ? 'OneOhmTest' : 'OneOhm',

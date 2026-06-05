@@ -4,8 +4,9 @@ import { Text, ProgressBar, IconButton } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
 import type { Project } from '@/data/types';
-import { spacing, fontWeight, useAppTheme } from '@/shared/theme';
+import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 import { CTChip } from '@/shared/components';
+import { formatCurrency } from '@/shared/utils/format';
 
 interface PaymentSnapshotProps {
   activeProject: Project;
@@ -29,10 +30,6 @@ export function PaymentSnapshot({
 
   const { totalValue, amountPaid, subsidy, netCost } = financials;
   const progress = totalValue > 0 ? amountPaid / totalValue : 0;
-
-  const formatCurrency = (value: number) => {
-    return '₹' + value.toLocaleString('en-IN');
-  };
 
   const formatDateRange = () => {
     if (!activeProject.startDate || !activeProject.endDate) {
@@ -244,7 +241,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
@@ -263,20 +260,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   cardLabel: {
-    fontSize: 10,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   totalValue: {
-    fontSize: 20,
+    fontSize: fontSize.xl,
     fontWeight: fontWeight.black,
-    marginTop: 2,
+    marginTop: spacing.micro,
   },
   paidValue: {
-    fontSize: 20,
+    fontSize: fontSize.xl,
     fontWeight: fontWeight.black,
-    marginTop: 2,
+    marginTop: spacing.micro,
   },
   progressBar: {
     height: 8,
@@ -294,24 +291,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   breakdownLabel: {
-    fontSize: 9,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   subsidyValue: {
-    fontSize: 13,
+    fontSize: fontSize.body,
     fontWeight: fontWeight.bold,
-    marginTop: 2,
+    marginTop: spacing.micro,
   },
   netCostValue: {
-    fontSize: 13,
+    fontSize: fontSize.body,
     fontWeight: fontWeight.bold,
-    marginTop: 2,
+    marginTop: spacing.micro,
   },
   breakdownCaption: {
-    fontSize: 8,
-    marginTop: 2,
+    fontSize: fontSize.micro,
+    marginTop: spacing.micro,
   },
   footer: {
     flexDirection: 'row',
@@ -333,7 +330,7 @@ const styles = StyleSheet.create({
     height: 14,
   },
   footerDate: {
-    fontSize: 9,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.semibold,
   },
   footerRight: {
@@ -341,7 +338,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   viewTimelineText: {
-    fontSize: 9,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
   },
   arrowIcon: {

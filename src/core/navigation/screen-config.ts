@@ -33,14 +33,6 @@ export const screenConfigs: Partial<
   [Route.LOGIN]: {
     animation: 'fade',
   },
-  [Route.NOTIFICATIONS]: {
-    headerShown: true,
-    headerTitle: 'Notifications',
-  },
-  [Route.SETTINGS]: {
-    headerShown: true,
-    headerTitle: 'Settings',
-  },
 };
 
 /**

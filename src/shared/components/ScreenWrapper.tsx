@@ -10,9 +10,9 @@
  * Layer: shared/components (Presentational — zero business logic)
  */
 
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import type { ViewStyle } from 'react-native';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View, Dimensions } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -21,6 +21,11 @@ import { spacing } from '@/shared/theme';
 import { useAppTheme } from '@/shared/theme';
 import { ThemeToggleButton } from './ThemeToggleButton';
 import { CTStateWrapper, type CTStateWrapperProps } from './CTStateWrapper';
+import { ErrorBoundary } from './ErrorBoundary';
+
+export const ScreenWrapperContext = createContext<{ edges?: Edge[] } | null>(
+  null,
+);
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
@@ -63,6 +68,10 @@ export function ScreenWrapper({
   contentContainerStyle,
 }: ScreenWrapperProps) {
   const theme = useAppTheme();
+  const context = useContext(ScreenWrapperContext);
+
+  const resolvedEdges = edges ??
+    context?.edges ?? ['top', 'left', 'right', 'bottom'];
 
   const barStyle = theme.dark ? 'light-content' : 'dark-content';
 
@@ -75,7 +84,15 @@ export function ScreenWrapper({
       />
 
       {/* ─── Premium Gradient Background (Edge-to-Edge) ─── */}
-      <View style={StyleSheet.absoluteFill}>
+      <View
+        style={[
+          styles.backgroundContainer,
+          {
+            width: Dimensions.get('screen').width,
+            height: Dimensions.get('screen').height,
+          },
+        ]}
+      >
         <Svg height="100%" width="100%">
           <Defs>
             <LinearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -117,7 +134,7 @@ export function ScreenWrapper({
         </>
       ) : null}
 
-      <SafeAreaView style={styles.safeArea} edges={edges}>
+      <SafeAreaView style={styles.safeArea} edges={resolvedEdges}>
         {showThemeToggle && (
           <View style={styles.toggleRow}>
             <ThemeToggleButton />
@@ -138,19 +155,23 @@ export function ScreenWrapper({
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            {stateConfig ? (
-              <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
-            ) : (
-              children
-            )}
+            <ErrorBoundary onReset={stateConfig?.errorConfig?.onRetry}>
+              {stateConfig ? (
+                <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
+              ) : (
+                children
+              )}
+            </ErrorBoundary>
           </KeyboardAwareScrollView>
         ) : (
           <View style={[styles.content, padded && styles.padded, style]}>
-            {stateConfig ? (
-              <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
-            ) : (
-              children
-            )}
+            <ErrorBoundary onReset={stateConfig?.errorConfig?.onRetry}>
+              {stateConfig ? (
+                <CTStateWrapper {...stateConfig}>{children}</CTStateWrapper>
+              ) : (
+                children
+              )}
+            </ErrorBoundary>
           </View>
         )}
       </SafeAreaView>
@@ -161,6 +182,11 @@ export function ScreenWrapper({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   safeArea: {
     flex: 1,

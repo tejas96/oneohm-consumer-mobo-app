@@ -250,9 +250,10 @@ const styles = StyleSheet.create({
   },
   hiddenInput: {
     ...StyleSheet.absoluteFill,
-    opacity: 1,
+    opacity: 0.01,
     color: 'transparent',
     backgroundColor: 'transparent',
+    fontSize: 1,
   },
   resendContainer: {
     alignItems: 'center',

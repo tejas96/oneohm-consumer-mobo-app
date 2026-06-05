@@ -4,9 +4,10 @@ import { Text, Divider } from 'react-native-paper';
 import { CTCard, CTChip } from '@/shared/components';
 import { useAppTheme, spacing, fontSize, fontWeight } from '@/shared/theme';
 import type { TranslationKey } from '@/core/i18n/i18n.types';
+import type { Project } from '@/data/types';
 
 interface ActiveProjectDetailsProps {
-  activeProject: any;
+  activeProject: Project;
   t: (key: TranslationKey) => string;
 }
 
@@ -146,7 +147,7 @@ export function ActiveProjectDetails({
           <Text
             style={[styles.detailsValue, { color: theme.colors.onSurface }]}
           >
-            {activeProject.capacity.toFixed(2)} kW ·{' '}
+            {Number(activeProject.capacity || 0).toFixed(2)} kW ·{' '}
             {activeProject.quoteVersion?.systemType || 'On-Grid'}
           </Text>
         </View>
@@ -216,7 +217,7 @@ export function ActiveProjectDetails({
           <Text
             style={[styles.detailsValue, { color: theme.colors.onSurface }]}
           >
-            {activeProject.property?.consumerName || ''}
+            {activeProject.property?.customerName || ''}
           </Text>
         </View>
         <Divider

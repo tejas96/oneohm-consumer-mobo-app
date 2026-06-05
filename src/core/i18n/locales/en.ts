@@ -58,6 +58,12 @@ export const en = {
     skip: 'Skip',
     error: 'An error occurred',
     retry: 'Retry',
+    success: 'Success',
+    ok: 'OK',
+    cancel: 'Cancel',
+    askLater: 'Ask Later',
+    selectedSystemSize: 'Selected: {size} kW',
+    actualSystemSize: 'Actual: {size} kW',
     stateConfig: {
       loadingDashboard: 'Loading Dashboard...',
       loadingTeam: 'Loading Team Details...',
@@ -70,16 +76,23 @@ export const en = {
       errorTitleDocuments: 'Unable to load documents.',
       errorTitlePayments: 'Unable to load payments data.',
       errorMessage: 'Please check your connection and try again.',
+      errorCrashTitle: 'App encountered an error',
+      errorCrashMessage: 'An unexpected crash occurred. Please try again.',
+      loadingChat: 'Loading Chat...',
+      errorTitleChat: 'Unable to load chat.',
     },
+  },
+  dev: {
+    simulatorTitle: 'Simulator Mode',
+    simulatorCallMessage:
+      "Direct calling simulated to: {phone}\n\n(On a real device, this opens your phone's native dialer app.)",
+    simulatorWhatsappMessage:
+      'WhatsApp / SMS simulated to: {phone}\nMessage: "{message}"\n\n(On a real device, this will open WhatsApp or fall back to standard SMS.)',
   },
   dashboard: {
     greetingMorning: 'Good Morning',
     greetingAfternoon: 'Good Afternoon',
     greetingEvening: 'Good Evening',
-    onboardingTitle: 'Your Solar Journey is Beginning!',
-    onboardingDesc:
-      'We are currently validating your electricity documents and securing the necessary government DISCOM solar approvals. Your custom real-time installation timeline, payments ledger, and live team support will light up right here the moment engineering verification is complete!',
-    onboardingStage: 'Onboarding & Document Verification',
     inProgress: 'In Progress',
     gridActive: 'Grid Active',
     paymentSnapshot: 'Payment Snapshot',
@@ -102,18 +115,33 @@ export const en = {
       warranty: 'Warranty',
       properties: 'Properties',
       propertiesSub: 'All accounts',
+      quotations: 'Quotations',
+      quotationsSub: 'View quotes',
+      chat: 'Chat',
+      chatSub: 'Message support',
     },
     systemSize: '{size}',
     nextStepRequired: 'Next Step Required',
     connectedMessage: 'Your solar generation is active.',
     gridConnected: 'Grid Connected',
+    guestUser: 'Guest User',
+    sustainability: {
+      title: 'Energy & Environmental Impact',
+      subtitle: 'Forecast for {size} kW system',
+      generation: 'Generation',
+      annualKwh: 'kWh / year',
+      dailyAvg: '≈ {avg} kWh/day avg',
+      savings: 'Savings',
+      annualSavings: 'per year',
+      monthlyAvg: '≈ {avg}/month',
+      co2Offset: 'CO2 Offset',
+      annualCo2: 'tonnes / year',
+      treesEquivalent: '= {count} trees',
+      payback: '25-Yr Lifetime Savings',
+    },
   },
   payments: {
     title: 'Payment Journey',
-    onboardingTitle: 'Your Solar Financial Ledger',
-    onboardingDesc:
-      'Track your entire payment journey, verified transactions, and government subsidy approvals in one place. Your sequential milestone ledger (Booking, Material Delivery, Installation, and Net-metering) will be activated once onboarding is complete.',
-    onboardingStage: 'Onboarding & Escrow Setup',
     targetLabel: 'Target: {amount} ({percent}%)',
     expectedRecovery: 'Expected Recovery',
     installmentsBadge: '{count} Inst.',
@@ -163,6 +191,8 @@ export const en = {
       t4: 'Due Date Deadline: {date}',
       t5: "Credited to customer's linked account 15–30 days post Term 4",
     },
+    emptyTimeline:
+      'Payment milestones will appear here once your project payment schedule is set up.',
   },
   profile: {
     title: 'Profile',
@@ -246,10 +276,6 @@ export const en = {
     assistanceDesc:
       'Reach out to your dedicated project team for priority installation support.',
     contactBtn: 'Contact Project Team',
-    onboardingTitle: 'Engineering & Design in Progress',
-    onboardingDesc:
-      'Our structural engineers and electrical designers are finalizing your optimal solar rooftop layout, shadow analysis, and single line diagram (SLD). Once the layout designs are verified, your detailed technical panel specifications and step-by-step engineering timeline will be activated here.',
-    onboardingStage: 'System Design & Engineering',
     noActiveProjectTitle: 'No Active Project',
     noActiveProjectDesc: 'Please select a project first.',
   },
@@ -281,17 +307,35 @@ export const en = {
     dialerErr: 'Direct calling is not supported on this device.',
     whatsappErr: 'WhatsApp is not installed. Switched to SMS fallback.',
     smsErr: 'Messaging services are not supported on this device.',
+    chatTitle: 'Project Chat',
+    chatPlaceholder: 'Type a message...',
+    you: 'You',
+    role_customer: 'Customer',
+    chatBtn: 'Project Chat',
   },
   documents: {
     title: 'Project Documents',
     searchPlaceholder: 'Search documents...',
     emptyState: 'No documents found matching criteria.',
-    onboardingTitle: 'Your Document Vault',
-    onboardingDesc:
-      'Securely view and download all your solar agreements, electrical schematics, utility NOC approvals, and system warranties in one place. These files will be uploaded automatically as onboarding progresses.',
-    onboardingStage: 'Onboarding & Document Setup',
     downloadStartedTitle: 'Download Started',
     downloadStartedDesc: 'Downloading "{title}" to your device.',
+    downloadCompleted: 'File downloaded successfully to Downloads.',
+    downloadUnavailable: 'This document is not available for download yet.',
+    downloadFailed: 'Could not download "{title}". Please try again later.',
+    permissionTitle: 'Storage Permission Required',
+    permissionMessage:
+      'This app needs storage permission to download files to your device.',
+    entityTypes: {
+      all: 'All',
+      customer: 'Customer',
+      property: 'Property',
+      site_activity: 'Site Activity',
+      loan: 'Loan',
+      quote: 'Quote',
+      project: 'Project',
+      payment: 'Payment',
+      project_expense: 'Expense',
+    },
   },
   projectSwitcher: {
     title: 'My Projects',
@@ -300,8 +344,6 @@ export const en = {
     currentlyActive: 'Currently Active',
     tapToSwitch: 'Tap to switch',
     done: 'done',
-    onboardingState: 'No Active Project (Onboarding State)',
-    onboardingDesc: 'Simulates onboarding & verification stage',
     statusPlanning: 'Planning',
     statusInProgress: 'In Progress',
     statusCompleted: 'Completed',
@@ -320,5 +362,194 @@ export const en = {
     subtitleInProgress: 'Installation project is active',
     subtitleCompleted: 'Project successfully completed',
     subtitleOnHold: 'Project is on hold',
+  },
+  flow: {
+    loading: 'Preparing your solar journey...',
+    interim: {
+      error: {
+        title: 'Something went wrong',
+        description:
+          'We could not load your property details. Please check your connection and try again.',
+        status: 'Connection issue',
+        retry: 'Try again',
+      },
+      no_property: {
+        title: 'No property yet',
+        description:
+          'Your installation site has not been added. Our team will set this up for you soon.',
+        status: 'Awaiting property',
+      },
+      select_property: {
+        title: 'Choose a property',
+        description:
+          'You have more than one property. Select which one you want to view.',
+        status: 'Selection required',
+      },
+      no_quotation: {
+        title: 'Quotation in progress',
+        description:
+          'We are preparing your solar quotation. You will be notified when it is ready.',
+        status: 'Quotation pending',
+      },
+      quotation_active: {
+        title: 'Review your quotation',
+        description:
+          'Your quotation is ready. Review the details and accept or reject when you are ready.',
+        status: 'Quotation available',
+      },
+      all_rejected: {
+        title: 'Quotations closed',
+        description:
+          'All quotations for this property were declined or expired. Contact OneOhm for next steps.',
+        status: 'All quotations inactive',
+      },
+      project_pending: {
+        title: 'Project starting soon',
+        description:
+          'Your quotation is accepted. We are setting up your installation project.',
+        status: 'Project setup',
+      },
+    },
+    propertyHeader: {
+      switchLabel: 'Switch',
+      switchA11y: 'Switch to a different property',
+      defaultPropertyName: 'My Property',
+    },
+  },
+  propertyPending: {
+    title: 'Your solar journey starts here',
+    description:
+      'We are setting up your installation site in our system. Once your property is registered, you can track quotations, payments, and project progress — all in one place.',
+    status: 'Property setup pending',
+    callButton: 'Call OneOhm',
+    callError: 'Unable to open the phone dialer on this device.',
+    refreshButton: 'Check for updates',
+    refreshError:
+      'We could not load your property details. Please check your connection and try again.',
+  },
+  projectPending: {
+    title: 'Project starting soon',
+    description:
+      'Your quotation is accepted. We are setting up your installation project. Check for updates or call OneOhm if you have questions.',
+    status: 'Project setup',
+    callButton: 'Call OneOhm',
+    callError: 'Unable to open the phone dialer on this device.',
+    refreshButton: 'Check for updates',
+    refreshError:
+      'We could not refresh your project status. Please check your connection and try again.',
+  },
+  propertySelection: {
+    title: 'Choose your property',
+    description:
+      'You have more than one installation site. Tap a property to continue.',
+    countOne: '{count} property',
+    countOther: '{count} properties',
+    selected: 'Selected',
+    defaultPropertyName: 'My Property',
+    selectedA11y: 'Selected property',
+    stage: {
+      no_quotation: 'No quotation',
+      quotation_ready: 'Quotation ready',
+      quote_accepted: 'Quote accepted',
+      in_progress: 'In progress',
+      completed: 'Completed',
+      quotations_closed: 'Quotations closed',
+    },
+  },
+  quotation: {
+    pending: {
+      title: 'Your quotation is on the way',
+      description:
+        'Our team is preparing a tailored solar quotation for your property. You will see pricing and system details here as soon as it is ready.',
+      status: 'Quotation preparation in progress',
+      refreshButton: 'Check for updates',
+    },
+    detail: {
+      title: 'Quotation',
+      heading: 'Your solar quotation',
+      viewAll: 'View all quotations',
+      totalLabel: 'Total payable',
+      validUntil: 'Valid until',
+      systemSize: 'System size',
+      projectType: 'Project type',
+      pricingTitle: 'Pricing breakdown',
+      expandPricing: 'Show pricing breakdown',
+      collapsePricing: 'Hide pricing breakdown',
+      loading: 'Loading quotation…',
+      errorTitle: 'Unable to load quotation',
+      backToDashboard: 'Back to Dashboard',
+      reviewingHint:
+        'Review the details below. Accept and reject actions will be available soon.',
+      pricingBase: 'Base price',
+      pricingGst: 'GST',
+      pricingDiscount: 'Discount',
+      pricingSubsidy: 'Subsidy',
+      pricingFinal: 'Final price',
+      pricingEffective: 'Effective price',
+    },
+    list: {
+      title: 'All quotations',
+      description: 'Tap a quotation to view full details and pricing.',
+      countOne: '{count} quotation',
+      countOther: '{count} quotations',
+      systemSize: 'System size',
+      amount: 'Amount',
+      latest: 'Latest',
+      emptyTitle: 'No quotations yet',
+      empty:
+        'Quotations for this property will appear here when they are sent.',
+      loading: 'Loading quotations…',
+      errorTitle: 'Unable to load quotations',
+    },
+    rejected: {
+      title: 'Quotations closed',
+      description:
+        'All quotations for this property were rejected or have expired. Contact OneOhm to discuss next steps.',
+      callButton: 'Call OneOhm',
+      callError: 'Unable to open the phone dialer on this device.',
+      refreshButton: 'Check for updates',
+    },
+    status: {
+      sent: 'Sent',
+      viewed: 'Viewed',
+      accepted: 'Accepted',
+      rejected: 'Rejected',
+      expired: 'Expired',
+      draft: 'Draft',
+    },
+    readOnly: {
+      title: 'Quotation accepted',
+      body: 'This quotation is locked. Your project setup will continue shortly.',
+    },
+    accept: {
+      button: 'Accept quotation',
+      title: 'Accept quotation',
+      message:
+        'Enter your full name as your digital signature to confirm you accept this quotation.',
+      signatureLabel: 'Your signature',
+      signaturePlaceholder: 'Full name as signature',
+      confirm: 'Confirm accept',
+      cancel: 'Cancel',
+      errorEmpty: 'Signature is required to accept the quotation.',
+      error: 'We could not accept the quotation. Please try again.',
+    },
+    reject: {
+      button: 'Reject quotation',
+      title: 'Reject quotation',
+      message: 'Tell us why you are rejecting this quotation so we can help.',
+      reasonLabel: 'Rejection reason',
+      reasonPlaceholder: 'e.g. Need revised pricing',
+      confirm: 'Confirm reject',
+      cancel: 'Cancel',
+      errorEmpty: 'A reason is required to reject the quotation.',
+      error: 'We could not reject the quotation. Please try again.',
+    },
+  },
+  tabs: {
+    home: 'Home',
+    project: 'Project',
+    docs: 'Docs',
+    payments: 'Payments',
+    profile: 'Profile',
   },
 };

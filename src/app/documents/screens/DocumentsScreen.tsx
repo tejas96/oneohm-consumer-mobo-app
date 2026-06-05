@@ -4,16 +4,26 @@
  * Layer: app/documents/screens
  */
 
-import React, { useRef } from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  RefreshControl,
+  Modal,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import { Text, Searchbar, IconButton } from 'react-native-paper';
 
 import {
   ScreenWrapper,
-  CTOnboardingPlaceholder,
   CTCard,
   CTChip,
   CTPremiumHeader,
+  CTStateWrapper,
 } from '@/shared/components';
 import {
   spacing,
@@ -30,162 +40,300 @@ import {
   type PropertySwitcherBottomSheetRef,
 } from '@/shared/components/PropertySwitcherBottomSheet';
 
+const { width: screenWidth } = Dimensions.get('window');
+
 export function DocumentsScreen() {
   const switcherRef = useRef<PropertySwitcherBottomSheetRef>(null);
+  const swiperListRef = useRef<FlatList>(null);
 
   const theme = useAppTheme();
   const { t } = useTranslation();
   const {
     activeProject,
-    isOnboarding,
     isLoading,
     isError,
+    isRefreshing,
     refetch,
-    categories,
+    entityTypes,
     searchQuery,
     setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
+    selectedEntityType,
+    setSelectedEntityType,
     filteredDocs,
     handleDownload,
     handleBack,
     hasMultipleProjects,
   } = useDocumentsLogic();
 
-  const renderContent = () => {
-    if (isOnboarding) {
-      return (
-        <CTOnboardingPlaceholder
-          title={t('documents.onboardingTitle')}
-          description={t('documents.onboardingDesc')}
-          lottieSource={require('@/assets/animations/lottie/Scanning Document.json')}
-          statusText={t('documents.onboardingStage')}
-          status="warning"
-        />
-      );
-    }
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [activePreviewIndex, setActivePreviewIndex] = useState(0);
 
+  const isImageFile = (url: string) => {
+    const lowerUrl = (url || '').toLowerCase();
     return (
-      <View style={styles.innerContainer}>
-        {/* Search Bar */}
-        <Searchbar
-          placeholder={t('documents.searchPlaceholder')}
-          onChangeText={setSearchQuery}
-          value={searchQuery}
-          style={[
-            styles.searchBar,
-            {
-              backgroundColor: theme.colors.surfaceVariant,
-            },
-          ]}
-          placeholderTextColor={theme.colors.onSurfaceVariant}
-          iconColor={theme.colors.onSurfaceVariant}
-          inputStyle={[styles.searchInput, { color: theme.colors.onSurface }]}
-        />
+      lowerUrl.endsWith('.jpg') ||
+      lowerUrl.endsWith('.jpeg') ||
+      lowerUrl.endsWith('.png') ||
+      lowerUrl.endsWith('.gif') ||
+      lowerUrl.endsWith('.webp')
+    );
+  };
 
-        {/* Categories row */}
+  const openPreview = (index: number) => {
+    setActivePreviewIndex(index);
+    setIsPreviewOpen(true);
+    setTimeout(() => {
+      swiperListRef.current?.scrollToIndex({
+        index,
+        animated: false,
+      });
+    }, 100);
+  };
+
+  const handleScroll = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / screenWidth);
+    if (
+      index >= 0 &&
+      index < filteredDocs.length &&
+      index !== activePreviewIndex
+    ) {
+      setActivePreviewIndex(index);
+    }
+  };
+
+  const renderContent = () => (
+    <View style={styles.innerContainer}>
+      {/* Search Bar */}
+      <Searchbar
+        placeholder={t('documents.searchPlaceholder')}
+        onChangeText={setSearchQuery}
+        value={searchQuery}
+        style={[
+          styles.searchBar,
+          {
+            backgroundColor: theme.colors.surfaceVariant,
+          },
+        ]}
+        placeholderTextColor={theme.colors.onSurfaceVariant}
+        iconColor={theme.colors.onSurfaceVariant}
+        inputStyle={[styles.searchInput, { color: theme.colors.onSurface }]}
+      />
+
+      {/* Entity Types Chips row */}
+      {entityTypes.length > 1 && (
         <View style={styles.categoriesRow}>
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={[...categories]}
+            data={[...entityTypes]}
             keyExtractor={item => item}
             renderItem={({ item }) => {
-              const isSelected = selectedCategory === item;
+              const isSelected = selectedEntityType === item;
               return (
                 <CTChip
                   status={isSelected ? 'brand' : 'neutral'}
-                  onPress={() => setSelectedCategory(item)}
+                  onPress={() => setSelectedEntityType(item)}
                   style={styles.chip}
                 >
-                  {item}
+                  {t(`documents.entityTypes.${item}` as any)}
                 </CTChip>
               );
             }}
           />
         </View>
+      )}
 
-        {/* Documents FlatList */}
-        <FlatList
-          data={filteredDocs}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={{ color: theme.colors.onSurfaceVariant }}>
-                {t('documents.emptyState')}
+      {/* Documents FlatList */}
+      <FlatList
+        data={filteredDocs}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refetch}
+            colors={[theme.colors.primary]}
+            tintColor={theme.colors.primary}
+          />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={{ color: theme.colors.onSurfaceVariant }}>
+              {t('documents.emptyState')}
+            </Text>
+          </View>
+        }
+        renderItem={({ item, index }) => (
+          <CTCard
+            variant="glass"
+            style={styles.card}
+            innerStyle={styles.cardInner}
+            onPress={() => openPreview(index)}
+          >
+            <View style={styles.cardRow}>
+              <IconButton
+                icon={isImageFile(item.fileUrl) ? 'image' : 'file-pdf-box'}
+                iconColor={
+                  isImageFile(item.fileUrl)
+                    ? theme.colors.primary
+                    : theme.colors.error
+                }
+                size={24}
+                style={[
+                  styles.iconBg,
+                  {
+                    backgroundColor: isImageFile(item.fileUrl)
+                      ? theme.colors.primaryContainer
+                      : theme.colors.errorContainer,
+                  },
+                ]}
+              />
+              <View style={styles.cardTextContainer}>
+                <Text
+                  style={[styles.docTitle, { color: theme.colors.onSurface }]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {item.title}
+                </Text>
+                <Text
+                  style={[
+                    styles.metadataText,
+                    { color: theme.colors.onSurfaceVariant },
+                  ]}
+                >
+                  {item.date} • {item.size}
+                </Text>
+              </View>
+              <View style={styles.actionContainer}>
+                <IconButton
+                  icon="download"
+                  iconColor={theme.colors.primary}
+                  size={20}
+                  style={styles.downloadIcon}
+                  onPress={() => handleDownload(item)}
+                />
+              </View>
+            </View>
+          </CTCard>
+        )}
+      />
+
+      {/* Document Preview Swiper Modal */}
+      <Modal
+        visible={isPreviewOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsPreviewOpen(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          {/* Modal Header */}
+          <View style={styles.modalHeader}>
+            <IconButton
+              icon="close"
+              iconColor="#fff"
+              size={24}
+              onPress={() => setIsPreviewOpen(false)}
+            />
+            <View style={styles.modalHeaderTitleContainer}>
+              <Text
+                style={styles.modalDocTitle}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {filteredDocs[activePreviewIndex]?.title || ''}
+              </Text>
+              <Text style={styles.modalDocSubtitle}>
+                {activePreviewIndex + 1} of {filteredDocs.length} •{' '}
+                {t(
+                  `documents.entityTypes.${filteredDocs[activePreviewIndex]?.entityType}` as any,
+                )}
               </Text>
             </View>
-          }
-          renderItem={({ item }) => (
-            <CTCard
-              variant="glass"
-              style={styles.card}
-              innerStyle={styles.cardInner}
-              onPress={() => handleDownload(item.title)}
-            >
-              <View style={styles.cardRow}>
-                <IconButton
-                  icon="file-pdf-box"
-                  iconColor={theme.colors.error}
-                  size={24}
-                  style={[
-                    styles.iconBg,
-                    { backgroundColor: theme.colors.errorContainer },
-                  ]}
-                />
-                <View style={styles.cardTextContainer}>
-                  <Text
-                    style={[styles.docTitle, { color: theme.colors.onSurface }]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {item.title}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.metadataText,
-                      { color: theme.colors.onSurfaceVariant },
-                    ]}
-                  >
-                    {item.date} • {item.size}
-                  </Text>
+            <IconButton
+              icon="download"
+              iconColor={theme.colors.primary}
+              size={24}
+              onPress={() => {
+                const activeDoc = filteredDocs[activePreviewIndex];
+                if (activeDoc) {
+                  void handleDownload(activeDoc);
+                }
+              }}
+            />
+          </View>
+
+          {/* Swiper FlatList */}
+          <FlatList
+            ref={swiperListRef}
+            data={filteredDocs}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={item => `preview-${item.id}`}
+            getItemLayout={(_, index) => ({
+              length: screenWidth,
+              offset: screenWidth * index,
+              index,
+            })}
+            initialScrollIndex={
+              activePreviewIndex < filteredDocs.length ? activePreviewIndex : 0
+            }
+            onMomentumScrollEnd={handleScroll}
+            renderItem={({ item }) => {
+              const isImg = isImageFile(item.fileUrl);
+              return (
+                <View style={[styles.slide, { width: screenWidth }]}>
+                  {isImg ? (
+                    <Image
+                      source={{ uri: item.fileUrl }}
+                      style={styles.previewImage}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <View style={styles.placeholderSlideContainer}>
+                      <IconButton
+                        icon="file-pdf-box"
+                        iconColor={theme.colors.error}
+                        size={80}
+                        style={styles.placeholderIcon}
+                      />
+                      <Text style={styles.placeholderFilename}>
+                        {item.title}
+                      </Text>
+                      <Text style={styles.placeholderFilesize}>
+                        {item.size}
+                      </Text>
+                      <TouchableOpacity
+                        style={[
+                          styles.openFileBtn,
+                          { backgroundColor: theme.colors.primary },
+                        ]}
+                        onPress={() => void handleDownload(item)}
+                      >
+                        <Text style={styles.openFileBtnText}>
+                          {t('documents.downloadStartedTitle') ||
+                            'Open Document'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
-                <View style={styles.actionContainer}>
-                  <IconButton
-                    icon="download"
-                    iconColor={theme.colors.primary}
-                    size={20}
-                    style={styles.downloadIcon}
-                    onPress={() => handleDownload(item.title)}
-                  />
-                </View>
-              </View>
-            </CTCard>
-          )}
-        />
-      </View>
-    );
-  };
+              );
+            }}
+          />
+        </SafeAreaView>
+      </Modal>
+    </View>
+  );
 
   return (
     <ScreenWrapper
       padded={false}
       edges={['top', 'left', 'right']}
       showThemeToggle={false}
-      stateConfig={{
-        state: isLoading ? 'loading' : isError ? 'error' : 'success',
-        loadingConfig: {
-          message: t('common.stateConfig.loadingDocuments'),
-        },
-        errorConfig: {
-          title: t('common.stateConfig.errorTitleDocuments'),
-          message: t('common.stateConfig.errorMessage'),
-          retryText: t('common.retry'),
-          onRetry: refetch,
-        },
-      }}
     >
       <CTPremiumHeader
         title={t('documents.title')}
@@ -194,7 +342,22 @@ export function DocumentsScreen() {
         onSwitchProject={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
-      <View style={styles.container}>{renderContent()}</View>
+      <View style={styles.container}>
+        <CTStateWrapper
+          state={isLoading ? 'loading' : isError ? 'error' : 'success'}
+          loadingConfig={{
+            message: t('common.stateConfig.loadingDocuments'),
+          }}
+          errorConfig={{
+            title: t('common.stateConfig.errorTitleDocuments'),
+            message: t('common.stateConfig.errorMessage'),
+            retryText: t('common.retry'),
+            onRetry: refetch,
+          }}
+        >
+          {renderContent()}
+        </CTStateWrapper>
+      </View>
       <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );
@@ -261,5 +424,83 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: spacing.xl,
     alignItems: 'center',
+  },
+  // Modal Previewer Styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    justifyContent: 'space-between',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  modalHeaderTitleContainer: {
+    flex: 1,
+    marginLeft: spacing.sm,
+    justifyContent: 'center',
+  },
+  modalDocTitle: {
+    color: '#fff',
+    fontSize: fontSize.body,
+    fontWeight: fontWeight.bold,
+  },
+  modalDocSubtitle: {
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: fontSize.caption,
+    marginTop: spacing.micro,
+  },
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  previewImage: {
+    width: '100%',
+    height: '80%',
+  },
+  placeholderSlideContainer: {
+    width: '85%',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: borderRadius.md,
+    padding: spacing.xl,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  placeholderIcon: {
+    margin: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: borderRadius.md,
+  },
+  placeholderFilename: {
+    color: '#fff',
+    fontSize: fontSize.body,
+    fontWeight: fontWeight.bold,
+    textAlign: 'center',
+    marginTop: spacing.md,
+  },
+  placeholderFilesize: {
+    color: 'rgba(255, 255, 255, 0.5)',
+    fontSize: fontSize.caption,
+    marginTop: spacing.xs,
+    textAlign: 'center',
+  },
+  openFileBtn: {
+    marginTop: spacing.xl,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  openFileBtnText: {
+    color: '#fff',
+    fontSize: fontSize.body,
+    fontWeight: fontWeight.bold,
   },
 });

@@ -9,7 +9,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
-import { spacing, fontWeight, useAppTheme } from '@/shared/theme';
+import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 
 interface FinancialSummaryProps {
   financials: {
@@ -20,7 +20,7 @@ interface FinancialSummaryProps {
     netCost: number;
   };
   dateRange: string;
-  formatCurrency: (value: number) => string;
+  formatCurrency: (value?: number | null) => string;
 }
 
 export function FinancialSummary({
@@ -233,13 +233,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   heading: {
-    fontSize: 10,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   dateText: {
-    fontSize: 10,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.semibold,
   },
   metricsContainer: {
@@ -255,15 +255,15 @@ const styles = StyleSheet.create({
     paddingRight: spacing.sm,
   },
   metricLabel: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.semibold,
   },
   metricCaption: {
-    fontSize: 8.5,
-    marginTop: 2,
+    fontSize: fontSize.micro,
+    marginTop: spacing.micro,
   },
   metricValueLarge: {
-    fontSize: 15,
+    fontSize: fontSize.body,
     fontWeight: fontWeight.black,
   },
   highlightRow: {
@@ -282,11 +282,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   highlightLabel: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
   },
   highlightValue: {
-    fontSize: 14,
+    fontSize: fontSize.body,
     fontWeight: fontWeight.black,
   },
   subsidyRow: {
@@ -304,18 +304,18 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   netLabel: {
-    fontSize: 12,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
   },
   netValueCol: {
     alignItems: 'flex-end',
   },
   netValue: {
-    fontSize: 16,
+    fontSize: fontSize.subhead,
     fontWeight: fontWeight.black,
   },
   netCaption: {
-    fontSize: 8,
-    marginTop: 2,
+    fontSize: fontSize.micro,
+    marginTop: spacing.micro,
   },
 });

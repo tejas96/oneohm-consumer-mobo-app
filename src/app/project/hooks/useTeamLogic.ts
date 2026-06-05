@@ -4,7 +4,7 @@
  * Layer: app/project/hooks
  */
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Alert, Linking } from 'react-native';
 import {
   useNavigation,
@@ -18,7 +18,11 @@ import { Route, type MainStackParamList } from '@/core/navigation';
 import { useTranslation } from '@/core/i18n';
 import { useTeamMembers, useSubmitFeedback } from '@/data';
 import type { TeamMember } from '@/data/types/team.types';
-import { useActiveProject } from '@/shared/hooks';
+import { useCustomerFlow } from '@/shared/hooks';
+import {
+  getLatestQuoteVersion,
+  mapActivePropertyToProject,
+} from '@/shared/utils';
 
 export function useTeamLogic() {
   const navigation =
@@ -27,8 +31,19 @@ export function useTeamLogic() {
   const { projectId } = route.params;
   const { t } = useTranslation();
 
-  // Active Project Details for consistent header styling
-  const { activeProject } = useActiveProject();
+  const { activeProperty, quotationView } = useCustomerFlow();
+  const latestQuoteVersion = useMemo(
+    () => getLatestQuoteVersion(quotationView.activeQuote),
+    [quotationView.activeQuote],
+  );
+  const activeProject = useMemo(
+    () =>
+      mapActivePropertyToProject(activeProperty, {
+        defaultPropertyName: t('projectSwitcher.defaultPropertyName'),
+        latestQuoteVersion,
+      }),
+    [activeProperty, latestQuoteVersion, t],
+  );
 
   // FDAL Hooks
   const {
@@ -69,8 +84,8 @@ export function useTeamLogic() {
       } else {
         if (__DEV__) {
           Alert.alert(
-            'Simulator Mode',
-            `Direct calling simulated to: ${phone}\n\n(On a real device, this opens your phone's native dialer app.)`,
+            t('dev.simulatorTitle'),
+            t('dev.simulatorCallMessage').replace('{phone}', phone),
           );
         } else {
           Toast.show({
@@ -83,8 +98,8 @@ export function useTeamLogic() {
     } catch {
       if (__DEV__) {
         Alert.alert(
-          'Simulator Mode',
-          `Direct calling simulated to: ${phone}\n\n(On a real device, this opens your phone's native dialer app.)`,
+          t('dev.simulatorTitle'),
+          t('dev.simulatorCallMessage').replace('{phone}', phone),
         );
       } else {
         Toast.show({
@@ -92,70 +107,6 @@ export function useTeamLogic() {
           text1: t('common.error'),
           text2: t('team.dialerErr'),
         });
-      }
-    }
-  };
-
-  const handleWhatsApp = async (phone: string, name: string) => {
-    if (!validatePhoneNumber(phone)) {
-      Alert.alert(t('common.error'), t('team.smsErr'));
-      return;
-    }
-
-    // Clean phone number (strip + or non-numeric characters for WhatsApp API)
-    const numericPhone = phone.replace(/[^0-9]/g, '');
-    const messageText = t('team.whatsappTemplate').replace('{name}', name);
-    const whatsappUrl = `whatsapp://send?phone=${numericPhone}&text=${encodeURIComponent(
-      messageText,
-    )}`;
-    const smsUrl = `sms:${phone}?body=${encodeURIComponent(messageText)}`;
-
-    try {
-      const canOpenWhatsapp = await Linking.canOpenURL(whatsappUrl);
-      if (canOpenWhatsapp) {
-        await Linking.openURL(whatsappUrl);
-      } else {
-        // Graceful SMS Fallback
-        const canOpenSms = await Linking.canOpenURL(smsUrl);
-        if (canOpenSms) {
-          Toast.show({
-            type: 'info',
-            text1: t('team.whatsappNotInstalled'),
-            text2: t('team.whatsappErr'),
-          });
-          await Linking.openURL(smsUrl);
-        } else {
-          if (__DEV__) {
-            Alert.alert(
-              'Simulator Mode',
-              `WhatsApp / SMS simulated to: ${phone}\nMessage: "${messageText}"\n\n(On a real device, this will open WhatsApp or fall back to standard SMS.)`,
-            );
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: t('common.error'),
-              text2: t('team.smsErr'),
-            });
-          }
-        }
-      }
-    } catch {
-      // Direct SMS fallback in case of exceptions
-      try {
-        await Linking.openURL(smsUrl);
-      } catch {
-        if (__DEV__) {
-          Alert.alert(
-            'Simulator Mode',
-            `WhatsApp / SMS simulated to: ${phone}\nMessage: "${messageText}"\n\n(On a real device, this will open WhatsApp or fall back to standard SMS.)`,
-          );
-        } else {
-          Toast.show({
-            type: 'error',
-            text1: t('common.error'),
-            text2: t('team.smsErr'),
-          });
-        }
       }
     }
   };
@@ -225,6 +176,10 @@ export function useTeamLogic() {
     navigation.goBack();
   };
 
+  const handleChat = () => {
+    navigation.navigate(Route.PROJECT_CHAT, { projectId });
+  };
+
   return {
     activeProject,
     teamMembers,
@@ -241,8 +196,8 @@ export function useTeamLogic() {
     closeFeedbackModal,
     handleSubmitFeedback,
     handleCall,
-    handleWhatsApp,
     handleBack,
+    handleChat,
     isSubmitting: submitFeedbackMutation.isPending,
   };
 }

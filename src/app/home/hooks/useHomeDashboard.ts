@@ -1,18 +1,74 @@
 /**
  * useHomeDashboard — Custom hook for managing Home dashboard state and logic
  *
+ * Resolver guarantees project_active before Home mounts; loads dashboard
+ * analytics from useCustomerProjectDashboard and property/quote context
+ * from useCustomerFlow.
+ *
  * Layer: app/home/hooks
  */
 
-import { useNavigation } from '@react-navigation/native';
+import { useMemo, useState, useEffect } from 'react';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useAuthStore } from '@/core/auth';
 import { Route, type MainStackParamList } from '@/core/navigation';
 import { useTranslation } from '@/core/i18n';
-import { useActiveProperty } from '@/shared/hooks';
+import {
+  useCustomerProjectDashboard,
+  useChatMessages,
+  useCustomerProjectFinancialSummary,
+} from '@/data';
+import type { Project, Quote, QuoteVersion } from '@/data/types';
+import { useCustomerFlow } from '@/shared/hooks';
 
-export type DashboardState = 'onboarding' | 'in_progress' | 'completed';
+function getLatestQuoteVersion(
+  quote: Quote | null | undefined,
+): QuoteVersion | null {
+  if (!quote?.versions?.length) {
+    return null;
+  }
+  return (
+    [...quote.versions].sort((a, b) => b.versionNumber - a.versionNumber)[0] ??
+    null
+  );
+}
+
+function readMetadataAmountPaid(metadata: unknown): number {
+  if (metadata && typeof metadata === 'object' && 'amountPaid' in metadata) {
+    const paid = (metadata as { amountPaid?: unknown }).amountPaid;
+    return typeof paid === 'number' ? paid : 0;
+  }
+  return 0;
+}
+
+function resolveSystemCapacityKw(
+  project: NonNullable<
+    ReturnType<typeof useCustomerFlow>['activeProperty']
+  >['project'],
+  quoteVersion: QuoteVersion | null,
+): number {
+  const actualSize =
+    quoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
+    quoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+    quoteVersion?.actualSystemSizeKw ??
+    (project as { actualSystemSizeKw?: number })?.actualSystemSizeKw;
+
+  if (typeof actualSize === 'number' && actualSize > 0) {
+    return actualSize;
+  }
+
+  if (project && 'systemSizeKw' in project) {
+    const fromProject = (project as { systemSizeKw?: number }).systemSizeKw;
+    if (typeof fromProject === 'number' && fromProject > 0) {
+      return fromProject;
+    }
+  }
+
+  return quoteVersion?.systemSizeKw ?? 0;
+}
 
 export function useHomeDashboard() {
   const navigation =
@@ -20,94 +76,164 @@ export function useHomeDashboard() {
   const user = useAuthStore(state => state.user);
   const refreshUser = useAuthStore(state => state.refreshUser);
   const { t } = useTranslation();
+
   const {
     activeProperty,
     properties,
-    isLoading,
-    isError,
-    refetch,
-    propertyStage,
-    latestQuoteVersion,
-  } = useActiveProperty();
+    quotationView,
+    isLoading: isFlowLoading,
+    isError: isFlowError,
+    isFetching: isFlowFetching,
+    refetch: refetchFlow,
+  } = useCustomerFlow();
+
+  const projectId = activeProperty?.project?.id ?? '';
+
+  const {
+    data: dashboard,
+    isError: isDashboardError,
+    isFetching: isDashboardFetching,
+    refetch: refetchDashboard,
+  } = useCustomerProjectDashboard(projectId, { enabled: !!projectId });
+
+  const {
+    data: financialSummary,
+    isError: isFinancialError,
+    isFetching: isFinancialFetching,
+    refetch: refetchFinancial,
+  } = useCustomerProjectFinancialSummary(projectId, { enabled: !!projectId });
+
+  const latestQuoteVersion = useMemo(
+    () => getLatestQuoteVersion(quotationView.activeQuote),
+    [quotationView.activeQuote],
+  );
+
+  const isLoading = isFlowLoading;
+  const isError = isFlowError || isDashboardError || isFinancialError;
+  const isRefreshing =
+    isFlowFetching || isDashboardFetching || isFinancialFetching;
 
   const handleRefetch = async () => {
-    await Promise.all([refetch(), refreshUser()]);
+    await Promise.all([
+      refetchFlow(),
+      refetchDashboard(),
+      refetchFinancial(),
+      refreshUser(),
+    ]);
   };
 
-  // Resolve overall dashboard state
-  let dashboardState: DashboardState = 'onboarding';
-  if (activeProperty && propertyStage === 'project_active') {
-    if (activeProperty.project?.status === 'COMPLETED') {
-      dashboardState = 'completed';
-    } else {
-      dashboardState = 'in_progress';
-    }
-  }
-
-  // Financial calculations
-  const totalValue = latestQuoteVersion?.finalPrice || 0;
-  const amountPaid =
-    (activeProperty?.project?.metadata?.amountPaid as number) || 0;
-  const subsidy =
-    latestQuoteVersion?.pricingBreakdown?.subsidyAmount ||
-    latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ||
-    0;
+  const totalValue = Number(latestQuoteVersion?.finalPrice ?? 0);
+  const amountPaid = Number(
+    financialSummary?.totalReceived ??
+    readMetadataAmountPaid(activeProperty?.project?.metadata)
+  );
+  const subsidy = Number(
+    latestQuoteVersion?.pricingBreakdown?.subsidyAmount ??
+    latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ??
+    0
+  );
   const outstanding = Math.max(0, totalValue - amountPaid);
   const netCost = totalValue - subsidy;
 
-  // Map CustomerProperty to compatibility object for the presentational widgets
-  const activeProjectMapped = activeProperty
-    ? {
-        id: activeProperty.id,
-        label:
-          activeProperty.propertyName ||
-          t('projectSwitcher.defaultPropertyName'),
-        status: activeProperty.project?.status || 'PLANNING',
-        totalValue,
-        subsidy,
-        amountPaid,
-        startDate: activeProperty.project?.startDate || '',
-        endDate: activeProperty.project?.endDate || '',
-        progress: activeProperty.project?.progressPercentage || 0,
-        capacity:
-          latestQuoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
-          latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
-          latestQuoteVersion?.actualSystemSizeKw ??
-          0,
-        projectNumber: activeProperty.project?.projectNumber,
-        property: activeProperty,
-        quoteVersion: latestQuoteVersion,
-      }
-    : null;
+  const progress =
+    dashboard?.metrics.completionPercentage ??
+    activeProperty?.project?.progressPercentage ??
+    0;
 
-  // Navigation handlers
+  const nextStep = dashboard?.metrics.upcomingDeadlines[0]?.name;
+
+  const activeProjectMapped: Project | null = useMemo(() => {
+    if (!activeProperty) {
+      return null;
+    }
+
+    const project = activeProperty.project;
+
+    return {
+      id: activeProperty.id,
+      label:
+        activeProperty.propertyName || t('projectSwitcher.defaultPropertyName'),
+      status: project?.status ?? 'PLANNING',
+      totalValue,
+      subsidy,
+      amountPaid,
+      startDate: project?.startDate ?? '',
+      endDate: project?.endDate ?? '',
+      progress,
+      capacity: resolveSystemCapacityKw(project, latestQuoteVersion),
+      nextStep,
+      projectNumber: project?.projectNumber,
+      property: activeProperty,
+      quoteVersion: latestQuoteVersion,
+    };
+  }, [
+    activeProperty,
+    amountPaid,
+    latestQuoteVersion,
+    nextStep,
+    progress,
+    subsidy,
+    t,
+    totalValue,
+  ]);
+
+  const isFocused = useIsFocused();
+  const { data: messages = [] } = useChatMessages(projectId, {
+    enabled: !!projectId && isFocused,
+  });
+  const [lastReadTime, setLastReadTime] = useState<number>(0);
+
+  useEffect(() => {
+    if (projectId && isFocused) {
+      AsyncStorage.getItem(`chat_last_read_${projectId}`)
+        .then(val => {
+          if (val) setLastReadTime(parseInt(val, 10));
+        })
+        .catch(err => console.error(err));
+    }
+  }, [projectId, isFocused]);
+
+  const hasUnreadChat = useMemo(() => {
+    if (messages.length === 0) return false;
+    const latestMsg = messages[messages.length - 1];
+    if (latestMsg.senderId === user?.id) return false;
+    return new Date(latestMsg.createdAt).getTime() > lastReadTime;
+  }, [messages, lastReadTime, user?.id]);
+
   const navigateToPayments = () =>
-    navigation.navigate(Route.PAYMENTS_TAB as any);
+    navigation.navigate(Route.MAIN_TABS, { screen: Route.PAYMENTS_TAB });
   const navigateToDocuments = () =>
-    navigation.navigate(Route.DOCUMENTS_TAB as any);
+    navigation.navigate(Route.MAIN_TABS, { screen: Route.DOCUMENTS_TAB });
   const navigateToSupport = () => navigation.navigate(Route.SUPPORT);
-  const navigateToWarranty = () => navigation.navigate(Route.WARRANTY);
   const navigateToProjectTeam = () => {
-    if (activeProperty?.project?.id) {
-      navigation.navigate(Route.PROJECT_TEAM, {
-        projectId: activeProperty.project.id,
+    if (projectId) {
+      navigation.navigate(Route.PROJECT_TEAM, { projectId });
+    }
+  };
+  const navigateToProfile = () =>
+    navigation.navigate(Route.MAIN_TABS, { screen: Route.PROFILE_TAB });
+
+  const navigateToQuotations = () => {
+    if (activeProperty?.id) {
+      navigation.navigate(Route.QUOTATION_LIST, {
+        propertyId: activeProperty.id,
       });
     }
   };
-  const navigateToNotifications = () =>
-    navigation.navigate(Route.NOTIFICATIONS);
-  const navigateToProfile = () =>
-    navigation.navigate(Route.MAIN_TABS, { screen: Route.PROFILE_TAB });
+
+  const navigateToChat = () => {
+    if (projectId) {
+      navigation.navigate(Route.PROJECT_CHAT, { projectId });
+    }
+  };
 
   return {
     user,
     activeProject: activeProjectMapped,
-    dashboardState,
     isLoading,
     isError,
+    isRefreshing,
     refetch: handleRefetch,
-
-    // Financial Metrics
     financials: {
       totalValue,
       amountPaid,
@@ -115,15 +241,14 @@ export function useHomeDashboard() {
       outstanding,
       netCost,
     },
-
-    // Handlers
     hasMultipleProjects: properties.length > 1,
+    hasUnreadChat,
     navigateToPayments,
     navigateToDocuments,
     navigateToSupport,
-    navigateToWarranty,
     navigateToProjectTeam,
-    navigateToNotifications,
     navigateToProfile,
+    navigateToQuotations,
+    navigateToChat,
   };
 }

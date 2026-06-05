@@ -17,11 +17,11 @@ import {
 
 import { useHomeDashboard } from '../hooks/useHomeDashboard';
 import { HomeHeader } from '../components/HomeHeader';
-import { OnboardingState } from '../components/OnboardingState';
 import { ProgressWidget } from '../components/ProgressWidget';
 import { PaymentSnapshot } from '../components/PaymentSnapshot';
 import { QuickActions } from '../components/QuickActions';
 import { BannerAlert } from '../components/BannerAlert';
+import { EnvironmentImpactCard } from '../components/EnvironmentImpactCard';
 
 export function HomeScreen() {
   const switcherRef = useRef<PropertySwitcherBottomSheetRef>(null);
@@ -31,62 +31,19 @@ export function HomeScreen() {
   const {
     user,
     activeProject,
-    dashboardState,
-    isLoading,
     isError,
+    isRefreshing,
     refetch,
     financials,
     navigateToPayments,
     navigateToDocuments,
     navigateToSupport,
-    navigateToWarranty,
     navigateToProjectTeam,
-    navigateToNotifications,
     hasMultipleProjects,
+    navigateToQuotations,
+    navigateToChat,
+    hasUnreadChat,
   } = useHomeDashboard();
-
-  const renderContent = () => {
-    if (dashboardState === 'onboarding') {
-      return <OnboardingState />;
-    }
-
-    // Otherwise, render full active tracking dashboard inside scrollview
-    return (
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={refetch}
-            colors={[theme.colors.primary]}
-            tintColor={theme.colors.primary}
-          />
-        }
-      >
-        {activeProject ? (
-          <>
-            <ProgressWidget activeProject={activeProject} />
-            <BannerAlert
-              activeProject={activeProject}
-              onPress={navigateToDocuments}
-            />
-            <PaymentSnapshot
-              activeProject={activeProject}
-              financials={financials}
-              onTimelinePress={navigateToPayments}
-            />
-            <QuickActions
-              onDocumentsPress={navigateToDocuments}
-              onSupportPress={navigateToSupport}
-              onWarrantyPress={navigateToWarranty}
-              onTeamPress={navigateToProjectTeam}
-            />
-          </>
-        ) : null}
-      </ScrollView>
-    );
-  };
 
   return (
     <ScreenWrapper
@@ -95,10 +52,7 @@ export function HomeScreen() {
       showThemeToggle={false}
       edges={['top', 'left', 'right']}
       stateConfig={{
-        state: isLoading ? 'loading' : isError ? 'error' : 'success',
-        loadingConfig: {
-          message: t('common.stateConfig.loadingDashboard'),
-        },
+        state: isError ? 'error' : 'success',
         errorConfig: {
           title: t('common.stateConfig.errorTitleDashboard'),
           message: t('common.stateConfig.errorMessage'),
@@ -112,11 +66,46 @@ export function HomeScreen() {
           activeProject?.property?.customerName || user?.firstName || ''
         }
         activeProject={activeProject}
-        onNotificationsPress={navigateToNotifications}
         onProjectSwitcherPress={() => switcherRef.current?.open()}
         hasMultipleProjects={hasMultipleProjects}
       />
-      <View style={styles.content}>{renderContent()}</View>
+      <View style={styles.content}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={refetch}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+        >
+          {activeProject ? (
+            <>
+              <ProgressWidget activeProject={activeProject} />
+              <BannerAlert
+                activeProject={activeProject}
+                onPress={navigateToDocuments}
+              />
+              <PaymentSnapshot
+                activeProject={activeProject}
+                financials={financials}
+                onTimelinePress={navigateToPayments}
+              />
+              <EnvironmentImpactCard activeProject={activeProject} />
+              <QuickActions
+                onQuotationsPress={navigateToQuotations}
+                onSupportPress={navigateToSupport}
+                onTeamPress={navigateToProjectTeam}
+                onChatPress={navigateToChat}
+                hasUnreadChat={hasUnreadChat}
+              />
+            </>
+          ) : null}
+        </ScrollView>
+      </View>
       <PropertySwitcherBottomSheet ref={switcherRef} />
     </ScreenWrapper>
   );

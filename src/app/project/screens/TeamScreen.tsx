@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native';
 import { Text, IconButton, ActivityIndicator } from 'react-native-paper';
 
 import {
@@ -41,8 +41,8 @@ export function TeamScreen() {
     closeFeedbackModal,
     handleSubmitFeedback,
     handleCall,
-    handleWhatsApp,
     handleBack,
+    handleChat,
     isSubmitting,
   } = useTeamLogic();
 
@@ -126,7 +126,7 @@ export function TeamScreen() {
                   { color: theme.colors.onSurfaceVariant },
                 ]}
               >
-                {item.rating.toFixed(1)}{' '}
+                {Number(item.rating || 0).toFixed(1)}{' '}
                 {item.reviewCount > 0
                   ? t('team.reviews').replace(
                       '{count}',
@@ -156,17 +156,6 @@ export function TeamScreen() {
             onPress={() => handleCall(item.phone)}
           >
             {t('team.callBtn')}
-          </CTButton>
-          <CTButton
-            variant="ghost"
-            size="sm"
-            icon="whatsapp"
-            compact
-            style={styles.actionButton}
-            textColor={theme.colors.secondary}
-            onPress={() => handleWhatsApp(item.phone, item.name)}
-          >
-            {t('team.whatsappBtn')}
           </CTButton>
           <CTButton
             variant="ghost"
@@ -207,13 +196,28 @@ export function TeamScreen() {
         onBack={handleBack}
       />
 
-      <FlatList
-        data={teamMembers}
-        keyExtractor={item => item.id}
-        renderItem={renderTeamMember}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      <View style={styles.listContainer}>
+        <FlatList
+          data={teamMembers}
+          keyExtractor={item => item.id}
+          renderItem={renderTeamMember}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+
+        <TouchableOpacity
+          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+          onPress={handleChat}
+          activeOpacity={0.8}
+        >
+          <IconButton
+            icon="chat"
+            iconColor={theme.colors.onPrimary}
+            size={24}
+            style={styles.fabIcon}
+          />
+        </TouchableOpacity>
+      </View>
 
       {/* Review Dialog */}
       <CTDialog
@@ -436,5 +440,27 @@ const styles = StyleSheet.create({
   },
   dialogLoading: {
     marginTop: spacing.md,
+  },
+  listContainer: {
+    flex: 1,
+    position: 'relative',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: spacing.lg,
+    right: spacing.lg,
+    borderRadius: 28,
+    width: 56,
+    height: 56,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+  },
+  fabIcon: {
+    margin: 0,
   },
 });

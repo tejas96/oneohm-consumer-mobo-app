@@ -15,7 +15,6 @@ export type {
   RootParamList,
   ScreenProps,
   OtpParams,
-  ProjectDetailParams,
 } from './navigation.types';
 
 // Hooks

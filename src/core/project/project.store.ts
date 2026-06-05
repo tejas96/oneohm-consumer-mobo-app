@@ -89,25 +89,3 @@ export const usePropertySelectionStore = create<PropertySelectionState>(
     },
   }),
 );
-
-interface ProjectSelectionShimState {
-  selectedProjectId: SelectedPropertyId;
-  setSelectedProjectId: (id: SelectedPropertyId) => void;
-}
-
-/** @deprecated Use usePropertySelectionStore — removed in T21 */
-export const useProjectSelectionStore = create<ProjectSelectionShimState>(
-  set => ({
-    selectedProjectId: null,
-    setSelectedProjectId: (id: SelectedPropertyId) => {
-      usePropertySelectionStore.getState().setSelectedPropertyId(id);
-      set({ selectedProjectId: id });
-    },
-  }),
-);
-
-usePropertySelectionStore.subscribe(state => {
-  useProjectSelectionStore.setState({
-    selectedProjectId: state.selectedPropertyId,
-  });
-});

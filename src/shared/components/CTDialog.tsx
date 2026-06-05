@@ -8,7 +8,12 @@
  */
 
 import React from 'react';
-import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import { Dialog, Portal, Text } from 'react-native-paper';
 
 import {
@@ -80,14 +85,25 @@ export function CTDialog({
 
       {message || children ? (
         <Dialog.Content style={styles.content}>
-          {message ? (
-            <Text
-              style={[styles.message, { color: theme.colors.onSurfaceVariant }]}
-            >
-              {message}
-            </Text>
-          ) : null}
-          {children}
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            bounces={false}
+          >
+            {message ? (
+              <Text
+                style={[
+                  styles.message,
+                  { color: theme.colors.onSurfaceVariant },
+                ]}
+              >
+                {message}
+              </Text>
+            ) : null}
+            {children}
+          </ScrollView>
         </Dialog.Content>
       ) : null}
 
@@ -113,7 +129,7 @@ export function CTDialog({
     <Portal>
       {keyboardAvoiding ? (
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardAvoidingView}
         >
           {dialogContent}
@@ -148,7 +164,13 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   keyboardAvoidingView: {
-    flex: 1,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
+  },
+  scroll: {
+    maxHeight: 280,
+  },
+  scrollContent: {
+    paddingBottom: spacing.sm,
   },
 });

@@ -10,7 +10,7 @@ import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 interface HomeHeaderProps {
   userName?: string;
   activeProject: Project | null;
-  onNotificationsPress: () => void;
+  onNotificationsPress?: () => void;
   onProjectSwitcherPress: () => void;
   hasMultipleProjects?: boolean;
 }
@@ -48,7 +48,7 @@ export function HomeHeader({
           style={[styles.userName, { color: theme.colors.onSurface }]}
           numberOfLines={1}
         >
-          {userName || 'Guest User'}
+          {userName || t('dashboard.guestUser')}
         </Text>
 
         {activeProject ? (
@@ -100,33 +100,35 @@ export function HomeHeader({
       </View>
 
       <View style={styles.rightCol}>
-        <TouchableOpacity
-          style={[
-            styles.notifWrapper,
-            {
-              backgroundColor: theme.colors.glassBgSubtle,
-              borderColor: theme.colors.outlineVariant,
-            },
-          ]}
-          onPress={onNotificationsPress}
-          activeOpacity={0.7}
-        >
-          <IconButton
-            icon="bell-outline"
-            size={20}
-            iconColor={theme.colors.onBackground}
-            style={styles.iconButton}
-          />
-          <View
+        {onNotificationsPress ? (
+          <TouchableOpacity
             style={[
-              styles.badgeDot,
+              styles.notifWrapper,
               {
-                backgroundColor: theme.colors.error,
-                borderColor: theme.colors.surface,
+                backgroundColor: theme.colors.glassBgSubtle,
+                borderColor: theme.colors.outlineVariant,
               },
             ]}
-          />
-        </TouchableOpacity>
+            onPress={onNotificationsPress}
+            activeOpacity={0.7}
+          >
+            <IconButton
+              icon="bell-outline"
+              size={20}
+              iconColor={theme.colors.onBackground}
+              style={styles.iconButton}
+            />
+            <View
+              style={[
+                styles.badgeDot,
+                {
+                  backgroundColor: theme.colors.error,
+                  borderColor: theme.colors.surface,
+                },
+              ]}
+            />
+          </TouchableOpacity>
+        ) : null}
       </View>
     </View>
   );

@@ -3,11 +3,12 @@
  *
  * Derives all specs from the active property's latest quote version.
  * No mock/fallback data is used — if real data is absent the screen
- * shows empty states or the onboarding placeholder.
+ * shows empty states. Tabs mount only under project_active (resolver).
  *
  * Layer: app/project/hooks
  */
 
+import { useMemo } from 'react';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,8 +16,13 @@ import { DcrPreference } from '@tejas96/shared';
 
 import { Route, type MainStackParamList } from '@/core/navigation';
 import { useTranslation } from '@/core/i18n';
-import { useActiveProperty } from '@/shared/hooks';
-import { useProjectMilestones } from '@/data';
+import { useCustomerProjectTimeline } from '@/data';
+import { useCustomerFlow } from '@/shared/hooks';
+import {
+  getLatestQuoteVersion,
+  mapActivePropertyToProject,
+  readMetadataAmountPaid,
+} from '@/shared/utils';
 
 export interface TimelineStep {
   title: string;
@@ -33,11 +39,18 @@ export interface PanelSpecs {
   warranty: string;
 }
 
-export interface InverterSpecs {
+export interface InverterItem {
+  brand: string;
   capacity: string;
   quantity: string;
+  name: string;
+  warranty?: string;
+}
+
+export interface InverterSpecs {
+  inverters: InverterItem[];
   phaseType: string;
-  brand: string;
+  totalCapacity: string;
 }
 
 export interface StructureSpecs {
@@ -59,31 +72,31 @@ export function useProjectLogic() {
   const {
     activeProperty,
     properties,
-    isOnboarding: activePropOnboarding,
+    quotationView,
     isLoading: isActivePropertyLoading,
     isError: isActivePropertyError,
     refetch: refetchActiveProperty,
-    latestQuoteVersion,
-  } = useActiveProperty();
+  } = useCustomerFlow();
 
-  const isOnboarding = activePropOnboarding || !activeProperty?.project;
-  const projectId = activeProperty?.project?.id || '';
+  const latestQuoteVersion = useMemo(
+    () => getLatestQuoteVersion(quotationView.activeQuote),
+    [quotationView.activeQuote],
+  );
+
+  const projectId = activeProperty?.project?.id ?? '';
 
   const {
     data: milestonesRaw,
     isLoading: isMilestonesLoading,
     isError: isMilestonesError,
     refetch: refetchMilestones,
-  } = useProjectMilestones(projectId, {
-    enabled: !isOnboarding && !!projectId,
+  } = useCustomerProjectTimeline(projectId, {
+    enabled: !!projectId,
   });
 
   const isLoading =
-    isActivePropertyLoading ||
-    (!isOnboarding && !!projectId && isMilestonesLoading);
-  const isError =
-    isActivePropertyError ||
-    (!isOnboarding && !!projectId && isMilestonesError);
+    isActivePropertyLoading || (!!projectId && isMilestonesLoading);
+  const isError = isActivePropertyError || (!!projectId && isMilestonesError);
 
   const refetch = async () => {
     await refetchActiveProperty();
@@ -92,32 +105,15 @@ export function useProjectLogic() {
     }
   };
 
-  // Build activeProject from real property/quote data only — no fallbacks.
-  const activeProject = activeProperty
-    ? {
-        id: activeProperty.id,
-        label: activeProperty.propertyName || '',
-        status: activeProperty.project?.status || 'PLANNING',
-        totalValue: latestQuoteVersion?.finalPrice || 0,
-        subsidy:
-          latestQuoteVersion?.pricingBreakdown?.subsidyAmount ||
-          latestQuoteVersion?.quoteSnapshot?.pricing?.subsidyAmount ||
-          0,
-        amountPaid:
-          (activeProperty.project?.metadata?.amountPaid as number) || 0,
-        startDate: activeProperty.project?.startDate || '',
-        endDate: activeProperty.project?.endDate || '',
-        progress: activeProperty.project?.progressPercentage || 0,
-        capacity:
-          latestQuoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
-          latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
-          latestQuoteVersion?.actualSystemSizeKw ??
-          0,
-        projectNumber: activeProperty.project?.projectNumber,
-        property: activeProperty,
-        quoteVersion: latestQuoteVersion,
-      }
-    : null;
+  const activeProject = useMemo(
+    () =>
+      mapActivePropertyToProject(activeProperty, {
+        defaultPropertyName: t('projectSwitcher.defaultPropertyName'),
+        latestQuoteVersion,
+        amountPaid: readMetadataAmountPaid(activeProperty?.project?.metadata),
+      }),
+    [activeProperty, latestQuoteVersion, t],
+  );
 
   // Mapping from MilestoneAggregateItem to TimelineStep
   const getMilestoneTitle = (name: string) => {
@@ -159,8 +155,8 @@ export function useProjectLogic() {
     }
   };
 
-  const timelineSteps: TimelineStep[] = milestonesRaw
-    ? [...milestonesRaw]
+  const timelineSteps: TimelineStep[] = milestonesRaw?.milestones
+    ? [...milestonesRaw.milestones]
         .filter(m => m.totalTasks > 0)
         .sort((a, b) => a.order - b.order)
         .map(m => {
@@ -184,6 +180,7 @@ export function useProjectLogic() {
   // Derive specs from the accepted quote snapshot inputs.
   // Returns null for each section when no quote data is present.
   const inputs = latestQuoteVersion?.quoteSnapshot?.inputs;
+  const calculation = latestQuoteVersion?.quoteSnapshot?.calculation;
 
   let dcrPanels: PanelSpecs | null = null;
   let nonDcrPanels: PanelSpecs | null = null;
@@ -192,47 +189,89 @@ export function useProjectLogic() {
 
   if (inputs) {
     const capacity =
-      latestQuoteVersion?.quoteSnapshot?.calculation?.actualSystemSizeKw ??
-      latestQuoteVersion?.quoteSnapshot?.inputs?.actualSystemSizeKw ??
+      calculation?.actualSystemSizeKw ??
+      inputs.actualSystemSizeKw ??
       latestQuoteVersion?.actualSystemSizeKw ??
       0;
-    const dcrPref = inputs.dcrPreference;
 
-    // DCR panels — only when the quote includes a DCR component
-    if (dcrPref !== DcrPreference.NON_DCR_ONLY && inputs.dcrSystemSizeKw) {
-      dcrPanels = {
-        technology: inputs.preferredPanelTechnology || '',
-        brand: inputs.preferredPanelBrand || '',
-        count: inputs.manualDcrPanelCount ?? 0,
-        warranty: '',
-      };
+    // 1. Solar Panels — derived from calculation if present
+    if (calculation?.panels?.length) {
+      for (const p of calculation.panels) {
+        const panelSpec: PanelSpecs = {
+          technology: p.technology || inputs.preferredPanelTechnology || '',
+          brand: p.brand || inputs.preferredPanelBrand || '',
+          count: p.quantity ?? 0,
+          warranty: p.productWarrantyYears
+            ? `${p.productWarrantyYears} Years Product`
+            : p.performanceWarrantyYears
+            ? `${p.performanceWarrantyYears} Years Performance`
+            : '',
+        };
+        if (p.isDcr) {
+          dcrPanels = panelSpec;
+        } else {
+          nonDcrPanels = panelSpec;
+        }
+      }
+    } else {
+      // Fallback to inputs-based panel specs
+      const dcrPref = inputs.dcrPreference;
+      if (dcrPref !== DcrPreference.NON_DCR_ONLY && inputs.dcrSystemSizeKw) {
+        dcrPanels = {
+          technology: inputs.preferredPanelTechnology || '',
+          brand: inputs.preferredPanelBrand || '',
+          count: inputs.manualDcrPanelCount ?? 0,
+          warranty: '',
+        };
+      }
+      if (dcrPref !== DcrPreference.DCR_ONLY && inputs.nonDcrSystemSizeKw) {
+        nonDcrPanels = {
+          technology: inputs.preferredPanelTechnology || '',
+          brand: inputs.preferredPanelBrand || '',
+          count: inputs.manualNonDcrPanelCount ?? 0,
+          warranty: '',
+        };
+      }
     }
 
-    // Non-DCR panels — only when the quote includes a non-DCR component
-    if (dcrPref !== DcrPreference.DCR_ONLY && inputs.nonDcrSystemSizeKw) {
-      nonDcrPanels = {
-        technology: inputs.preferredPanelTechnology || '',
-        brand: inputs.preferredPanelBrand || '',
-        count: inputs.manualNonDcrPanelCount ?? 0,
-        warranty: '',
-      };
-    }
-
-    // Inverter — derived from quote inputs
-    if (capacity > 0) {
+    // 2. Inverters — derived from calculation if present
+    if (calculation?.inverters?.inverters?.length) {
+      const items = calculation.inverters.inverters.map((inv, idx) => ({
+        brand: inv.brand || inputs.preferredInverterBrand || '',
+        capacity: `${Number(inv.capacityKw || 0).toFixed(2)} kW`,
+        quantity: `${inv.quantity} Unit${inv.quantity > 1 ? 's' : ''}`,
+        name: inv.name || `Inverter ${idx + 1}`,
+        warranty: inv.productWarrantyYears
+          ? `${inv.productWarrantyYears} Years Product`
+          : '',
+      }));
       inverter = {
-        capacity: `${capacity.toFixed(2)} kW`,
-        quantity: inputs.manualInverterCount
-          ? `${inputs.manualInverterCount} Unit${
-              inputs.manualInverterCount > 1 ? 's' : ''
-            }`
-          : '1 Unit',
+        inverters: items,
         phaseType: inputs.phaseType || '',
-        brand: inputs.preferredInverterBrand || '',
+        totalCapacity: `${Number(calculation.inverters.totalCapacityKw || 0).toFixed(2)} kW`,
+      };
+    } else if (capacity > 0) {
+      // Fallback to inputs-based inverter specs
+      inverter = {
+        inverters: [
+          {
+            brand: inputs.preferredInverterBrand || '',
+            capacity: `${Number(capacity || 0).toFixed(2)} kW`,
+            quantity: inputs.manualInverterCount
+              ? `${inputs.manualInverterCount} Unit${
+                  inputs.manualInverterCount > 1 ? 's' : ''
+                }`
+              : '1 Unit',
+            name: 'Inverter 1',
+            warranty: '',
+          },
+        ],
+        phaseType: inputs.phaseType || '',
+        totalCapacity: `${Number(capacity || 0).toFixed(2)} kW`,
       };
     }
 
-    // Mounting structure — from quote inputs
+    // 3. Mounting structure — from quote inputs
     if (inputs.structureType) {
       structure = {
         structureType: inputs.structureType,
@@ -247,7 +286,8 @@ export function useProjectLogic() {
     structure,
   };
 
-  const handleBack = () => navigation.navigate(Route.HOME_TAB as any);
+  const handleBack = () =>
+    navigation.navigate(Route.MAIN_TABS, { screen: Route.HOME_TAB });
   const handleContactTeam = () => {
     if (activeProperty?.project?.id) {
       navigation.navigate(Route.PROJECT_TEAM, {
@@ -263,7 +303,6 @@ export function useProjectLogic() {
 
   return {
     activeProject,
-    isOnboarding,
     isLoading,
     isError,
     refetch,

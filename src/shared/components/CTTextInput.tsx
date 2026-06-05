@@ -9,7 +9,7 @@
 
 import React from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Platform } from 'react-native';
 import { HelperText, TextInput } from 'react-native-paper';
 import type { Props as PaperTextInputProps } from 'react-native-paper/lib/typescript/components/TextInput/TextInput';
 
@@ -28,6 +28,8 @@ export interface CTTextInputProps
   helperText?: string;
   /** Outer container style */
   containerStyle?: StyleProp<ViewStyle>;
+  /** Optional custom background color to override the default (surfaceVariant for flat, theme.colors.background for outlined) */
+  backgroundColor?: string;
 }
 
 export function CTTextInput({
@@ -36,6 +38,7 @@ export function CTTextInput({
   helperText,
   containerStyle,
   style,
+  backgroundColor,
   ...rest
 }: CTTextInputProps) {
   const theme = useAppTheme();
@@ -50,6 +53,15 @@ export function CTTextInput({
 
   const activeColor = statusColors[status];
 
+  // Resolve background color:
+  // - If outlined: we need a solid background for the label mask to prevent border line crossing.
+  // - If flat: standard is surfaceVariant.
+  const resolvedBgColor =
+    backgroundColor ??
+    (variant === 'outlined'
+      ? theme.colors.background
+      : theme.colors.surfaceVariant);
+
   return (
     <View style={[styles.container, containerStyle]}>
       <TextInput
@@ -62,11 +74,51 @@ export function CTTextInput({
         activeUnderlineColor={activeColor}
         underlineColor={theme.colors.outline}
         outlineStyle={styles.outline}
+        theme={{
+          ...rest.theme,
+          colors: {
+            ...rest.theme?.colors,
+            background: resolvedBgColor,
+          },
+        }}
         style={[
           styles.input,
-          { backgroundColor: theme.colors.surfaceVariant },
+          rest.multiline
+            ? {
+                textAlignVertical:
+                  rest.numberOfLines && rest.numberOfLines > 1
+                    ? 'top'
+                    : 'center',
+                minHeight: rest.dense ? 36 : 40,
+              }
+            : { textAlignVertical: 'center' },
           style,
         ]}
+        contentStyle={
+          rest.multiline
+            ? [
+                {
+                  paddingTop:
+                    Platform.OS === 'ios'
+                      ? rest.dense
+                        ? 6
+                        : 10
+                      : rest.dense
+                      ? 6
+                      : 8,
+                  paddingBottom:
+                    Platform.OS === 'ios'
+                      ? rest.dense
+                        ? 6
+                        : 10
+                      : rest.dense
+                      ? 6
+                      : 8,
+                },
+                rest.contentStyle,
+              ]
+            : rest.contentStyle
+        }
         {...rest}
       />
       {helperText ? (

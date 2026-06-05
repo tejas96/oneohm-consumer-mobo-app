@@ -28,7 +28,7 @@ export function PortfolioOverview({ aggregates, t }: PortfolioOverviewProps) {
       <View style={styles.statsGrid}>
         <CTCard variant="glass" style={styles.statsCard}>
           <Text style={[styles.statsValue, { color: theme.colors.primary }]}>
-            {aggregates.totalCapacity.toFixed(2)} kW
+            {Number(aggregates.totalCapacity || 0).toFixed(2)} kW
           </Text>
           <Text
             style={[
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     marginBottom: spacing.md,
     opacity: 0.5,
+    textAlign: 'center',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -103,6 +104,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
     marginBottom: spacing['2xs'],
+    textAlign: 'center',
   },
   statsLabel: {
     fontSize: fontSize.micro,

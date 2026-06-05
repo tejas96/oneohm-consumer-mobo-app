@@ -9,7 +9,13 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
-import { spacing, fontWeight, useAppTheme } from '@/shared/theme';
+import {
+  spacing,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  useAppTheme,
+} from '@/shared/theme';
 import { TimelineNode } from './TimelineNode';
 import type { PaymentMilestone } from '../hooks/usePayment';
 
@@ -17,7 +23,7 @@ interface TimelineTrackerProps {
   milestones: PaymentMilestone[];
   expandedTerms: Record<number, boolean>;
   onToggleTerm: (id: number) => void;
-  formatCurrency: (value: number) => string;
+  formatCurrency: (value?: number | null) => string;
 }
 
 export function TimelineTracker({
@@ -40,6 +46,17 @@ export function TimelineTracker({
       >
         {t('payments.tracker')}
       </Text>
+
+      {milestones.length === 0 ? (
+        <Text
+          style={[
+            styles.emptyTimeline,
+            { color: theme.colors.onSurfaceVariant },
+          ]}
+        >
+          {t('payments.emptyTimeline')}
+        </Text>
+      ) : null}
 
       {/* Timeline Nodes List Container */}
       <View style={styles.timelineList}>
@@ -76,10 +93,16 @@ const styles = StyleSheet.create({
     paddingBottom: spacing['3xl'],
   },
   sectionTitle: {
-    fontSize: 10,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 1,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  emptyTimeline: {
+    fontSize: fontSize.body,
+    lineHeight: lineHeight.body,
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
   },

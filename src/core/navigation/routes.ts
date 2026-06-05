@@ -34,8 +34,8 @@ export enum Route {
   DOCUMENTS = 'Documents',
   PAYMENTS = 'Payments',
   SUPPORT = 'Support',
-  WARRANTY = 'Warranty',
   PROJECT_TEAM = 'ProjectTeam',
+  PROJECT_CHAT = 'ProjectChat',
 
   // ── Customer Flow (resolver + journey screens) ──
   // Mount point: CustomerFlowResolver replaces MAIN_TABS as the first

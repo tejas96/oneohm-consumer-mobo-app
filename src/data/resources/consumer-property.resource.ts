@@ -28,6 +28,7 @@ export function useCustomerProperties(options?: QueryOptions) {
     enabled: (options?.enabled ?? true) && isAuthenticated,
     staleTime: 0,
     refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
     meta: options?.meta,
   });
 }

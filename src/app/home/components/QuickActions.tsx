@@ -8,20 +8,22 @@ import {
 import { IconButton, Text } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
-import { spacing, fontWeight, useAppTheme } from '@/shared/theme';
+import { spacing, fontSize, fontWeight, useAppTheme } from '@/shared/theme';
 
 interface QuickActionsProps {
-  onDocumentsPress: () => void;
+  onQuotationsPress: () => void;
   onSupportPress: () => void;
-  onWarrantyPress: () => void;
   onTeamPress: () => void;
+  onChatPress: () => void;
+  hasUnreadChat?: boolean;
 }
 
 export function QuickActions({
-  onDocumentsPress,
+  onQuotationsPress,
   onSupportPress,
-  onWarrantyPress,
   onTeamPress,
+  onChatPress,
+  hasUnreadChat,
 }: QuickActionsProps) {
   const { t } = useTranslation();
   const theme = useAppTheme();
@@ -41,10 +43,10 @@ export function QuickActions({
       color: theme.colors.primary, // Accessible green in light mode
     },
     {
-      label: t('dashboard.actions.documents'),
-      sublabel: t('dashboard.actions.documentsSub'),
+      label: t('dashboard.actions.quotations'),
+      sublabel: t('dashboard.actions.quotationsSub'),
       icon: 'file-document-outline',
-      onPress: onDocumentsPress,
+      onPress: onQuotationsPress,
       color: theme.colors.brandBlue, // Accessible blue in light mode
     },
     {
@@ -55,11 +57,11 @@ export function QuickActions({
       color: theme.colors.brandPurple, // Accessible purple in light mode
     },
     {
-      label: t('dashboard.actions.properties'),
-      sublabel: t('dashboard.actions.propertiesSub'),
-      icon: 'home-outline',
-      onPress: onWarrantyPress,
-      color: theme.colors.brandGray, // Dynamic gray
+      label: t('dashboard.actions.chat'),
+      sublabel: t('dashboard.actions.chatSub'),
+      icon: 'chat-outline',
+      onPress: onChatPress,
+      color: theme.colors.warningAccent, // Beautiful warm orange/gold
     },
   ];
 
@@ -118,6 +120,14 @@ export function QuickActions({
                 {item.sublabel}
               </Text>
             </View>
+            {item.icon === 'chat-outline' && hasUnreadChat ? (
+              <View
+                style={[
+                  styles.unreadDot,
+                  { backgroundColor: theme.colors.error },
+                ]}
+              />
+            ) : null}
           </TouchableOpacity>
         ))}
       </View>
@@ -131,7 +141,7 @@ const styles = StyleSheet.create({
     marginVertical: spacing.md,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
     textTransform: 'uppercase',
     letterSpacing: 1.2,
@@ -166,11 +176,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 11,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
   },
   sublabel: {
-    fontSize: 9,
-    marginTop: 2,
+    fontSize: fontSize.xs,
+    marginTop: spacing.micro,
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: spacing.md,
+    right: spacing.md,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
 });

@@ -25,6 +25,8 @@ jest.mock('react-native-svg', () => {
     Defs: MockSvg,
     LinearGradient: MockSvg,
     Stop: MockSvg,
+    Mask: MockSvg,
+    Path: MockSvg,
   };
 });
 
@@ -73,5 +75,43 @@ jest.mock('@react-native-firebase/messaging', () => {
     __esModule: true,
     default: messaging,
     getMessaging: jest.fn(() => mockMessagingInstance),
+  };
+});
+
+// React Native Reanimated mock
+jest.mock('react-native-reanimated', () => {
+  return {
+    __esModule: true,
+    default: {
+      createAnimatedComponent: component => component,
+    },
+    useSharedValue: val => ({ value: val }),
+    useAnimatedProps: cb => cb(),
+    useFrameCallback: jest.fn(),
+  };
+});
+
+// React Native Worklets mock
+jest.mock('react-native-worklets', () => {
+  return {
+    Worklets: {
+      createRunOnJS: fn => fn,
+      createRunOnWorklet: fn => fn,
+    },
+    createSerializable: val => val,
+  };
+});
+
+// React Native Blob Util mock
+jest.mock('react-native-blob-util', () => {
+  return {
+    default: {
+      fs: {
+        dirs: {
+          DocumentDir: '',
+          DownloadDir: '',
+        },
+      },
+    },
   };
 });

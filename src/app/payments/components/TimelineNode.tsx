@@ -16,7 +16,13 @@ import {
 import { Text, IconButton } from 'react-native-paper';
 
 import { useTranslation } from '@/core/i18n';
-import { spacing, fontWeight, useAppTheme } from '@/shared/theme';
+import {
+  spacing,
+  fontSize,
+  lineHeight,
+  fontWeight,
+  useAppTheme,
+} from '@/shared/theme';
 import { CTChip, CTProgressBar } from '@/shared/components';
 import type { PaymentMilestone } from '../hooks/usePayment';
 
@@ -35,15 +41,8 @@ interface TimelineNodeProps {
   milestone: PaymentMilestone;
   isExpanded: boolean;
   onToggle: () => void;
-  formatCurrency: (value: number) => string;
+  formatCurrency: (value?: number | null) => string;
 }
-
-// Component-level layout & typography tokens
-const TEXT_MICRO_SIZE = 9;
-const TEXT_SMALL_SIZE = 9.5;
-const TEXT_CAPTION_SIZE = 10;
-const TEXT_TITLE_SIZE = 12;
-const TEXT_SUBSIDY_SIZE = 11;
 
 const LOCK_ICON_SIZE = 16;
 const CHEVRON_ICON_SIZE = 18;
@@ -73,8 +72,16 @@ export function TimelineNode({
     infoBulletKeys,
   } = milestone;
 
+  const hasDetails =
+    (installments && installments.length > 0) ||
+    (infoBulletKeys && infoBulletKeys.length > 0) ||
+    !!infoTextKey;
+
   // LayoutAnimation triggered on accordion state changes
   const handlePress = () => {
+    if (!hasDetails) {
+      return;
+    }
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     onToggle();
   };
@@ -146,8 +153,8 @@ export function TimelineNode({
               borderColor: getCardBorderColor(),
             },
           ]}
-          onPress={handlePress}
-          activeOpacity={0.9}
+          onPress={hasDetails ? handlePress : undefined}
+          activeOpacity={hasDetails ? 0.9 : 1.0}
         >
           {/* Header row */}
           <View style={styles.cardHeader}>
@@ -157,7 +164,7 @@ export function TimelineNode({
                   style={[styles.termName, { color: theme.colors.onSurface }]}
                   numberOfLines={1}
                 >
-                  {t(nameKey)}
+                  {milestone.label ?? t(nameKey)}
                 </Text>
                 <CTChip
                   status={statusChip.status}
@@ -286,19 +293,19 @@ export function TimelineNode({
                   iconColor={theme.colors.iconMuted}
                   style={styles.lockIcon}
                 />
-              ) : (
+              ) : hasDetails ? (
                 <IconButton
                   icon={isExpanded ? 'chevron-up' : 'chevron-down'}
                   size={CHEVRON_ICON_SIZE}
                   iconColor={theme.colors.iconMuted}
                   style={styles.chevronIcon}
                 />
-              )}
+              ) : null}
             </View>
           </View>
 
           {/* Collapsible details */}
-          {isExpanded && status !== 'LOCKED' && (
+          {isExpanded && status !== 'LOCKED' && hasDetails && (
             <View
               style={[
                 styles.detailsBlock,
@@ -370,7 +377,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   termName: {
-    fontSize: TEXT_TITLE_SIZE,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
     flexShrink: 1,
   },
@@ -378,39 +385,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: spacing.xs,
     flexWrap: 'wrap',
   },
   targetLabel: {
-    fontSize: TEXT_SMALL_SIZE,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.semibold,
   },
   dueLabel: {
-    fontSize: TEXT_CAPTION_SIZE,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.black,
   },
   receivedLabel: {
-    fontSize: TEXT_CAPTION_SIZE,
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.bold,
   },
   subsidyRecovery: {
-    fontSize: TEXT_SUBSIDY_SIZE,
+    fontSize: fontSize.caption,
     fontWeight: fontWeight.bold,
   },
   progressBar: {
-    marginTop: 8,
+    marginTop: spacing.xs,
   },
   deadlineText: {
-    fontSize: TEXT_MICRO_SIZE,
+    fontSize: fontSize.xs,
     fontWeight: fontWeight.medium,
-    marginTop: 8,
+    marginTop: spacing.xs,
   },
   chevronWrapper: {
     flexDirection: 'column',
     alignItems: 'flex-end',
     justifyContent: 'center',
     marginLeft: spacing.xs,
-    gap: 4,
+    gap: spacing['2xs'],
   },
   chevronIcon: {
     margin: 0,
@@ -426,17 +433,17 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   messageText: {
-    fontSize: TEXT_CAPTION_SIZE,
-    lineHeight: 15,
+    fontSize: fontSize.micro,
+    lineHeight: lineHeight.caption,
   },
   instBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
+    paddingHorizontal: spacing['2xs'] + 2,
+    paddingVertical: spacing.micro,
+    borderRadius: spacing['2xs'] + 2,
     borderWidth: HAIRLINE_BORDER,
   },
   instBadgeText: {
-    fontSize: TEXT_MICRO_SIZE - 0.5, // 8.5
+    fontSize: fontSize.micro,
     fontWeight: fontWeight.semibold,
   },
   statusChip: {
@@ -448,10 +455,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statusChipText: {
-    fontSize: TEXT_MICRO_SIZE - 0.5, // 8.5
-    lineHeight: 10,
+    fontSize: fontSize.micro,
+    lineHeight: lineHeight.micro,
     marginVertical: 0,
-    marginHorizontal: 4,
+    marginHorizontal: spacing['2xs'],
     padding: 0,
   },
 });

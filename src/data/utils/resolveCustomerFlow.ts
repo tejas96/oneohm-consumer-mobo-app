@@ -5,16 +5,17 @@
  * the resolver should route to. Called by the CustomerFlowResolver gate (T6).
  *
  * Decision order (§2.2):
- *   1. isLoading or selectedPropertyId === null  → 'resolving'
+ *   1. isLoading                                 → 'resolving'
  *   2. isError                                   → 'error'
- *   3. 0 properties                              → 'no_property'
- *   4. >1 property AND no selection ('none'/stale id) → 'select_property'
- *   5. activeProperty has no quotes              → 'no_quotation'
- *   6. accepted quote exists:
+ *   3. 0 properties                              → 'no_property' (no selection needed)
+ *   4. selectedPropertyId === null               → 'resolving' (store hydrating)
+ *   5. >1 property AND no selection ('none'/stale id) → 'select_property'
+ *   6. quotationView.allQuotes.length === 0      → 'no_quotation'
+ *   7. quotationView.mode === 'read_only':
  *        property.project present                → 'project_active'
  *        property.project absent                 → 'project_pending'
- *   7. all quotes rejected/expired               → 'all_rejected'
- *   8. otherwise (quote sent/viewed/draft)       → 'quotation_active'
+ *   8. quotationView.mode === 'all_rejected'     → 'all_rejected'
+ *   9. otherwise (interactive)                   → 'quotation_active'
  *
  * Pure & deterministic: no API calls, no store reads, no side effects.
  *
@@ -26,22 +27,21 @@ import type {
   CustomerFlowInput,
   CustomerFlowState,
 } from '@/data/types/customer-journey.types';
-import type { Quote } from '@/data/types/project.types';
-
-const INACTIVE_STATUSES = new Set(['rejected', 'expired']);
-
-function quoteStatus(q: Quote): string {
-  return String(q.status).toLowerCase();
-}
 
 export function resolveCustomerFlow(
   input: CustomerFlowInput,
 ): CustomerFlowState {
-  const { isLoading, isError, properties, selectedPropertyId, activeProperty } =
-    input;
+  const {
+    isLoading,
+    isError,
+    properties,
+    selectedPropertyId,
+    activeProperty,
+    quotationView,
+  } = input;
 
-  // 1. Still hydrating / loading
-  if (isLoading || selectedPropertyId === null) {
+  // 1. Properties query or selection store still loading
+  if (isLoading) {
     return 'resolving';
   }
 
@@ -50,12 +50,17 @@ export function resolveCustomerFlow(
     return 'error';
   }
 
-  // 3. Customer has no properties yet
+  // 3. Customer has no properties yet (selection id may still be null)
   if (properties.length === 0) {
     return 'no_property';
   }
 
-  // 4. Multiple properties and none explicitly selected
+  // 4. Selection store not hydrated yet (only matters when properties exist)
+  if (selectedPropertyId === null) {
+    return 'resolving';
+  }
+
+  // 5. Multiple properties and none explicitly selected
   //    (selectedPropertyId 'none' = explicit deselect; stale id = selection
   //    that no longer matches any loaded property)
   const selectionIsValid =
@@ -74,29 +79,24 @@ export function resolveCustomerFlow(
     return 'resolving';
   }
 
-  const quotes = activeProperty.quotes ?? [];
-
-  // 5. No quotations on this property yet
-  if (quotes.length === 0) {
+  // 6. No quotations on this property yet
+  if (quotationView.allQuotes.length === 0) {
     return 'no_quotation';
   }
 
-  const hasAcceptedQuote = quotes.some(q => quoteStatus(q) === 'accepted');
-
-  // 6. An accepted quote exists — route on whether project was created yet
-  if (hasAcceptedQuote) {
+  // 7. An accepted quote exists — route on whether project was created yet
+  if (quotationView.mode === 'read_only') {
     return activeProperty.project !== undefined &&
       activeProperty.project !== null
       ? 'project_active'
       : 'project_pending';
   }
 
-  // 7. Every quote is rejected or expired
-  const allInactive = quotes.every(q => INACTIVE_STATUSES.has(quoteStatus(q)));
-  if (allInactive) {
+  // 8. Every quote is rejected or expired
+  if (quotationView.mode === 'all_rejected') {
     return 'all_rejected';
   }
 
-  // 8. At least one live quote (sent / viewed / draft)
+  // 9. At least one live quote (interactive mode)
   return 'quotation_active';
 }

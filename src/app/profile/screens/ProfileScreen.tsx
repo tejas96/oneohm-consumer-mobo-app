@@ -6,9 +6,9 @@
 
 import React, { useRef } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { Text, Portal, Snackbar, IconButton } from 'react-native-paper';
+import { Text, Portal, Snackbar } from 'react-native-paper';
 
-import { ScreenWrapper, CTCard } from '@/shared/components';
+import { ScreenWrapper } from '@/shared/components';
 import {
   spacing,
   fontSize,
@@ -43,13 +43,11 @@ export function ProfileScreen() {
     setLanguage,
     selectedProjectId,
     activeProject,
-    isOnboarding,
+    hasActiveProject,
     projects,
     isLoading,
     aggregates,
-    navigateToNotifications,
-    navigateToSupport,
-    navigateToWarranty,
+    navigateToTeam,
     handleSwitchProject,
   } = useProfileLogic();
 
@@ -110,42 +108,16 @@ export function ProfileScreen() {
         />
 
         {/* Active Project breakdown details list */}
-        {isOnboarding ? (
-          <CTCard
-            variant="glass"
-            style={styles.noticeCard}
-            innerStyle={styles.noticeCardInner}
-          >
-            <IconButton
-              icon="information-outline"
-              iconColor={theme.colors.warningText}
-              size={24}
-              style={[
-                styles.noticeIconBg,
-                { backgroundColor: theme.colors.warningBg },
-              ]}
-            />
-            <Text
-              style={[
-                styles.noticeText,
-                { color: theme.colors.onSurfaceVariant },
-              ]}
-            >
-              Technical specifications and property details will populate here
-              once project onboarding is complete.
-            </Text>
-          </CTCard>
-        ) : (
-          <ActiveProjectDetails activeProject={activeProject as any} t={t} />
-        )}
+        {activeProject ? (
+          <ActiveProjectDetails activeProject={activeProject} t={t} />
+        ) : null}
 
-        {/* Settings options list (Notifications, Support, Warranty, Logout) */}
+        {/* Settings options list (Notifications, Support, Logout) */}
         <AccountSettings
-          navigateToNotifications={navigateToNotifications}
-          navigateToSupport={navigateToSupport}
-          navigateToWarranty={navigateToWarranty}
+          navigateToTeam={navigateToTeam}
           logout={logout}
           t={t}
+          hasActiveProject={hasActiveProject}
         />
 
         {/* Footer Version Info */}

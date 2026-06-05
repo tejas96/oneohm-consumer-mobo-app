@@ -1,4 +1,4 @@
-export { ScreenWrapper } from './ScreenWrapper';
+export { ScreenWrapper, ScreenWrapperContext } from './ScreenWrapper';
 export { LoadingOverlay } from './LoadingOverlay';
 export { ThemeToggleButton } from './ThemeToggleButton';
 export { CTTabBar } from './CTTabBar';
@@ -18,10 +18,15 @@ export { CTProgressCircle } from './CTProgressCircle';
 export { CTStateWrapper } from './CTStateWrapper';
 export { CTOnboardingPlaceholder } from './CTOnboardingPlaceholder';
 export { CTPremiumHeader } from './CTPremiumHeader';
-export { PropertySwitcherBottomSheet } from './PropertySwitcherBottomSheet';
+export {
+  PropertySwitcherBottomSheet,
+  type PropertySwitcherBottomSheetRef,
+} from './PropertySwitcherBottomSheet';
+export { PropertyContextHeader } from './PropertyContextHeader';
 export { ForceUpdateScreen } from './ForceUpdateScreen';
 export { MaintenanceScreen } from './MaintenanceScreen';
 export { RecommendedUpdateSheet } from './RecommendedUpdateSheet';
+export { ErrorBoundary } from './ErrorBoundary';
 
 // Type exports
 export type { CTButtonProps } from './CTButton';
@@ -43,3 +48,5 @@ export type {
   CTPremiumHeaderProps,
   ActiveProjectSummary,
 } from './CTPremiumHeader';
+export type { PropertyContextHeaderProps } from './PropertyContextHeader';
+export type { ErrorBoundaryProps } from './ErrorBoundary';

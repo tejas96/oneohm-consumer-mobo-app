@@ -65,6 +65,8 @@ export const API_ENDPOINTS = {
     TEAM: (id: string) => `/projects/${id}/customer-team`,
     /** POST — Submit feedback for a team member */
     FEEDBACK: (id: string) => `/projects/${id}/team/feedback`,
+    /** GET & POST — Get project chat messages / Send message */
+    CHAT: (id: string) => `/projects/${id}/chat`,
   },
 
   // ============================================
@@ -73,16 +75,41 @@ export const API_ENDPOINTS = {
   CONSUMER: {
     /** GET — Logged-in customer's properties (quotes + project eager-loaded) */
     PROPERTIES: '/consumer/properties',
-  },
-
-  // ============================================
-  // CUSTOMER PROPERTIES
-  // ============================================
-  CUSTOMER_PROPERTIES: {
-    /** GET — Get properties for logged in customer */
-    MY_PROPERTIES: '/customer-properties/my-properties',
-    /** GET — Get property by ID */
-    GET: (id: string) => `/customer-properties/${id}`,
+    /** Customer-safe quotation routes (T9 backend) */
+    QUOTATIONS: {
+      /** GET — List quotations for an owned property */
+      BY_PROPERTY: (propertyId: string) =>
+        `/consumer/properties/${propertyId}/quotations`,
+      /** GET — Single quotation by ID */
+      DETAIL: (quotationId: string) => `/consumer/quotations/${quotationId}`,
+      /** POST — Accept quotation (requires customerSignature) */
+      ACCEPT: (quotationId: string) =>
+        `/consumer/quotations/${quotationId}/accept`,
+      /** POST — Reject quotation (requires rejectionReason) */
+      REJECT: (quotationId: string) =>
+        `/consumer/quotations/${quotationId}/reject`,
+    },
+    /** Customer-safe project routes (T14 backend) */
+    PROJECT: {
+      /** GET — Project for an owned property (null if pre-conversion) */
+      BY_PROPERTY: (propertyId: string) =>
+        `/consumer/properties/${propertyId}/project`,
+      /** GET — Project dashboard / summary analytics */
+      DASHBOARD: (projectId: string) =>
+        `/consumer/projects/${projectId}/dashboard`,
+      /** GET — Payment terms / receipt ledger breakdown */
+      PAYMENTS: (projectId: string) =>
+        `/consumer/projects/${projectId}/payments`,
+      /** GET — Financial summary (ledger + quote contract) */
+      FINANCIAL_SUMMARY: (projectId: string) =>
+        `/consumer/projects/${projectId}/financial-summary`,
+      /** GET — Installation milestone timeline */
+      TIMELINE: (projectId: string) =>
+        `/consumer/projects/${projectId}/timeline`,
+      /** GET — Project documents */
+      DOCUMENTS: (projectId: string) =>
+        `/consumer/projects/${projectId}/documents`,
+    },
   },
 
   // ============================================
