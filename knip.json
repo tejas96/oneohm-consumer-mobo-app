@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "index.js",
+    "App.tsx",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js",
+    "jest.setup.js",
+    "react-native.config.js",
+    "scripts/**/*.{js,ts,mjs,cjs}",
+    "__tests__/**/*.{ts,tsx,js}",
+    "src/**/*.test.{ts,tsx}"
+  ],
+  "project": ["src/**/*.{ts,tsx,js,jsx}", "*.{js,ts}"],
+  "ignore": [
+    "android/**",
+    "ios/**",
+    "vendor/**",
+    "patches/**",
+    "coverage/**",
+    "**/*.d.ts"
+  ]
+}
