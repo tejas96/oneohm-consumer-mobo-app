@@ -40,35 +40,6 @@ export async function getItem(key: string): Promise<string | null> {
 }
 
 /**
- * Store a JSON-serializable value.
- */
-export async function setJSON<T>(key: string, value: T): Promise<void> {
-  try {
-    await AsyncStorage.setItem(key, JSON.stringify(value));
-  } catch (error: unknown) {
-    if (__DEV__) {
-      console.error(`[AppStorage] Failed to set JSON "${key}":`, error);
-    }
-  }
-}
-
-/**
- * Retrieve and parse a JSON value.
- */
-export async function getJSON<T>(key: string): Promise<T | null> {
-  try {
-    const raw = await AsyncStorage.getItem(key);
-    if (raw === null) return null;
-    return JSON.parse(raw) as T;
-  } catch (error: unknown) {
-    if (__DEV__) {
-      console.error(`[AppStorage] Failed to parse JSON "${key}":`, error);
-    }
-    return null;
-  }
-}
-
-/**
  * Remove a single item.
  */
 export async function removeItem(key: string): Promise<void> {
@@ -77,19 +48,6 @@ export async function removeItem(key: string): Promise<void> {
   } catch (error: unknown) {
     if (__DEV__) {
       console.error(`[AppStorage] Failed to remove "${key}":`, error);
-    }
-  }
-}
-
-/**
- * Clear all app storage. Use with caution.
- */
-export async function clearAll(): Promise<void> {
-  try {
-    await AsyncStorage.clear();
-  } catch (error: unknown) {
-    if (__DEV__) {
-      console.error('[AppStorage] Failed to clear all:', error);
     }
   }
 }

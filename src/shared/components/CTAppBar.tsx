@@ -16,7 +16,7 @@ import { Appbar } from 'react-native-paper';
 
 import { fontSize, fontWeight, spacing, useAppTheme } from '@/shared/theme';
 
-export interface CTAppBarAction {
+interface CTAppBarAction {
   /** Material icon name or custom icon source */
   icon: string;
   onPress: () => void;

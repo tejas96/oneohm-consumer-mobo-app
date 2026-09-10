@@ -7,11 +7,13 @@
  * Decision rules (§2.4):
  *   1. If an accepted quote exists → read_only mode, that quote is active,
  *      all actions disabled.
- *   2. If every quote is rejected or expired → all_rejected mode, no active
- *      quote, no actions.
- *   3. Otherwise → interactive mode; active quote = latest non-rejected,
- *      non-expired quote (by createdAt desc). canAccept only when no accepted
- *      quote already exists and target is not rejected/expired.
+ *   2. If every quote is rejected, expired or withdrawn → all_rejected mode,
+ *      no active quote, no actions.
+ *   3. Otherwise → interactive mode; active quote = latest live quote (by
+ *      createdAt desc). canAccept only when no accepted quote already exists
+ *      and the target is still live.
+ *
+ * "Dead" throughout means rejected, expired, or voided - see `isDead`.
  *
  * Pure & deterministic: no API calls, no store reads, no side effects.
  *
@@ -23,6 +25,22 @@ import type { Quote } from '@/data/types/project.types';
 import type { QuotationView } from '@/data/types/customer-journey.types';
 
 const INACTIVE_STATUSES = new Set(['rejected', 'expired']);
+
+/**
+ * A quote nothing can be done with any more.
+ *
+ * `voidedAt` sits alongside the dead statuses rather than inside them because
+ * voiding deliberately leaves `status` alone - a withdrawn quote still reads
+ * `sent`, or even `accepted`. Reading only `status` would show the customer a
+ * live-looking price with working Accept and Reject buttons that the API then
+ * refuses, which is the exact dead end this field exists to prevent.
+ */
+function isDead(quote: Quote): boolean {
+  return (
+    Boolean(quote.voidedAt) ||
+    INACTIVE_STATUSES.has(String(quote.status).toLowerCase())
+  );
+}
 
 /** Sort quotes newest-first by createdAt. Mutates a copy — never the original. */
 function sortNewestFirst(quotes: Quote[]): Quote[] {
@@ -45,7 +63,11 @@ export function resolveQuotationView(quotes: Quote[]): QuotationView {
   const sorted = sortNewestFirst(quotes);
   const status = (q: Quote): string => String(q.status).toLowerCase();
 
-  const acceptedQuote = sorted.find(q => status(q) === 'accepted') ?? null;
+  // A voided accepted quote no longer locks anything - cancelling the project
+  // is what voids it, and that releases the property. So `read_only` has to
+  // mean a LIVE acceptance, the same test the API applies.
+  const acceptedQuote =
+    sorted.find(q => status(q) === 'accepted' && !isDead(q)) ?? null;
 
   // Rule 1: accepted quote wins
   if (acceptedQuote !== null) {
@@ -58,9 +80,9 @@ export function resolveQuotationView(quotes: Quote[]): QuotationView {
     };
   }
 
-  const allInactive = sorted.every(q => INACTIVE_STATUSES.has(status(q)));
+  const allInactive = sorted.every(isDead);
 
-  // Rule 2: all rejected/expired
+  // Rule 2: all rejected, expired or withdrawn
   if (allInactive) {
     return {
       mode: 'all_rejected',
@@ -71,12 +93,10 @@ export function resolveQuotationView(quotes: Quote[]): QuotationView {
     };
   }
 
-  // Rule 3: interactive — pick latest quote that is not rejected/expired
-  const latestActive =
-    sorted.find(q => !INACTIVE_STATUSES.has(status(q))) ?? null;
+  // Rule 3: interactive — pick latest quote that is still alive
+  const latestActive = sorted.find(q => !isDead(q)) ?? null;
 
-  const canActOn = (q: Quote | null): boolean =>
-    q !== null && !INACTIVE_STATUSES.has(status(q));
+  const canActOn = (q: Quote | null): boolean => q !== null && !isDead(q);
 
   return {
     mode: 'interactive',

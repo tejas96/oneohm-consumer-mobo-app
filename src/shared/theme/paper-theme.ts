@@ -295,6 +295,3 @@ export type AppTheme = typeof darkPaperTheme;
 export function useAppTheme(): AppTheme {
   return useTheme<MD3Theme>() as unknown as AppTheme;
 }
-
-// Legacy alias kept for any remaining references during migration
-export const paperTheme = darkPaperTheme;

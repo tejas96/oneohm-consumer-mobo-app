@@ -13,9 +13,3 @@ export interface TeamMember {
   rating: number; // Running average score
   reviewCount: number; // Number of reviews submitted
 }
-
-export interface FeedbackSubmission {
-  memberId: string;
-  rating: number;
-  comment: string;
-}

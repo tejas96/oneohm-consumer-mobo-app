@@ -8,7 +8,7 @@
  * Dependency direction: data/services, data/query-keys, core/auth
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useAuthStore } from '@/core/auth';
 import type { OtpRequestPayload, OtpVerifyPayload } from '@/core/auth';
@@ -16,7 +16,7 @@ import { FcmManager } from '@/core/notifications';
 
 import { authKeys } from '../query-keys';
 import { AuthService } from '../services';
-import type { MutationOptions, QueryOptions } from '../types';
+import type { MutationOptions } from '../types';
 
 /**
  * Hook to request an OTP for a phone number.
@@ -50,42 +50,6 @@ export function useVerifyOtp(options?: MutationOptions) {
 
       // Asynchronously trigger FCM setup & token sync for the newly logged in user
       FcmManager.requestPermissions();
-    },
-    meta: options?.meta,
-  });
-}
-
-/**
- * Hook to get the current authenticated user.
- */
-export function useCurrentUser(options?: QueryOptions) {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-
-  return useQuery({
-    queryKey: authKeys.currentUser(),
-    queryFn: () => AuthService.getCurrentUser(),
-    enabled: (options?.enabled ?? true) && isAuthenticated,
-    meta: options?.meta,
-  });
-}
-
-/**
- * Hook to logout the current user.
- */
-export function useLogout(options?: MutationOptions) {
-  const queryClient = useQueryClient();
-  const logout = useAuthStore(state => state.logout);
-
-  return useMutation({
-    mutationFn: () => AuthService.logout(),
-    onSuccess: async () => {
-      await logout();
-      queryClient.clear();
-    },
-    onError: async () => {
-      // Even if the server-side logout fails, clear local state
-      await logout();
-      queryClient.clear();
     },
     meta: options?.meta,
   });

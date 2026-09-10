@@ -86,26 +86,3 @@ export async function secureClear(service: string): Promise<boolean> {
     return false;
   }
 }
-
-/**
- * Check if biometric authentication is available on the device.
- */
-export async function isBiometricSupported(): Promise<boolean> {
-  try {
-    const biometryType = await Keychain.getSupportedBiometryType();
-    return biometryType !== null;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Get the available biometry type (Face ID, Touch ID, Fingerprint, etc.)
- */
-export async function getBiometryType(): Promise<Keychain.BIOMETRY_TYPE | null> {
-  try {
-    return await Keychain.getSupportedBiometryType();
-  } catch {
-    return null;
-  }
-}

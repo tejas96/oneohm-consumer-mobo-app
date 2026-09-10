@@ -46,7 +46,7 @@ export type AuthStackParamList = {
 };
 
 /** Params passed to the OTP screen */
-export interface OtpParams {
+interface OtpParams {
   phone: string;
 }
 
@@ -76,13 +76,13 @@ export type MainStackParamList = {
 };
 
 /** Params for viewing a single quotation's details */
-export interface QuotationDetailParams {
+interface QuotationDetailParams {
   quotationId: string;
   propertyId: string;
 }
 
 /** Params for the quotation list (all quotes for a property) */
-export interface QuotationListParams {
+interface QuotationListParams {
   propertyId: string;
 }
 

@@ -120,5 +120,3 @@ export const API_ENDPOINTS = {
     VERSION_CHECK: '/app-config/version-check',
   },
 } as const;
-
-export type ApiEndpointModule = keyof typeof API_ENDPOINTS;

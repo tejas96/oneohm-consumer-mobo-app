@@ -12,26 +12,6 @@
 // Pagination
 // ============================================
 
-/** Standard pagination parameters for list endpoints */
-export interface PaginationParams {
-  page?: number;
-  limit?: number;
-}
-
-/** Pagination metadata returned by the backend */
-export interface PaginationMeta {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-/** Standard paginated response wrapper */
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: PaginationMeta;
-}
-
 // ============================================
 // Query Options
 // ============================================

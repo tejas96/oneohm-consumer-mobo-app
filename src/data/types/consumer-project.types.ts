@@ -15,7 +15,7 @@ import type { ProjectStatus, PropertyType } from './project.types';
 // ============================================
 
 /** Nested property DTO returned inside ConsumerProject */
-export interface ConsumerProjectProperty {
+interface ConsumerProjectProperty {
   id: string;
   propertyName?: string;
   propertyType?: PropertyType;
@@ -28,7 +28,7 @@ export interface ConsumerProjectProperty {
 }
 
 /** Panel configuration from quote snapshot */
-export interface ConsumerProjectPanelConfig {
+interface ConsumerProjectPanelConfig {
   name: string;
   brand: string;
   isDcr: boolean;
@@ -40,7 +40,7 @@ export interface ConsumerProjectPanelConfig {
 }
 
 /** Inverter configuration from quote snapshot */
-export interface ConsumerProjectInverterConfig {
+interface ConsumerProjectInverterConfig {
   name: string;
   brand: string;
   capacityKw: number;
@@ -52,7 +52,7 @@ export interface ConsumerProjectInverterConfig {
  * Full project detail — matches backend ProjectResponseDto.
  * Returned by GET /consumer/properties/:propertyId/project
  */
-export interface ConsumerProject {
+interface ConsumerProject {
   id: string;
   propertyId: string;
   property: ConsumerProjectProperty;
@@ -93,13 +93,13 @@ export interface ConsumerProjectResponse {
 // GET /consumer/projects/:projectId/dashboard
 // ============================================
 
-export interface DashboardUpcomingDeadline {
+interface DashboardUpcomingDeadline {
   id: string;
   name: string;
   endDate: string;
 }
 
-export interface DashboardMetrics {
+interface DashboardMetrics {
   totalTasks: number;
   completedTasks: number;
   inProgressTasks: number;
@@ -110,7 +110,7 @@ export interface DashboardMetrics {
   upcomingDeadlines: DashboardUpcomingDeadline[];
 }
 
-export interface DashboardActivityItem {
+interface DashboardActivityItem {
   taskId: string;
   taskCode: string;
   taskName: string;
@@ -123,7 +123,7 @@ export interface DashboardActivityItem {
   createdAt: string;
 }
 
-export interface DashboardTeamWorkload {
+interface DashboardTeamWorkload {
   userId: string;
   userName: string;
   tasksByStatus: Record<string, number>;
@@ -132,7 +132,7 @@ export interface DashboardTeamWorkload {
   workloadPercent: number;
 }
 
-export interface DashboardMilestoneProgress {
+interface DashboardMilestoneProgress {
   name: string;
   order: number;
   totalTasks: number;
@@ -159,14 +159,14 @@ export interface ConsumerProjectDashboard {
 // GET /consumer/projects/:projectId/payments
 // ============================================
 
-export type ConsumerPaymentTermStatus =
+type ConsumerPaymentTermStatus =
   | 'pending'
   | 'partial'
   | 'paid'
   | 'waived'
   | 'cancelled';
 
-export interface ConsumerPayment {
+interface ConsumerPayment {
   id: string;
   paymentNumber: string;
   paidAmount: number;
@@ -211,7 +211,7 @@ export interface ConsumerFinancialSummary {
 // GET /consumer/projects/:projectId/timeline
 // ============================================
 
-export interface ConsumerTimelineMilestone {
+interface ConsumerTimelineMilestone {
   name: string;
   order: number;
   totalTasks: number;

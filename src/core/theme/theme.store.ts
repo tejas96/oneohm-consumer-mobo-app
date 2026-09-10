@@ -14,7 +14,7 @@ import { create } from 'zustand';
 import { getItem, setItem } from '@/core/storage/app.storage';
 import { STORAGE_KEYS } from '@/core/config/constants';
 
-export type ThemeMode = 'dark' | 'light';
+type ThemeMode = 'dark' | 'light';
 
 interface ThemeState {
   mode: ThemeMode;

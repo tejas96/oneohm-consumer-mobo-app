@@ -25,7 +25,7 @@ import {
 } from '@/shared/theme';
 import { CTButton } from './CTButton';
 
-export type ScreenState = 'success' | 'loading' | 'error' | 'empty';
+type ScreenState = 'success' | 'loading' | 'error' | 'empty';
 
 export interface CTStateWrapperProps {
   /** The current state of the screen wrapper */

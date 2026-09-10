@@ -24,9 +24,7 @@ export const defaultScreenOptions: NativeStackNavigationOptions = {
  * Per-screen option overrides.
  * Only add entries here when a screen needs to deviate from defaults.
  */
-export const screenConfigs: Partial<
-  Record<Route, NativeStackNavigationOptions>
-> = {
+const screenConfigs: Partial<Record<Route, NativeStackNavigationOptions>> = {
   [Route.ONBOARDING]: {
     animation: 'fade',
   },
