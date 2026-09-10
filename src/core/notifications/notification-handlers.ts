@@ -10,7 +10,7 @@
 import { CommonActions } from '@react-navigation/native';
 
 // Custom payload types sent by Firebase Console / Admin SDK
-export interface NotificationPayload {
+interface NotificationPayload {
   routeType?: 'PROJECT_DETAIL' | 'SUPPORT_TICKET' | 'PAYMENT_RECEIPT';
   projectId?: string;
   ticketId?: string;

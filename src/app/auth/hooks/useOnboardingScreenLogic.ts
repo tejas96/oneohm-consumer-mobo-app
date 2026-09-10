@@ -17,7 +17,7 @@ import { useTranslation } from '@/core/i18n';
 
 export const TOTAL_SLIDES = 5;
 
-export interface OnboardingSlideData {
+interface OnboardingSlideData {
   title: string;
   subtitle: string;
   accentColor: string;

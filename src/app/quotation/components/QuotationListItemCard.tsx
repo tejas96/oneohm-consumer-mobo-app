@@ -92,10 +92,7 @@ export function QuotationListItemCard({
             {formatQuoteDate(quote.createdAt)}
           </Text>
         </View>
-        <QuotationStatusChip
-          status={String(quote.status)}
-          voidedAt={quote.voidedAt}
-        />
+        <QuotationStatusChip status={String(quote.status)} />
       </View>
 
       <View

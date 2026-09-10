@@ -8,25 +8,6 @@
  * Dependency direction: None (leaf node)
  */
 
-/** Default pagination settings */
-export const PAGINATION = {
-  DEFAULT_PAGE: 1,
-  DEFAULT_LIMIT: 20,
-  MAX_LIMIT: 100,
-} as const;
-
-/** HTTP status codes for reference in interceptors/error handling */
-export const HTTP_STATUS = {
-  OK: 200,
-  CREATED: 201,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  RATE_LIMITED: 429,
-  INTERNAL_ERROR: 500,
-} as const;
-
 /** Keychain service identifiers for secure storage */
 export const KEYCHAIN = {
   AUTH_SERVICE: 'com.oneohm.consumer.auth',

@@ -9,21 +9,13 @@ import type {
   Quote as SharedQuote,
   QuoteVersion as SharedQuoteVersion,
   ProjectStatus,
-  PropertyStatus,
   PropertyType,
   PricingBreakdown,
   QuoteSnapshot,
   PaymentMilestone,
 } from '@tejas96/shared';
 
-export type {
-  ProjectStatus,
-  PropertyStatus,
-  PropertyType,
-  PricingBreakdown,
-  QuoteSnapshot,
-  PaymentMilestone,
-};
+export type { ProjectStatus, PropertyType, PricingBreakdown };
 
 export interface CustomerProperty
   extends Omit<SharedCustomerProperty, 'project' | 'quotes'> {
@@ -41,7 +33,7 @@ export interface CustomerProperty
 }
 
 /** Flat fields from consumer QuoteResponseDto (latest version) when versions are omitted */
-export interface ConsumerQuoteFlatFields {
+interface ConsumerQuoteFlatFields {
   quoteNumber?: string;
   validUntil?: string;
   systemType?: string;
@@ -108,22 +100,4 @@ export interface Project {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
-}
-
-export type MilestoneDisplayStatus =
-  | 'pending'
-  | 'in_progress'
-  | 'completed'
-  | 'blocked'
-  | 'no_tasks';
-
-export interface MilestoneAggregateItem {
-  name: string;
-  order: number;
-  totalTasks: number;
-  completedTasks: number;
-  inProgressTasks: number;
-  blockedTasks: number;
-  percent: number;
-  status: MilestoneDisplayStatus;
 }
