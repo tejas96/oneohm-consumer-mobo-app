@@ -101,8 +101,6 @@ async function del<T>(
 // Export
 // ============================================
 
-export { apiClient };
-
 export const api = {
   get,
   post,

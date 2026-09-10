@@ -7,15 +7,4 @@
  * Layer: shared/utils
  */
 
-export {
-  formatCurrency,
-  formatCurrencyCompact,
-  formatDate,
-  formatNumber,
-  formatPhoneForDisplay,
-  formatRelativeDate,
-  formatTimeAgo,
-  getFullName,
-  getInitials,
-  normalizePhoneToE164,
-} from '@tejas96/shared';
+export { formatCurrency, normalizePhoneToE164 } from '@tejas96/shared';

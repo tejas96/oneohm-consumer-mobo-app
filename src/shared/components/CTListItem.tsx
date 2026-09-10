@@ -20,7 +20,7 @@ import {
   useAppTheme,
 } from '@/shared/theme';
 
-export interface CTListItemLeftIcon {
+interface CTListItemLeftIcon {
   /** Material icon name */
   name: string;
   /** Icon tint color (defaults to theme.colors.primary) */

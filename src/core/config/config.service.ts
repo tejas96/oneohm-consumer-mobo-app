@@ -206,9 +206,3 @@ class ConfigService {
 }
 
 export const configService = new ConfigService();
-
-/**
- * Frozen configurations instance.
- * Preserves the exact signature of legacy imports.
- */
-export const config = configService.getAll();

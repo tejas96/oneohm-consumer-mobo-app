@@ -16,7 +16,7 @@ import {
 import type { CustomerFlowState } from '@/data/types/customer-journey.types';
 import { spacing } from '@/shared/theme';
 
-export type InterimFlowState = Exclude<
+type InterimFlowState = Exclude<
   CustomerFlowState,
   'resolving' | 'project_active'
 >;

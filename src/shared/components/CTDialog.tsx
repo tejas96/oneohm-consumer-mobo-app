@@ -26,7 +26,7 @@ import {
 import { CTButton } from './CTButton';
 import type { CTButtonProps } from './CTButton';
 
-export interface CTDialogAction {
+interface CTDialogAction {
   label: string;
   onPress: () => void;
   /** CTButton variant — defaults to 'ghost' for cancel, 'primary' for confirm */

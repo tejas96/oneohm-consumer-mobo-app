@@ -10,7 +10,7 @@
 
 import type { Quote } from '@/data/types/project.types';
 
-export function filterConsumerVisibleQuotes(quotes: Quote[]): Quote[] {
+function filterConsumerVisibleQuotes(quotes: Quote[]): Quote[] {
   return quotes.filter(q => String(q.status).toLowerCase() !== 'draft');
 }
 

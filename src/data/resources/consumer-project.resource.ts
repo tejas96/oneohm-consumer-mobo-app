@@ -23,25 +23,6 @@ const CONSUMER_QUERY_FRESHNESS = {
 };
 
 /**
- * Hook to fetch the project for an owned property.
- *
- * Returns { project: ConsumerProject | null }.
- * When project is null, the property has not been converted yet (pre-conversion).
- * Used by the flow resolver to decide project_pending vs project_active.
- */
-export function useCustomerProject(propertyId: string, options?: QueryOptions) {
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-
-  return useQuery({
-    queryKey: consumerKeys.projectByProperty(propertyId),
-    queryFn: () => ConsumerProjectService.getProjectByProperty(propertyId),
-    enabled: (options?.enabled ?? true) && isAuthenticated && !!propertyId,
-    ...CONSUMER_QUERY_FRESHNESS,
-    meta: options?.meta,
-  });
-}
-
-/**
  * Hook to fetch the project dashboard / summary analytics.
  *
  * Returns ConsumerProjectDashboard with metrics, task breakdowns,

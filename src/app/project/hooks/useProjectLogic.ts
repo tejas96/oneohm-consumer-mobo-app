@@ -39,7 +39,7 @@ export interface PanelSpecs {
   warranty: string;
 }
 
-export interface InverterItem {
+interface InverterItem {
   brand: string;
   capacity: string;
   quantity: string;

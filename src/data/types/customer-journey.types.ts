@@ -77,7 +77,7 @@ export interface CustomerFlowInput {
  * - read_only    : an accepted quote exists — actions disabled
  * - all_rejected : every quote is rejected/expired — show Call OneOhm
  */
-export type QuotationViewMode = 'interactive' | 'read_only' | 'all_rejected';
+type QuotationViewMode = 'interactive' | 'read_only' | 'all_rejected';
 
 /**
  * Output of resolveQuotationView(). Consumed by quotation screens (T11–T14).

@@ -106,8 +106,6 @@ export const colors = {
   },
 } as const;
 
-export type ColorTheme = typeof colors;
-
 /**
  * Converts a hex color string to rgba format with the specified opacity.
  *
