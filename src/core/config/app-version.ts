@@ -10,7 +10,7 @@
 import { Platform } from 'react-native';
 
 /** Current app version — must match package.json version */
-export const APP_VERSION = '0.3.0';
+export const APP_VERSION = '0.1.7';
 
 /** App type identifier for the backend version check API */
 export const APP_TYPE = 'consumer' as const;
